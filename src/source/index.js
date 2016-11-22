@@ -1,0 +1,78 @@
+/**
+ * Download source from given URL via ytdl or return local file.
+ * @module boram/source
+ */
+
+import {basename} from "path";
+import React from "react";
+import {useSheet} from "../jss";
+import Source from "./source";
+import Format from "./format";
+import Download from "./download";
+import ShowHide from "../show-hide";
+
+@useSheet({
+  source: {
+    display: "flex",
+    height: "100%",
+    alignItems: "center",
+  },
+})
+export default class extends React.Component {
+  state = {}
+  componentWillMount() {
+    if (BORAM_DEBUG) {
+      let info = process.env.BORAM_DEBUG_INFO;
+      const source = process.env.BORAM_DEBUG_SOURCE;
+      if (info) {
+        info = require("fs").readFileSync(info, {encoding: "utf-8"});
+        this.handleInfoLoad(JSON.parse(info));
+      } else if (source) {
+        this.handleSourceLoad({path: require("path").resolve(source)});
+      }
+    }
+  }
+  handleSourceLoad = (source) => {
+    this.props.onTabTitle(basename(source.path));
+    this.props.onLoad(source);
+  }
+  handleInfoLoad = (info) => {
+    this.props.onTabTitle(info.title);
+    this.setState({info});
+  }
+  handleFormatLoad = (format) => {
+    this.setState({format});
+  }
+  handleCancel = () => {
+    this.props.onTabTitle();
+    this.setState({info: null, format: null});
+  }
+  render() {
+    const {classes} = this.sheet;
+    return (
+      <div className={classes.source}>
+        <ShowHide show={!this.state.info}>
+          <Source
+            onInfo={this.handleInfoLoad}
+            onSource={this.handleSourceLoad}
+          />
+        </ShowHide>
+        <ShowHide show={!!this.state.info && !this.state.format}>
+          <Format
+            info={this.state.info}
+            onLoad={this.handleFormatLoad}
+            onCancel={this.handleCancel}
+          />
+        </ShowHide>
+        <ShowHide show={!!this.state.format}>
+          <Download
+            info={this.state.info}
+            format={this.state.format}
+            onLoad={this.props.onLoad}
+            onCancel={this.handleCancel}
+          />
+        </ShowHide>
+      </div>
+    );
+  }
+}
