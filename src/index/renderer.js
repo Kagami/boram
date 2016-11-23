@@ -9,6 +9,9 @@ import injectTapEventPlugin from "react-tap-event-plugin";
 import jss from "../jss";
 import {MuiThemeProvider, BACKGROUND_COLOR} from "../theme";
 import MainTabs from "../main-tabs";
+import "file!./roboto-light.ttf";
+import "file!./roboto-regular.ttf";
+import "file!./roboto-medium.ttf";
 
 // Global styles.
 jss.createStyleSheet({
@@ -17,8 +20,36 @@ jss.createStyleSheet({
     fontSize: "18px",
     backgroundColor: BACKGROUND_COLOR,
   },
+  "@font-face": [{
+    fontFamily: "'Roboto'",
+    fontStyle: "normal",
+    fontWeight: "300",
+    src: [
+      "local('Roboto Light')",
+      "local('Roboto-Light')",
+      "url(roboto-light.ttf) format('truetype')",
+    ],
+  }, {
+    fontFamily: "'Roboto'",
+    fontStyle: "normal",
+    fontWeight: "400",
+    src: [
+      "local('Roboto')",
+      "local('Roboto-Regular')",
+      "url(roboto-regular.ttf) format('truetype')",
+    ],
+  }, {
+    fontFamily: "'Roboto'",
+    fontStyle: "normal",
+    fontWeight: "500",
+    src: [
+      "local('Roboto Medium')",
+      "local('Roboto-Medium')",
+      "url(roboto-medium.ttf) format('truetype')",
+    ],
+  }],
   "body, input": {
-    fontFamily: "Roboto, sans-serif",
+    fontFamily: "'Roboto', sans-serif",
   },
   "input, select:focus, button:focus": {
     outline: "none",
