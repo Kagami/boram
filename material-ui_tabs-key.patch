@@ -1,0 +1,36 @@
+diff --git a/node_modules/material-ui/Tabs/Tab.js b/node_modules/material-ui/Tabs/Tab.js
+index e0fd233..5f965c0 100644
+--- a/node_modules/material-ui/Tabs/Tab.js
++++ b/node_modules/material-ui/Tabs/Tab.js
+@@ -103,7 +103,7 @@ var Tab = function (_Component) {
+           style = _props.style,
+           value = _props.value,
+           width = _props.width,
+-          other = (0, _objectWithoutProperties3.default)(_props, ['icon', 'index', 'onActive', 'onTouchTap', 'selected', 'label', 'style', 'value', 'width']);
++          other = (0, _objectWithoutProperties3.default)(_props, ['icon', 'index', 'onActive', 'onTouchTap', 'selected', 'label', 'style', 'value', 'width', 'tabKey']);
+ 
+ 
+       var styles = getStyles(this.props, this.context);
+diff --git a/node_modules/material-ui/Tabs/Tabs.js b/node_modules/material-ui/Tabs/Tabs.js
+index 98e821a..d13e7be 100644
+--- a/node_modules/material-ui/Tabs/Tabs.js
++++ b/node_modules/material-ui/Tabs/Tabs.js
+@@ -202,14 +202,16 @@ var Tabs = function (_Component) {
+ 
+         process.env.NODE_ENV !== "production" ? (0, _warning2.default)(!tabValue || tab.props.value !== undefined, 'Material-UI: Tabs value prop has been passed, but Tab ' + index + '\n        does not have a value prop. Needs value if Tabs is going\n        to be a controlled component.') : void 0;
+ 
++        let key = tab.props.tabKey;
++        key = key == null ? index : key;
+         tabContent.push(tab.props.children ? (0, _react.createElement)(tabTemplate || _TabTemplate2.default, {
+-          key: index,
++          key,
+           selected: _this2.getSelected(tab, index),
+           style: tabTemplateStyle
+         }, tab.props.children) : undefined);
+ 
+         return (0, _react.cloneElement)(tab, {
+-          key: index,
++          key,
+           index: index,
+           selected: _this2.getSelected(tab, index),
+           width: width + '%',
