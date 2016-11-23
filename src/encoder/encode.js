@@ -39,6 +39,10 @@ class Output extends React.PureComponent {
   componentDidMount() {
     this.scrollToEnd();
   }
+  componentWillUpdate() {
+    const {scrollHeight, scrollTop, clientHeight} = this.refs.out;
+    this.atEnd = scrollHeight - scrollTop <= clientHeight;
+  }
   componentDidUpdate() {
     this.scrollToEnd();
   }
@@ -48,17 +52,9 @@ class Output extends React.PureComponent {
       this.refs.out.scrollTop = this.refs.out.scrollHeight;
     }
   }
-  handleScroll = () => {
-    const {scrollHeight, scrollTop, clientHeight} = this.refs.out;
-    this.atEnd = scrollHeight - scrollTop <= clientHeight;
-  };
   render() {
     const {classes} = this.sheet;
-    return (
-      <pre ref="out" className={classes.output} onScroll={this.handleScroll}>
-        {this.props.value}
-      </pre>
-    );
+    return <pre ref="out" className={classes.output}>{this.props.value}</pre>;
   }
 }
 
