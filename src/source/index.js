@@ -53,6 +53,7 @@ export default class extends React.Component {
       <div className={classes.source}>
         <ShowHide show={!this.state.info}>
           <Source
+            events={this.props.events}
             onInfo={this.handleInfoLoad}
             onSource={this.handleSourceLoad}
           />
@@ -66,6 +67,7 @@ export default class extends React.Component {
         </ShowHide>
         <ShowHide show={!!this.state.format}>
           <Download
+            events={this.props.events}
             info={this.state.info}
             format={this.state.format}
             onLoad={this.props.onLoad}

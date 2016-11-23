@@ -3,6 +3,7 @@
  * @module boram/main-tabs
  */
 
+import {remote} from "electron";
 import React from "react";
 import cx from "classnames";
 import Icon from "react-fa";
@@ -61,15 +62,20 @@ const KEY_9 = 57;
 })
 export default class extends React.Component {
   state = {tabs: [], tabIndex: 0}
-  tabKey = 0
   componentWillMount() {
     this.addTab();
   }
   componentDidMount() {
+    window.addEventListener("beforeunload", this.handleGlobalClose, false);
     document.addEventListener("keydown", this.handleGlobaKey, false);
   }
   componentWillUnmount() {
     document.removeEventListener("keydown", this.handleGlobaKey, false);
+    window.removeEventListener("beforeunload", this.handleGlobalClose, false);
+  }
+  tabKey = 0
+  getInstance(i) {
+    return this.refs[`instance${i}`];
   }
   addTab(label = DEFAULT_LABEL) {
     const tabs = this.state.tabs;
@@ -77,6 +83,24 @@ export default class extends React.Component {
     tabs.push({key, label});
     this.setState({tabs});
   }
+  handleGlobalClose = (e) => {
+    if (!BORAM_DEBUG) {
+      const choice = remote.dialog.showMessageBox({
+        title: "Confirm",
+        message: "Close all tabs and quit?",
+        buttons: ["OK", "Cancel"],
+      });
+      // TODO(Kagami): Doesn't work reliable right now, see
+      // <https://github.com/electron/electron/issues/7977>.
+      if (choice !== 0) {
+        e.returnValue = false;
+        return;
+      }
+    }
+    for (let i = 0; i < this.state.tabs.length; i++) {
+      this.getInstance(i).cleanup();
+    }
+  };
   handleGlobaKey = (e) => {
     if (e.keyCode >= KEY_0 && e.keyCode <= KEY_9 && e.altKey) {
       let tabIndex = e.keyCode - KEY_0;
@@ -91,7 +115,7 @@ export default class extends React.Component {
     tabs[i].label = label;
     this.setState({tabs});
   };
-  handleSelect = (tabIndex, e) => {
+  handleSelect = (tabIndex) => {
     this.setState({tabIndex});
   };
   handleNew = (e) => {
@@ -102,6 +126,14 @@ export default class extends React.Component {
   };
   handleClose = (i, e) => {
     e.stopPropagation();
+    if (this.state.tabs.length <= 1) return remote.getCurrentWindow().close();
+    const choice = remote.dialog.showMessageBox({
+      title: "Confirm",
+      message: "Close tab?",
+      buttons: ["OK", "Cancel"],
+    });
+    if (choice !== 0) return;
+    this.getInstance(i).cleanup();
     const tabs = this.state.tabs;
     tabs.splice(i, 1);
     let tabIndex = this.state.tabIndex;
@@ -115,7 +147,8 @@ export default class extends React.Component {
       <div className={classes.label}>
         {label}
         <Icon
-          name="remove"
+          name="close"
+          title="Close tab"
           className={classes.icon}
           onTouchTap={this.handleClose.bind(null, i)}
         />
@@ -161,6 +194,7 @@ export default class extends React.Component {
           disableTouchRipple
         >
           <Instance
+            ref={`instance${i}`}
             active={this.state.tabIndex === i}
             onTabTitle={this.handleTitleChange.bind(null, i)}
           />

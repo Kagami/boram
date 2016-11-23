@@ -68,6 +68,12 @@ export default class extends React.PureComponent {
       overflow: "hidden",
     },
   }
+  constructor(props) {
+    super(props);
+    this.props.events.on("cleanup", () => {
+      this.cancel();
+    });
+  }
   state = {progress: 0, log: ""};
   getOutput() {
     return (this.props.encoding || this.state.output || this.state.encodeError)
@@ -181,9 +187,9 @@ export default class extends React.PureComponent {
     };
     const run = (args) => {
       handleLog(this.showArgs(args));
-      const result = FFmpeg._run(args, handleLog);
-      this.ffchild = result.child;
-      return result;
+      const ff = FFmpeg._run(args, handleLog);
+      this.ffchild = ff.child;
+      return ff;
     };
     /* eslint-enable no-use-before-define */
 

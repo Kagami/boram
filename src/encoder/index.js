@@ -59,7 +59,6 @@ export default class extends React.Component {
       height: "100%",
     },
   }
-
   state = {
     encoding: false,
     allValid: true,
@@ -78,7 +77,6 @@ export default class extends React.Component {
     modeCRF: false,
     rawArgs: "",
   }
-
   componentDidMount() {
     this.handleAll();
   }
@@ -587,7 +585,6 @@ export default class extends React.Component {
           inkBarStyle={styles.inkBar}
           contentContainerClassName={classes.tabContentOuter}
           tabTemplateStyle={styles.tabContent}
-          initialSelectedIndex={4}
         >
           <Tab className={classes.tab} label="info">
             <Info
@@ -642,6 +639,7 @@ export default class extends React.Component {
           <Tab className={classes.tab} label="encode">
             <Encode
               ref="encode"
+              events={this.props.events}
               source={this.props.source}
               encoding={this.state.encoding}
               allValid={this.state.allValid}

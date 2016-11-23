@@ -4,7 +4,7 @@
  */
 
 import tmp from "tmp";
-import {app, BrowserWindow} from "electron";
+import {BrowserWindow, app} from "electron";
 import pkg from "json!../../package.json";
 import "file!./index.html";
 import "file!./icon.png";

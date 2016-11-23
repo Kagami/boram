@@ -142,8 +142,11 @@ export function clearOpt(arr, key) {
 }
 
 export function tryRun(fn, arg, def) {
+  const args = arguments.length > 1
+    ? (Array.isArray(arg) ? arg : [arg])
+    : [];
   try {
-    return fn(arg);
+    return fn(...args);
   } catch (e) {
     return def;
   }
