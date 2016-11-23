@@ -16,7 +16,6 @@ import FlatButton from "material-ui/FlatButton";
 import SelectField from "material-ui/SelectField";
 import RaisedButton from "material-ui/RaisedButton";
 import LinearProgress from "material-ui/LinearProgress";
-import CircularProgress from "material-ui/CircularProgress";
 import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 import {useSheet} from "../jss";
 // Reexport stuff.
@@ -25,9 +24,7 @@ export {Tabs, Tab};
 export {MenuItem};
 export {TextField};
 export {FlatButton};
-export {RaisedButton};
 export {LinearProgress};
-export {CircularProgress};
 export {MuiThemeProvider};
 
 // Some theme constants.
@@ -251,6 +248,7 @@ export const SmallButton = (function() {
     return (
       <RaisedButton
         {...props}
+        secondary
         style={style}
         buttonStyle={styles.button}
         labelStyle={styles.label}
@@ -286,6 +284,7 @@ export const BigButton = (function() {
     return (
       <RaisedButton
         {...props}
+        secondary
         style={style}
         buttonStyle={styles.button}
         labelStyle={styles.label}

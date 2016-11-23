@@ -6,15 +6,12 @@
 import React from "react";
 import FFprobe from "../ffprobe";
 import {useSheet} from "../jss";
-import {CircularProgress, RaisedButton} from "../theme";
+import {BigButton} from "../theme";
 import ShowHide from "../show-hide";
 import {showErr} from "../util";
 
 @useSheet({
-  header: {
-    marginBottom: 30,
-  },
-  progress: {
+  info: {
     position: "absolute",
     top: 0,
     bottom: 0,
@@ -52,17 +49,13 @@ export default class extends React.Component {
   render() {
     const {classes} = this.sheet;
     return (
-      <div>
-        <h2 className={classes.header}>Gathering video info</h2>
+      <div className={classes.info}>
         <ShowHide show={!this.state.error}>
-          <div className={classes.progress}>
-            <CircularProgress size={300} thickness={10} />
-          </div>
+          <h2>Gathering video info…</h2>
         </ShowHide>
         <ShowHide show={!!this.state.error}>
           <div className={classes.error}>{showErr(this.state.error)}</div>
-          <RaisedButton
-            secondary
+          <BigButton
             label="Cancel"
             onClick={this.props.onCancel}
           />

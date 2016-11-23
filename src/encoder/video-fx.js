@@ -42,7 +42,6 @@ export default class extends React.PureComponent {
             onCheck={this.props.makeChecker("deinterlace")}
           />
           {/*<SmallButton
-            secondary
             label="detect"
             style={{marginLeft: 0}}
             />*/}
@@ -85,7 +84,6 @@ export default class extends React.PureComponent {
             onBlur={this.props.onUpdate}
           />
           {/*<SmallButton
-            secondary
             label="detect"
           />*/}
         </Prop>
@@ -123,7 +121,6 @@ export default class extends React.PureComponent {
           )}
           </SmallSelect>
           {/*<SmallButton
-            secondary
             icon={<BoldIcon name="folder-open-o" />}
             title="Load external subtitle"
           />*/}

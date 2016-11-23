@@ -274,7 +274,6 @@ export default class extends React.PureComponent {
         <Pane space={5}>
           <div>
             <BigButton
-              secondary
               icon={<Icon name="tv" />}
               title="Make fast preview encode and play it"
               disabled={!this.props.allValid || this.props.encoding}
@@ -282,14 +281,12 @@ export default class extends React.PureComponent {
             />
             <Sep margin={2.5} />
             <BigButton
-              secondary
               icon={<Icon name="files-o" />}
               title="Open new tab for this source"
               onClick={this.handleNewTab}
             />
             <Sep margin={2.5} />
             <BigButton
-              secondary
               width={85}
               label={this.props.encoding ? "cancel" : "start"}
               title="Start/stop encoding"
@@ -298,7 +295,6 @@ export default class extends React.PureComponent {
             />
             <Sep margin={2.5} />
             <BigButton
-              secondary
               width={85}
               label="save"
               title="Save result"

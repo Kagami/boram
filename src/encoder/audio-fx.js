@@ -43,7 +43,6 @@ export default class extends React.PureComponent {
           )}
           </SmallSelect>
           {/*<SmallButton
-            secondary
             icon={<BoldIcon name="folder-open-o" />}
             title="Load external subtitle"
           />*/}

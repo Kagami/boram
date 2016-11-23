@@ -10,9 +10,10 @@ export default function(props) {
     Object.assign(style, props.style);
     return <div style={style}>{props.children}</div>;
   } else {
-    if (!props.show) return null;
+    const {show, ...other} = props;
+    if (!show) return null;
     if (React.Children.count(props.children) > 1) {
-      return <div {...props}>{props.children}</div>;
+      return <div {...other}>{props.children}</div>;
     } else {
       return props.children;
     }
