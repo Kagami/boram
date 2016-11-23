@@ -244,8 +244,7 @@ export default class extends React.Component {
       }
     }
     if (opts.speed) {
-      // FIXME(Kagami): Fix duration.
-      // FIXME(Kagami): Fix FPS.
+      // TODO(Kagami): Fix FPS and duration.
       // TODO(Kagami): Does it work with subtitles?
       vfilters.push(`setpts=PTS*${opts.speed}`);
     }
@@ -372,8 +371,8 @@ export default class extends React.Component {
     let croph = getText("videoFX", "croph");
     let cropx = getText("videoFX", "cropx");
     let cropy = getText("videoFX", "cropy");
-    let speed = getText("videoFX", "speed");
-    let fps = getText("videoFX", "fps");
+    let speed = ""; //getText("videoFX", "speed");
+    let fps = ""; //getText("videoFX", "fps");
     const burnSubs = get("burnSubs");
     const strackn = get("strackn");
     // afx.
@@ -443,6 +442,7 @@ export default class extends React.Component {
       // `requireRange` checks for `>=`. Fix this?
       return requireRange(v, 0.001);
     });
+    // TODO(Kagami): accept "num/den" form and abbreviations?
     fps = validate(fps, v => {
       if (!v) return null;
       v = requireFloat(v);

@@ -89,7 +89,7 @@ export default class extends React.PureComponent {
             label="detect"
           />*/}
         </Prop>
-        <Prop name="speed" nameClassName={classes.prop}>
+        {/*<Prop name="speed" nameClassName={classes.prop}>
           <SmallInput
             ref="speed"
             hintText="factor"
@@ -101,7 +101,7 @@ export default class extends React.PureComponent {
             hintText="fps"
             onBlur={this.props.onUpdate}
           />
-        </Prop>
+        </Prop>*/}
         <Prop name="burn subs" nameClassName={classes.prop}>
           <InlineCheckbox
             checked={this.props.burnSubs}
