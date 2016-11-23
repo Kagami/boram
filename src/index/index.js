@@ -16,10 +16,11 @@ if (BORAM_DEBUG) {
 tmp.setGracefulCleanup();
 
 app.on("ready", () => {
-  // TODO(Kagami): minwidth/minheight to avoid layout breakage?
   const win = new BrowserWindow({
     width: 960,
     height: 960,
+    minWidth: 960,
+    minHeight: 960,
     title: `${pkg.name} v${pkg.version}`,
     icon: `${__dirname}/icon.png`,
   });
