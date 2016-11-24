@@ -27,6 +27,7 @@ import {
     height: "100%",
     margin: 0,
     padding: 8,
+    border: "2px solid #ccc",
     overflowY: "scroll",
     fontSize: "14px",
     whiteSpace: "pre-wrap",
@@ -270,7 +271,7 @@ export default class extends React.PureComponent {
   render() {
     const {styles} = this.constructor;
     return (
-      <Pane vertical space={10} style2={styles.output}>
+      <Pane vertical space={5} style2={styles.output}>
         <Pane space={5}>
           <div>
             <BigButton

@@ -21,7 +21,7 @@ export default class extends React.PureComponent {
   render() {
     const {classes} = this.sheet;
     return (
-      <div>
+      <div style={{width: "50%"}}>
         <Prop name="audio track" nameClassName={classes.prop}>
           <InlineCheckbox
             checked={this.props.hasAudio}

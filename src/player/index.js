@@ -531,7 +531,6 @@ class Volume extends React.PureComponent {
     float: "left",
     marginRight: 5,
     border: "1px solid #ccc",
-
     "&:focus": {
       outline: "none",
       borderColor: "#000",

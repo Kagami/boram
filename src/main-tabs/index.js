@@ -21,6 +21,7 @@ const KEY_9 = 57;
     lineHeight: "40px",
     color: "#fff !important",
     backgroundColor: "#bbb !important",
+    WebkitUserSelect: "none",
     // TODO(Kagami): The only way to style tab header height. See:
     // <https://github.com/callemall/material-ui/issues/5391>.
     // Report that.

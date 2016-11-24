@@ -67,8 +67,7 @@ export const Prop = useSheet({
   },
   name: {
     display: "inline-block",
-    width: 150,
-    minWidth: 150,
+    width: "30%",
     verticalAlign: "middle",
     cursor: "default",
     WebkitUserSelect: "none",
@@ -79,7 +78,7 @@ export const Prop = useSheet({
   value: {
     display: "inline-block",
     color: SECONDARY_COLOR,
-    // maxWidth: 350,
+    maxWidth: "65%",
     overflow: "hidden",
     verticalAlign: "middle",
     textOverflow: "ellipsis",
@@ -233,7 +232,7 @@ export const SmallButton = (function() {
     button: {
       height: 26,
       lineHeight: "26px",
-      backgroundColor: "#bdbdbd",
+      backgroundColor: "#bbb",
       color: "#fff",
       // borderRadius: 0,
     },
@@ -267,7 +266,7 @@ export const BigButton = (function() {
     button: {
       height: 30,
       lineHeight: "30px",
-      backgroundColor: "#bdbdbd",
+      backgroundColor: "#bbb",
       color: "#fff",
       borderRadius: 0,
     },

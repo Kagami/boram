@@ -32,6 +32,7 @@ const MAX_VORBIS_Q = 10;
     height: "100%",
   },
   tab: {
+    WebkitUserSelect: "none",
     "& > div > div": {
       height: "35px !important",
     },
@@ -39,7 +40,7 @@ const MAX_VORBIS_Q = 10;
   tabContentOuter: {
     height: "calc(100% - 35px)",
     boxSizing: "border-box",
-    padding: "10px 15px",
+    padding: "5px 10px",
   },
 })
 export default class extends React.Component {
