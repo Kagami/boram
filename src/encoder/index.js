@@ -5,6 +5,7 @@
 
 import assert from "assert";
 import React from "react";
+import cx from "classnames";
 import {useSheet} from "../jss";
 import {Pane, Tabs, Tab} from "../theme";
 import Player from "../player";
@@ -34,11 +35,17 @@ const MAX_VORBIS_Q = 10;
     height: "100%",
   },
   tab: {
+    color: "#fff !important",
     backgroundColor: "#ccc !important",
+    cursor: "auto !important",
     WebkitUserSelect: "none",
     "& > div > div": {
       height: "35px !important",
     },
+  },
+  activeTab: {
+    color: "#999 !important",
+    backgroundColor: "#eee !important",
   },
   tabContent: {
     flex: 1,
@@ -56,6 +63,7 @@ export default class extends React.PureComponent {
     },
   }
   state = {
+    tabIndex: 0,
     encoding: false,
     allValid: true,
     mstart: 0,
@@ -559,6 +567,9 @@ export default class extends React.PureComponent {
   };
   handleEncoding = (encoding) => {
     this.setState({encoding});
+    if (encoding) {
+      this.refs.player.pause();
+    }
   };
   getTabTemplate({children, selected}) {
     const style = {
@@ -569,12 +580,29 @@ export default class extends React.PureComponent {
     };
     return <div style={style}>{children}</div>;
   }
+  handleSelect = (tabIndex) => {
+    this.setState({tabIndex});
+  };
+  getTabNode(label, index, children) {
+    const {classes} = this.sheet;
+    const active = this.state.tabIndex === index;
+    return (
+      <Tab
+        value={index}
+        label={label}
+        className={cx(classes.tab, active && classes.activeTab)}
+      >
+        {children}
+      </Tab>
+    );
+  }
   render() {
     const {classes} = this.sheet;
     const {styles} = this.constructor;
     return (
       <Pane vertical style1={styles.item1} size2={340}>
         <Player
+          ref="player"
           active={this.props.active}
           source={this.props.source}
           format={this.props.info.format}
@@ -585,12 +613,13 @@ export default class extends React.PureComponent {
           onMarkEnd={this.handleMarkEnd}
         />
         <Tabs
+          onChange={this.handleSelect}
           className={classes.tabs}
           inkBarStyle={{display: "none"}}
           contentContainerClassName={classes.tabContent}
           tabTemplate={this.getTabTemplate}
         >
-          <Tab className={classes.tab} label="info">
+          {this.getTabNode("info", 0,
             <Info
               ref="info"
               format={this.props.info.format}
@@ -599,8 +628,8 @@ export default class extends React.PureComponent {
               stracks={this.getSubTracks()}
               onUpdate={this.handleAll}
             />
-          </Tab>
-          <Tab className={classes.tab} label="video fx">
+          )}
+          {this.getTabNode("video fx", 1,
             <VideoFX
               ref="videoFX"
               makeChecker={this.makeChecker}
@@ -613,8 +642,8 @@ export default class extends React.PureComponent {
               strackn={this.state.strackn}
               onUpdate={this.handleAll}
             />
-          </Tab>
-          <Tab className={classes.tab} label="audio fx">
+          )}
+          {this.getTabNode("audio fx", 2,
             <AudioFX
               ref="audioFX"
               makeChecker={this.makeChecker}
@@ -624,8 +653,8 @@ export default class extends React.PureComponent {
               atrackn={this.state.atrackn}
               onUpdate={this.handleAll}
             />
-          </Tab>
-          <Tab className={classes.tab} label="codecs">
+          )}
+          {this.getTabNode("codecs", 3,
             <Codecs
               ref="codecs"
               makeChecker={this.makeChecker}
@@ -639,8 +668,8 @@ export default class extends React.PureComponent {
               onUpdate={this.handleAll}
               onRawArgs={this.handleRawArgs}
             />
-          </Tab>
-          <Tab className={classes.tab} label="encode">
+          )}
+          {this.getTabNode("encode", 4,
             <Encode
               ref="encode"
               events={this.props.events}
@@ -653,7 +682,7 @@ export default class extends React.PureComponent {
               rawArgs={this.state.rawArgs}
               onEncoding={this.handleEncoding}
             />
-          </Tab>
+          )}
         </Tabs>
       </Pane>
     );

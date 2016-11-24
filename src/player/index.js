@@ -4,8 +4,8 @@
  */
 
 import React from "react";
-import Icon from "react-fa";
 import cx from "classnames";
+import Icon from "react-fa";
 import {useSheet} from "../jss";
 import {parseTime, showTime, parseTimeBase, tryRun} from "../util";
 
@@ -334,9 +334,9 @@ const Controls = useSheet({
     right: 0,
     bottom: 0,
     padding: "5px 0 5px 5px",
-    backgroundColor: "#fff",
-    // border: "solid #ccc",
-    // borderWidth: "1px 0",
+    backgroundColor: "#eee",
+    border: "solid #ccc",
+    borderWidth: "1px 0",
   },
 })(function(props, {classes}) {
   return <div className={classes.controls}>{props.children}</div>;
@@ -347,12 +347,12 @@ const Controls = useSheet({
     cursor: "pointer",
     width: 44,
     padding: 0,
-    lineHeight: "30px",
+    lineHeight: "28px",
     fontSize: "18px",
     // verticalAlign: "middle",
     marginRight: 5,
     border: 0,
-    backgroundColor: "#fff",
+    backgroundColor: "#eee",
     float: "left",
 
     "&:hover:not($pressed)": {
@@ -360,7 +360,7 @@ const Controls = useSheet({
     },
 
     "&:disabled": {
-      backgroundColor: "#fff !important",
+      backgroundColor: "#eee !important",
       opacity: 0.5,
       cursor: "auto",
     },
@@ -523,7 +523,7 @@ class Volume extends React.PureComponent {
 @useSheet({
   time: {
     width: 100,
-    height: 30,
+    height: 28,
     verticalAlign: "top",
     boxSizing: "border-box",
     textAlign: "center",
@@ -531,6 +531,7 @@ class Volume extends React.PureComponent {
     float: "left",
     marginRight: 5,
     border: "1px solid #ccc",
+    backgroundColor: "#f8f8f8",
     "&:focus": {
       outline: "none",
       borderColor: "#000",
@@ -574,10 +575,10 @@ class Time extends React.PureComponent {
   range: {
     display: "block",
     width: "100%",
-    height: 30,
+    height: 28,
     margin: 0,
     cursor: "pointer",
-    backgroundColor: "#fff",
+    backgroundColor: "#eee",
     WebkitAppearance: "none",
 
     "&::-webkit-slider-thumb": {

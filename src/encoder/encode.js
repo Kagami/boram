@@ -81,7 +81,7 @@ export default class extends React.PureComponent {
       ? this.state.log
       : this.props.allValid
         ? "Ready to start."
-        : "Wrong parameters given.";
+        : "Fix invalid settings.";
   }
   /** Fixed arguments being passed to FFmpeg. */
   getCommonArgs() {

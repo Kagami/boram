@@ -117,7 +117,7 @@ export class SmallInput extends React.PureComponent {
   }
   handleKeyDown = (e) => {
     e.nativeEvent.stopImmediatePropagation();
-  }
+  };
   render() {
     const {styles} = this.constructor;
     const {style, ...other} = this.props;
@@ -149,7 +149,7 @@ export class ArgsInput extends React.PureComponent {
   }
   handleKeyDown = (e) => {
     e.nativeEvent.stopImmediatePropagation();
-  }
+  };
   render() {
     return (
       <TextField
@@ -175,7 +175,6 @@ export const SmallSelect = (function() {
       color: SECONDARY_COLOR,
     },
   };
-
   return function(props) {
     const {style, ...other} = props;
     const mainStyle = Object.assign(
@@ -194,29 +193,31 @@ export const SmallSelect = (function() {
   };
 })();
 
-export const InlineCheckbox = useSheet({
-  checkbox: {
-    display: "inline-block !important",
-    width: "auto !important",
-    verticalAlign: "middle",
-  },
-})(function() {
+export const InlineCheckbox = (function() {
   const styles = {
+    checkbox: {
+      display: "inline-block",
+      width: "auto",
+      verticalAlign: "middle",
+    },
     icon: {
       marginRight: COMMON_MARGIN,
     },
   };
-
-  return function(props, {classes}) {
+  function handleKeyDown(e) {
+    e.preventDefault();
+  }
+  return function(props) {
     return (
       <Checkbox
         {...props}
-        className={classes.checkbox}
+        style={styles.checkbox}
         iconStyle={styles.icon}
+        onKeyDown={handleKeyDown}
       />
     );
   };
-}());
+})();
 
 export const SmallButton = (function() {
   const styles = {
@@ -230,23 +231,26 @@ export const SmallButton = (function() {
       lineHeight: "26px",
       backgroundColor: "#bbb",
       color: "#fff",
-      // borderRadius: 0,
     },
     label: {
       fontSize: "inherit",
       textTransform: "none",
     },
   };
-
+  function handleKeyDown(e) {
+    e.preventDefault();
+  }
   return function(props) {
-    const style = Object.assign({}, styles.buttonOuter, props.style);
+    const {style, ...other} = props;
+    const mainStyle = Object.assign({}, styles.buttonOuter, style);
     return (
       <RaisedButton
-        {...props}
+        {...other}
         secondary
-        style={style}
+        style={mainStyle}
         buttonStyle={styles.button}
         labelStyle={styles.label}
+        onKeyDown={handleKeyDown}
       />
     );
   };
@@ -265,18 +269,26 @@ export const BigButton = (function() {
       color: "#fff",
       borderRadius: 0,
     },
+    overlay: {
+      borderRadius: 0,
+    },
   };
-
+  function handleKeyDown(e) {
+    e.preventDefault();
+  }
   return function(props) {
-    const style = Object.assign({
-      width: props.width || "auto",
-    }, styles.buttonOuter, props.style);
+    const {style, width, ...other} = props;
+    const mainStyle = Object.assign({
+      width: width || "auto",
+    }, styles.buttonOuter, style);
     return (
       <RaisedButton
-        {...props}
+        {...other}
         secondary
-        style={style}
+        style={mainStyle}
         buttonStyle={styles.button}
+        overlayStyle={styles.overlay}
+        onKeyDown={handleKeyDown}
       />
     );
   };
@@ -287,7 +299,7 @@ export function BigProgress(props) {
     <LinearProgress
       {...props}
       mode="determinate"
-      style={{height: 30, borderRadius: 0}}
+      style={{height: 30, borderRadius: 0, backgroundColor: "#ccc"}}
     />
   );
 }

@@ -21,6 +21,7 @@ const KEY_9 = 57;
     lineHeight: "40px",
     color: "#fff !important",
     backgroundColor: "#bbb !important",
+    cursor: "auto !important",
     WebkitUserSelect: "none",
     // TODO(Kagami): The only way to style tab header height. See:
     // <https://github.com/callemall/material-ui/issues/5391>.
@@ -47,11 +48,13 @@ const KEY_9 = 57;
     fontSize: "30px",
     lineHeight: "40px",
     marginTop: -1,
+    cursor: "pointer",
   },
   iconNew: {
     fontSize: "30px",
     width: 60,
     lineHeight: "40px",
+    cursor: "pointer",
   },
   tabContent: {
     position: "fixed",
