@@ -5,18 +5,11 @@
 
 import EventEmitter from "events";
 import React from "react";
-import {useSheet} from "../jss";
 import Source from "../source";
 import Info from "../info";
 import Encoder from "../encoder";
 import ShowHide from "../show-hide";
 
-@useSheet({
-  instance: {
-    height: "100%",
-    textAlign: "center",
-  },
-})
 export default class extends React.PureComponent {
   state = {}
   events = new EventEmitter();
@@ -34,9 +27,8 @@ export default class extends React.PureComponent {
     this.setState({source: null, info: null});
   }
   render() {
-    const {classes} = this.sheet;
     return (
-      <div className={classes.instance}>
+      <div style={{height: "100%"}}>
         <ShowHide show={!this.state.source}>
           <Source
             events={this.events}

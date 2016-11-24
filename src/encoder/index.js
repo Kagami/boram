@@ -6,7 +6,7 @@
 import assert from "assert";
 import React from "react";
 import {useSheet} from "../jss";
-import {Tabs, Tab, Pane} from "../theme";
+import {Pane, Tabs, Tab} from "../theme";
 import Player from "../player";
 import Info from "./info";
 import VideoFX from "./video-fx";
@@ -29,35 +29,30 @@ const MAX_VORBIS_Q = 10;
 
 @useSheet({
   tabs: {
+    display: "flex",
+    flexDirection: "column",
     height: "100%",
   },
   tab: {
+    backgroundColor: "#ccc !important",
     WebkitUserSelect: "none",
     "& > div > div": {
       height: "35px !important",
     },
   },
-  tabContentOuter: {
-    height: "calc(100% - 35px)",
+  tabContent: {
+    flex: 1,
+    height: 0,
     boxSizing: "border-box",
     padding: "5px 10px",
   },
 })
-export default class extends React.Component {
+export default class extends React.PureComponent {
   static styles = {
     item1: {
       flex: 1,
       // Workaround window shrink issue.
       minHeight: 0,
-    },
-    tabItem: {
-      backgroundColor: "#ccc",
-    },
-    inkBar: {
-      display: "none",
-    },
-    tabContent: {
-      height: "100%",
     },
   }
   state = {
@@ -565,6 +560,15 @@ export default class extends React.Component {
   handleEncoding = (encoding) => {
     this.setState({encoding});
   };
+  getTabTemplate({children, selected}) {
+    const style = {
+      // XXX(Kagami): Can't use display property because multiline
+      // TextField works badly inside fully hidden divs.
+      overflow: selected ? "visible" : "hidden",
+      height: selected ? "100%" : 0,
+    };
+    return <div style={style}>{children}</div>;
+  }
   render() {
     const {classes} = this.sheet;
     const {styles} = this.constructor;
@@ -582,10 +586,9 @@ export default class extends React.Component {
         />
         <Tabs
           className={classes.tabs}
-          tabItemContainerStyle={styles.tabItem}
-          inkBarStyle={styles.inkBar}
-          contentContainerClassName={classes.tabContentOuter}
-          tabTemplateStyle={styles.tabContent}
+          inkBarStyle={{display: "none"}}
+          contentContainerClassName={classes.tabContent}
+          tabTemplate={this.getTabTemplate}
         >
           <Tab className={classes.tab} label="info">
             <Info

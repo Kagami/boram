@@ -15,17 +15,19 @@ import {
 } from "../theme";
 
 @useSheet({
-  prop: {
+  outer: {
+    height: "100%",
+  },
+  name: {
     lineHeight: "48px",
   },
-  propArgs: {
+  nameArgs: {
     lineHeight: "48px",
     verticalAlign: "top",
     width: "15%",
   },
   valueArgs: {
-    // FIXME(Kagami): Use display flex in <Prop> instead.
-    width: "calc(100% - 150px)",
+    width: "85%",
     maxWidth: "none",
   },
 })
@@ -33,9 +35,9 @@ export default class extends React.PureComponent {
   render() {
     const {classes} = this.sheet;
     return (
-      <div>
+      <div className={classes.outer}>
         <div style={{width: "50%"}}>
-          <Prop name="fragment" nameClassName={classes.prop}>
+          <Prop name="fragment" nameClassName={classes.name}>
             <SmallInput
               ref="start"
               width={75}
@@ -50,7 +52,7 @@ export default class extends React.PureComponent {
               onBlur={this.props.onUpdate}
             />
           </Prop>
-          <Prop name="video codec" nameClassName={classes.prop}>
+          <Prop name="video codec" nameClassName={classes.name}>
             <SmallSelect
               width={75}
               value={this.props.vcodec}
@@ -73,7 +75,7 @@ export default class extends React.PureComponent {
               onBlur={this.props.onUpdate}
             />
           </Prop>
-          <Prop name="audio codec" nameClassName={classes.prop}>
+          <Prop name="audio codec" nameClassName={classes.name}>
             <SmallSelect
               width={75}
               value={this.props.acodec}
@@ -91,7 +93,7 @@ export default class extends React.PureComponent {
               onBlur={this.props.onUpdate}
             />
           </Prop>
-          <Prop name="mode" nameClassName={classes.prop}>
+          <Prop name="mode" nameClassName={classes.name}>
             <InlineCheckbox
               label="2pass"
               title="Use 2pass encode (recommended)"
@@ -117,7 +119,7 @@ export default class extends React.PureComponent {
         </div>
         <Prop
           name="raw args"
-          nameClassName={classes.propArgs}
+          nameClassName={classes.nameArgs}
           valueClassName={classes.valueArgs}
         >
           <ArgsInput

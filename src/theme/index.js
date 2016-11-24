@@ -62,9 +62,6 @@ export function Pane(props) {
 }
 
 export const Prop = useSheet({
-  prop: {
-    // display: "flex",
-  },
   name: {
     display: "inline-block",
     width: "30%",
@@ -86,7 +83,7 @@ export const Prop = useSheet({
   },
 })(function(props, {classes}) {
   return (
-    <div className={cx(classes.prop, props.className)}>
+    <div className={props.className}>
       <div className={cx(classes.name, props.nameClassName)}>
         {props.name}:
       </div>
@@ -102,7 +99,6 @@ export class SmallInput extends React.PureComponent {
     outer: {
       margin: 0,
       textAlign: "center",
-      // verticalAlign: "middle",
     },
     hint: {
       width: "100%",
@@ -149,7 +145,7 @@ export class ArgsInput extends React.PureComponent {
     return this.refs.input.getValue();
   }
   setValue(value) {
-    this.refs.input.getInputNode().value = value;
+    this.refs.input.input.setValue(value);
   }
   handleKeyDown = (e) => {
     e.nativeEvent.stopImmediatePropagation();
@@ -259,7 +255,6 @@ export const SmallButton = (function() {
 export const BigButton = (function() {
   const styles = {
     buttonOuter: {
-      // margin: "0 10px",
       minWidth: 40,
       height: 30,
     },
@@ -269,10 +264,6 @@ export const BigButton = (function() {
       backgroundColor: "#bbb",
       color: "#fff",
       borderRadius: 0,
-    },
-    label: {
-      // fontSize: "inherit",
-      // textTransform: "none",
     },
   };
 
@@ -286,7 +277,6 @@ export const BigButton = (function() {
         secondary
         style={style}
         buttonStyle={styles.button}
-        labelStyle={styles.label}
       />
     );
   };

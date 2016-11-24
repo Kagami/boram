@@ -16,6 +16,7 @@ import ShowHide from "../show-hide";
     display: "flex",
     height: "100%",
     alignItems: "center",
+    textAlign: "center",
   },
 })
 export default class extends React.Component {
