@@ -69,6 +69,7 @@ export default class extends React.Component {
         <ShowHide show={!!this.state.format}>
           <Download
             events={this.props.events}
+            info={this.state.info}
             format={this.state.format}
             onLoad={this.props.onLoad}
             onCancel={this.handleCancel}

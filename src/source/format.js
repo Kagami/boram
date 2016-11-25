@@ -3,6 +3,7 @@
  * @module boram/source/format
  */
 
+import assert from "assert";
 import React from "react";
 import {useSheet} from "../jss";
 import {Tip, BigButton, SmallSelect, MenuItem, Sep} from "../theme";
@@ -19,11 +20,18 @@ export default class extends React.Component {
     vfid: this.getVideoFormats()[0].key,
     afid: this.getAudioFormats()[0].key,
   }
+  componentDidMount() {
+    if (BORAM_DEBUG) {
+      if (process.env.BORAM_DEBUG_FORMAT) {
+        this.handleDownload();
+      }
+    }
+  }
   // Prefer high-quality.
   compareVideo(a, b) {
     // Higher resolution/FPS is always better.
-    if (a.width !== b.width) return b.width - a.width;
     if (a.height !== b.height) return b.height - a.height;
+    if (a.width !== b.width) return b.width - a.width;
     if (a.fps !== b.fps) return b.fps - a.fps;
     // VP9 at high resolution/FPS is better than H.264.
     if (a.vcodec && b.vcodec) {
@@ -57,6 +65,7 @@ export default class extends React.Component {
       .sort(this.compareVideo)
       .map(f => ({
         key: f.format_id,
+        ext: f.ext,
         text: this.getVideoText(f),
       }));
     return formats.length ? formats : [{key: null, text: "none"}];
@@ -92,7 +101,9 @@ export default class extends React.Component {
   };
   handleDownload = () => {
     const {vfid, afid} = this.state;
-    this.props.onLoad({vfid, afid});
+    const ext = this.getVideoFormats().find(f => f.key === vfid).ext;
+    assert(ext);
+    this.props.onLoad({vfid, afid, ext});
   };
   render() {
     const {classes} = this.sheet;

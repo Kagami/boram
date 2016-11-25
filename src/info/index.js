@@ -25,20 +25,19 @@ import {showErr} from "../util";
 export default class extends React.Component {
   state = {}
   componentDidMount() {
-    let ffchild = null;
+    let ff = null;
     this.props.events.on("cleanup", () => {
-      if (ffchild) {
-        ffchild.kill("SIGKILL");
+      try {
+        ff.kill("SIGKILL");
+      } catch (e) {
+        /* skip */
       }
     });
 
-    const ff = FFprobe.getInfo(this.props.source.path);
-    ffchild = ff.child;
+    ff = FFprobe.getInfo(this.props.source.path);
     ff.then(info => {
-      ffchild = null;
       this.props.onLoad(info);
     }, error => {
-      ffchild = null;
       this.setState({error});
     });
   }

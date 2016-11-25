@@ -69,13 +69,16 @@ export default class extends React.PureComponent {
       overflow: "hidden",
     },
   }
-  constructor(props) {
-    super(props);
+  state = {progress: 0, log: ""}
+  componentDidMount() {
     this.props.events.on("cleanup", () => {
-      this.cancel();
+      try {
+        this.ff.kill("SIGKILL");
+      } catch (e) {
+        /* skip */
+      }
     });
   }
-  state = {progress: 0, log: ""};
   getOutput() {
     return (this.props.encoding || this.state.output || this.state.encodeError)
       ? this.state.log
@@ -188,9 +191,8 @@ export default class extends React.PureComponent {
     };
     const run = (args) => {
       handleLog(this.showArgs(args));
-      const ff = FFmpeg._run(args, handleLog);
-      this.ffchild = ff.child;
-      return ff;
+      this.ff = FFmpeg._run(args, handleLog);
+      return this.ff;
     };
     /* eslint-enable no-use-before-define */
 
@@ -217,7 +219,6 @@ export default class extends React.PureComponent {
       });
     }
     videop.then(() => {
-      this.ffchild = null;
       this.setState({output, progress: 100});
       this.props.onEncoding(false);
       if (preview) {
@@ -226,7 +227,6 @@ export default class extends React.PureComponent {
         shell.openItem(outpath);
       }
     }, (encodeError) => {
-      this.ffchild = null;
       this.setState({encodeError, progress: 0});
       this.props.onEncoding(false);
       // handleLog(showErr(encodeError));
@@ -234,10 +234,12 @@ export default class extends React.PureComponent {
   }
   cancel() {
     // `start` will fail into error state automatically.
-    if (this.ffchild) {
+    try {
       // No need to wait for graceful exit on TERM.
       // We just want it to stop.
-      this.ffchild.kill("SIGKILL");
+      this.ff.kill("SIGKILL");
+    } catch (e) {
+      /* skip */
     }
   }
   handlePreview = () => {

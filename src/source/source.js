@@ -67,15 +67,16 @@ const YTDL_SUPPORTED_URL =
   },
 })
 export default class extends React.Component {
-  constructor(props) {
-    super(props);
+  state = {url: ""}
+  componentDidMount() {
     this.props.events.on("cleanup", () => {
-      if (this.ytchild) {
-        this.ytchild.kill("SIGKILL");
+      try {
+        this.ytdl.kill("SIGKILL");
+      } catch (e) {
+        /* skip */
       }
     });
   }
-  state = {url: ""}
   handleFormClick = () => {
     if (this.state.infoLoading) return;
     if (this.state.infoError) {
@@ -110,13 +111,10 @@ export default class extends React.Component {
     if (!this.state.url) return;
     if (this.state.infoLoading) return;
     this.setState({infoLoading: true});
-    const ytdl = YouTubeDL.getInfo(this.state.url);
-    this.ytchild = ytdl.child;
-    ytdl.then(info => {
-      this.ytchild = null;
+    this.ytdl = YouTubeDL.getInfo(this.state.url);
+    this.ytdl.then(info => {
       this.props.onInfo(info);
     }, err => {
-      this.ytchild = null;
       this.setState({infoLoading: false, infoError: err});
     });
   }

@@ -177,7 +177,7 @@ export function makeRunner(exe, obj) {
         [runpath, args] = this._fixPathArgs(runpath, args);
       }
       let child = null;
-      const result = new Promise((resolve, reject) => {
+      const runner = new Promise((resolve, reject) => {
         try {
           child = spawn(runpath, args, {stdio: ["ignore", "pipe", "pipe"]});
         } catch (err) {
@@ -196,9 +196,11 @@ export function makeRunner(exe, obj) {
           }
         });
         child.on("error", err => {
+          child = null;
           reject(new Error(`Failed to run ${exe}: ${err.message}`));
         });
         child.on("close", code => {
+          child = null;
           if (code || code == null) {
             return reject(new Error(
               `${exe} exited with code ${code} (${stderr})`
@@ -207,8 +209,12 @@ export function makeRunner(exe, obj) {
           resolve(stdout);
         });
       });
-      result.child = child;
-      return result;
+      runner.kill = (signal) => {
+        if (child) {
+          child.kill(signal);
+        }
+      };
+      return runner;
     }, ...obj,
   };
 }
