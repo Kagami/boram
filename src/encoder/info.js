@@ -3,6 +3,7 @@
  * @module boram/encoder/info
  */
 
+import {shell} from "electron";
 import React from "react";
 import {useSheet} from "../jss";
 import {Prop} from "../theme";
@@ -71,13 +72,25 @@ export default class extends React.PureComponent {
       throw new Error("Unknown codec_type");
     }
   }
+  handlePathClick = () => {
+    const fpath = this.props.format.filename;
+    shell.openItem(fpath);
+  };
   render() {
     const {classes} = this.sheet;
     const {format} = this.props;
     return (
       <div className={classes.info}>
         <div className={classes.general}>
-          <Prop name="path">{format.filename}</Prop>
+          <Prop name="path">
+            <span
+              title={format.filename}
+              style={{cursor: "pointer"}}
+              onClick={this.handlePathClick}
+            >
+              {format.filename}
+            </span>
+          </Prop>
           <Prop name="file size">{showSize(+format.size)}</Prop>
           <Prop name="duration">{showTime(+format.duration)}</Prop>
           <Prop name="bitrate">{showBitrate(+format.bit_rate)}</Prop>

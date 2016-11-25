@@ -19,7 +19,6 @@ const YTDL_SUPPORTED_URL =
     width: 650,
     height: 600,
     marginBottom: 50,
-    textAlign: "center",
   },
   border: {
     height: "100%",

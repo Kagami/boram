@@ -11,7 +11,6 @@ import {showSize} from "../util";
 
 @useSheet({
   format: {
-    textAlign: "center",
     marginBottom: 100,
   },
 })
@@ -56,7 +55,7 @@ export default class extends React.Component {
     }
     text += ` ${width}x${height}`;
     if (fps > 1) text += ` ${fps}fps`;
-    if (filesize) text += ` ${showSize(filesize)}`;
+    if (filesize) text += ` (${showSize(filesize, {tight: true})})`;
     return text;
   }
   getVideoFormats() {
@@ -75,7 +74,9 @@ export default class extends React.Component {
   }
   getAudioText(format) {
     const {acodec, abr, filesize} = format;
-    return `${acodec.replace(/\..+$/, "")} ${abr}kbits (${showSize(filesize)})`;
+    let text = `${acodec.replace(/\..+$/, "")} ${abr}kbits`;
+    if (filesize) text += ` (${showSize(filesize, {tight: true})})`;
+    return text;
   }
   getAudioFormats() {
     return this.props.info.formats
@@ -112,7 +113,7 @@ export default class extends React.Component {
         <h2>Video format</h2>
         <SmallSelect
           width={300}
-          style={{fontSize: "inherit"}}
+          style={{fontSize: "16px"}}
           labelStyle={{paddingRight: 24}}
           value={this.state.vfid}
           disabled={this.isNoVideo()}
@@ -123,7 +124,7 @@ export default class extends React.Component {
             key={f.key}
             value={f.key}
             primaryText={f.text}
-            style={{fontSize: "inherit"}}
+            style={{fontSize: "16px"}}
           />
         )}
         </SmallSelect>
@@ -131,7 +132,7 @@ export default class extends React.Component {
         <h2>Audio format (optional)</h2>
         <SmallSelect
           width={300}
-          style={{fontSize: "inherit"}}
+          style={{fontSize: "16px"}}
           labelStyle={{paddingRight: 24}}
           value={this.state.afid}
           disabled={this.isNoAudio()}
@@ -142,22 +143,22 @@ export default class extends React.Component {
             key={f.key}
             value={f.key}
             primaryText={f.text}
-            style={{fontSize: "inherit"}}
+            style={{fontSize: "16px"}}
           />
         )}
         </SmallSelect>
         <Sep vertical size={60} />
         <BigButton
-          width={300}
+          width={260}
           height={40}
-          label="Download"
+          label="download"
           labelStyle={{fontSize: "inherit"}}
           disabled={this.isNoVideo()}
           onClick={this.handleDownload}
         />
         <Sep vertical />
         <BigButton
-          width={300}
+          width={260}
           height={40}
           label="back"
           labelStyle={{fontSize: "inherit"}}
@@ -166,7 +167,7 @@ export default class extends React.Component {
         <Tip icon="info-circle">
           <span>Formats with highest resolution/fps are recommended </span>
           <span>(overall quality will be higher).</span><br/>
-          <span>You can shrink it later via settings if needed.</span>
+          <span>You can shrink them on encoding if needed.</span>
         </Tip>
       </div>
     );

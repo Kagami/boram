@@ -12,15 +12,16 @@ import which from "which";
 // cleanup inside main process.
 export const tmp = require("electron").remote.require("tmp");
 
-export function showSize(size) {
+export function showSize(size, opts = {}) {
+  const space = opts.tight ? "" : " ";
   if (size < 1024) {
-    return size + "B";
+    return `${size}${space}B`;
   } else if (size < 1024 * 1024) {
     size /= 1024;
-    return size.toFixed(2) + "KiB";
+    return `${size.toFixed(2)}${space}KiB`;
   } else {
     size /= 1024 * 1024;
-    return size.toFixed(2) + "MiB";
+    return `${size.toFixed(2)}${space}MiB`;
   }
 }
 
@@ -29,10 +30,10 @@ export function showBitrate(bitrate) {
     return bitrate + " bps";
   } else if (bitrate < 1000 * 1000) {
     bitrate /= 1000;
-    return bitrate.toFixed(2) + "Kbps";
+    return bitrate.toFixed(2) + " Kbps";
   } else {
     bitrate /= 1000 * 1000;
-    return bitrate.toFixed(2) + "Mbps";
+    return bitrate.toFixed(2) + " Mbps";
   }
 }
 
@@ -74,7 +75,7 @@ export function parseFrameRate(rate) {
 }
 
 export function showFrameRate(rate) {
-  return (rate % 1 ? rate.toFixed(3) : rate) + "fps";
+  return (rate % 1 ? rate.toFixed(3) : rate) + " fps";
 }
 
 export function parseTimeBase(tb) {
