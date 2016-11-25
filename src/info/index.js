@@ -25,22 +25,20 @@ import {showErr} from "../util";
 export default class extends React.Component {
   state = {}
   componentDidMount() {
-    let ff = null;
-    this.props.events.on("cleanup", () => {
-      try {
-        ff.kill("SIGKILL");
-      } catch (e) {
-        /* skip */
-      }
-    });
-
-    ff = FFprobe.getInfo(this.props.source.path);
-    ff.then(info => {
+    this.props.events.addListener("cleanup", this.cleanup);
+    this.ff = FFprobe.getInfo(this.props.source.path);
+    this.ff.then(info => {
       this.props.onLoad(info);
     }, error => {
       this.setState({error});
     });
   }
+  componentWillUnmount() {
+    this.props.events.removeListener("cleanup", this.cleanup);
+  }
+  cleanup = () => {
+    try { this.ff.kill("SIGKILL"); } catch (e) { /* skip */ }
+  };
   render() {
     const {classes} = this.sheet;
     return (

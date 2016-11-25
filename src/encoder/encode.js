@@ -71,13 +71,10 @@ export default class extends React.PureComponent {
   }
   state = {progress: 0, log: ""}
   componentDidMount() {
-    this.props.events.on("cleanup", () => {
-      try {
-        this.ff.kill("SIGKILL");
-      } catch (e) {
-        /* skip */
-      }
-    });
+    this.props.events.addListener("cleanup", this.cleanup);
+  }
+  componentWillUnmount() {
+    this.props.events.removeListener("cleanup", this.cleanup);
   }
   getOutput() {
     return (this.props.encoding || this.state.output || this.state.encodeError)
@@ -242,6 +239,9 @@ export default class extends React.PureComponent {
       /* skip */
     }
   }
+  cleanup = () => {
+    this.cancel();
+  };
   handlePreview = () => {
     this.toggleEncode({preview: true});
   };

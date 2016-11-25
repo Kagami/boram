@@ -69,14 +69,14 @@ const YTDL_SUPPORTED_URL =
 export default class extends React.Component {
   state = {url: ""}
   componentDidMount() {
-    this.props.events.on("cleanup", () => {
-      try {
-        this.ytdl.kill("SIGKILL");
-      } catch (e) {
-        /* skip */
-      }
-    });
+    this.props.events.addListener("cleanup", this.cleanup);
   }
+  componentWillUnmount() {
+    this.props.events.removeListener("cleanup", this.cleanup);
+  }
+  cleanup = () => {
+    try { this.ytdl.kill("SIGKILL"); } catch (e) { /* skip */ }
+  };
   handleFormClick = () => {
     if (this.state.infoLoading) return;
     if (this.state.infoError) {
