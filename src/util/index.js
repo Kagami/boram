@@ -17,10 +17,10 @@ export function showSize(size) {
     return size + "B";
   } else if (size < 1024 * 1024) {
     size /= 1024;
-    return size.toFixed(2) + " KiB";
+    return size.toFixed(2) + "KiB";
   } else {
     size /= 1024 * 1024;
-    return size.toFixed(2) + " MiB";
+    return size.toFixed(2) + "MiB";
   }
 }
 
@@ -29,28 +29,16 @@ export function showBitrate(bitrate) {
     return bitrate + " bps";
   } else if (bitrate < 1000 * 1000) {
     bitrate /= 1000;
-    return bitrate.toFixed(2) + " Kbps";
+    return bitrate.toFixed(2) + "Kbps";
   } else {
     bitrate /= 1000 * 1000;
-    return bitrate.toFixed(2) + " Mbps";
+    return bitrate.toFixed(2) + "Mbps";
   }
-}
-
-/** Simple helper since JavaScript lacks coffee's "?." */
-export function showErr(err) {
-  return err ? err.message : null;
 }
 
 function pad2(n) {
   n |= 0;
   return n < 10 ? "0" + n : n.toString();
-}
-
-export function showTime(duration, sep) {
-  let ts = pad2(duration / 60) + (sep || ":");
-  ts += pad2(duration % 60);
-  ts += (duration % 1).toFixed(3).slice(1, 5);
-  return ts;
 }
 
 export function parseTime(time) {
@@ -73,18 +61,30 @@ export function parseTime(time) {
   return duration;
 }
 
+export function showTime(duration, sep) {
+  let ts = pad2(duration / 60) + (sep || ":");
+  ts += pad2(duration % 60);
+  ts += (duration % 1).toFixed(3).slice(1, 5);
+  return ts;
+}
+
 export function parseFrameRate(rate) {
   const [num, den] = rate.split("/", 2).map(n => parseInt(n, 10));
   return num / den;
 }
 
 export function showFrameRate(rate) {
-  return (rate % 1 ? rate.toFixed(3) : rate) + " fps";
+  return (rate % 1 ? rate.toFixed(3) : rate) + "fps";
 }
 
 export function parseTimeBase(tb) {
   const [num, den] = tb.split("/", 2).map(n => parseInt(n, 10));
   return num / den;
+}
+
+/** Simple helper since JavaScript lacks coffee's "?." */
+export function showErr(err) {
+  return err ? err.message : null;
 }
 
 /**

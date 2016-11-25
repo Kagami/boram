@@ -8,18 +8,18 @@ import React from "react";
 import Icon from "react-fa";
 import {useSheet} from "../jss";
 import YouTubeDL from "../youtube-dl";
-import Tip from "../tip";
+import {Tip} from "../theme";
 import {showErr} from "../util";
 
 const YTDL_SUPPORTED_URL =
   "https://rg3.github.io/youtube-dl/supportedsites.html";
 
 @useSheet({
-  outer: {
+  source2: {
     width: 650,
     height: 600,
-    margin: "0 auto",
     marginBottom: 50,
+    textAlign: "center",
   },
   border: {
     height: "100%",
@@ -134,7 +134,7 @@ export default class extends React.Component {
   render() {
     const {classes} = this.sheet;
     return (
-      <div className={classes.outer}>
+      <div className={classes.source2}>
         <div
           className={classes.border}
           onDrop={this.handleDrop}

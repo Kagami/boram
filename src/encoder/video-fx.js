@@ -52,7 +52,7 @@ export default class extends React.PureComponent {
             hintText="width"
             onBlur={this.props.onUpdate}
           />
-          <Sep width={10}>×</Sep>
+          <Sep size={10}>×</Sep>
           <SmallInput
             ref="scaleh"
             hintText="height"
@@ -65,19 +65,19 @@ export default class extends React.PureComponent {
             hintText="width"
             onBlur={this.props.onUpdate}
           />
-          <Sep width={10}>:</Sep>
+          <Sep size={10}>:</Sep>
           <SmallInput
             ref="croph"
             hintText="height"
             onBlur={this.props.onUpdate}
           />
-          <Sep width={10}>:</Sep>
+          <Sep size={10}>:</Sep>
           <SmallInput
             ref="cropx"
             hintText="left"
             onBlur={this.props.onUpdate}
           />
-          <Sep width={10}>:</Sep>
+          <Sep size={10}>:</Sep>
           <SmallInput
             ref="cropy"
             hintText="top"

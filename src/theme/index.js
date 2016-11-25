@@ -170,17 +170,18 @@ export const SmallSelect = (function() {
   const styles = {
     select: {
       verticalAlign: "middle",
+      overflow: "hidden",
     },
     item: {
       color: SECONDARY_COLOR,
     },
   };
   return function(props) {
-    const {style, ...other} = props;
+    const {style, width, ...other} = props;
     const mainStyle = Object.assign(
       {},
       styles.select,
-      {width: props.width || 140},
+      {width: width || 140},
       style,
     );
     return (
@@ -260,11 +261,8 @@ export const BigButton = (function() {
   const styles = {
     buttonOuter: {
       minWidth: 40,
-      height: 30,
     },
     button: {
-      height: 30,
-      lineHeight: "30px",
       backgroundColor: "#bbb",
       color: "#fff",
       borderRadius: 0,
@@ -277,16 +275,20 @@ export const BigButton = (function() {
     e.preventDefault();
   }
   return function(props) {
-    const {style, width, ...other} = props;
+    const {style, width, height, ...other} = props;
     const mainStyle = Object.assign({
       width: width || "auto",
+      height: height || 30,
     }, styles.buttonOuter, style);
+    const buttonStyle = Object.assign({
+      height: height || 30,
+    }, styles.button);
     return (
       <RaisedButton
         {...other}
         secondary
         style={mainStyle}
-        buttonStyle={styles.button}
+        buttonStyle={buttonStyle}
         overlayStyle={styles.overlay}
         onKeyDown={handleKeyDown}
       />
@@ -311,13 +313,48 @@ export function BoldIcon(props) {
 }
 
 export function Sep(props) {
+  const display = props.vertical ? "block" : "inline-block";
+  const margin = props.vertical ? `${props.margin || 5}px 0`
+                                : `0 ${props.margin || 5}px`;
   const style = {
-    display: "inline-block",
+    display,
+    margin,
     textAlign: "center",
-    margin: `0 ${props.margin || 5}px`,
-    width: props.width || "auto",
+    [props.vertical ? "height" : "width"]: props.size || "auto",
   };
   return (
     <div style={style}>{props.children}</div>
   );
+}
+
+/** Tips widget. */
+@useSheet({
+  icon: {
+    display: "inline-block",
+    marginRight: 15,
+    color: "blue",
+  },
+})
+export class Tip extends React.Component {
+  static styles = {
+    tip: {
+      position: "fixed",
+      left: 50,
+      right: 50,
+      bottom: 30,
+      padding: 10,
+      color: "#333",
+      backgroundColor: BACKGROUND_COLOR,
+    },
+  }
+  render() {
+    const {classes} = this.sheet;
+    const styles = this.constructor.styles;
+    return (
+      <Paper style={styles.tip}>
+        <Icon name={this.props.icon} className={classes.icon} />
+        {this.props.children}
+      </Paper>
+    );
+  }
 }

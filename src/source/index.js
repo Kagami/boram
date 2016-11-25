@@ -15,8 +15,8 @@ import ShowHide from "../show-hide";
   source: {
     display: "flex",
     height: "100%",
+    justifyContent: "center",
     alignItems: "center",
-    textAlign: "center",
   },
 })
 export default class extends React.Component {
@@ -69,7 +69,6 @@ export default class extends React.Component {
         <ShowHide show={!!this.state.format}>
           <Download
             events={this.props.events}
-            info={this.state.info}
             format={this.state.format}
             onLoad={this.props.onLoad}
             onCancel={this.handleCancel}
