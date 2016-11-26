@@ -75,10 +75,17 @@ export default class extends React.PureComponent {
   }
   componentWillUnmount() {
     this.props.events.removeListener("abort", this.abort);
+    this.cleanup();
+  }
+  cleanup() {
     try { this.tmpLog.removeCallback(); } catch (e) { /* skip */ }
     try { this.tmpPreview.removeCallback(); } catch (e) { /* skip */ }
     try { this.tmpEncode.removeCallback(); } catch (e) { /* skip */ }
   }
+  abort = () => {
+    this.cancel();
+    this.cleanup();
+  };
   getOutput() {
     return (this.props.encoding || this.state.output || this.state.encodeError)
       ? this.state.log
@@ -240,9 +247,6 @@ export default class extends React.PureComponent {
       /* skip */
     }
   }
-  abort = () => {
-    this.cancel();
-  };
   handlePreview = () => {
     this.toggleEncode({preview: true});
   };

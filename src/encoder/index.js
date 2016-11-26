@@ -39,7 +39,7 @@ const MAX_VORBIS_Q = 10;
     backgroundColor: "#ccc !important",
     cursor: "auto !important",
     WebkitUserSelect: "none",
-    "& > div > div": {
+    "& > div": {
       height: "35px !important",
     },
   },
@@ -598,6 +598,7 @@ export default class extends React.PureComponent {
       <Tab
         value={index}
         label={label}
+        disableTouchRipple
         className={cx({
           [classes.tab]: true,
           [classes.activeTab]: active,

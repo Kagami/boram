@@ -80,10 +80,6 @@ export default class extends React.Component {
     window.addEventListener("beforeunload", this.handleGlobalClose, false);
     document.addEventListener("keydown", this.handleGlobaKey, false);
   }
-  componentWillUnmount() {
-    document.removeEventListener("keydown", this.handleGlobaKey, false);
-    window.removeEventListener("beforeunload", this.handleGlobalClose, false);
-  }
   tabKey = 0
   getInstance(i) {
     return this.refs[`instance${i}`];
