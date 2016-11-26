@@ -137,7 +137,6 @@ export default class extends React.Component {
   };
   handleClose = (i, e) => {
     e.stopPropagation();
-    if (this.state.tabs.length <= 1) return remote.getCurrentWindow().close();
     const choice = remote.dialog.showMessageBox({
       title: "Confirm",
       message: "Close tab?",
@@ -148,9 +147,12 @@ export default class extends React.Component {
     const tabs = this.state.tabs;
     tabs.splice(i, 1);
     let tabIndex = this.state.tabIndex;
-    tabIndex = Math.max(0, tabIndex);
     tabIndex = Math.min(tabIndex, tabs.length - 1);
+    tabIndex = Math.max(0, tabIndex);
     this.setState({tabs, tabIndex});
+    if (!this.state.tabs.length) {
+      this.addTab();
+    }
   };
   getLabelNode(label, i) {
     const {classes} = this.sheet;
