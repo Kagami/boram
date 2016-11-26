@@ -3,7 +3,7 @@
  * @module boram/source/source
  */
 
-import {shell} from "electron";
+import {shell, remote} from "electron";
 import React from "react";
 import Icon from "react-fa";
 import {useSheet} from "../jss";
@@ -13,6 +13,9 @@ import {showErr} from "../util";
 
 const YTDL_SUPPORTED_URL =
   "https://rg3.github.io/youtube-dl/supportedsites.html";
+const COMMON_VIDEO_EXTENSIONS = [
+  "mkv", "webm", "mp4", "mov", "avi", "ts", "tp",
+];
 
 @useSheet({
   source2: {
@@ -61,9 +64,6 @@ const YTDL_SUPPORTED_URL =
     fontSize: "200px",
     display: "block",
   },
-  file: {
-    display: "none",
-  },
 })
 export default class extends React.PureComponent {
   state = {url: ""}
@@ -83,7 +83,14 @@ export default class extends React.PureComponent {
     } else if (this.state.url) {
       this.handleInfoGet();
     } else {
-      this.refs.file.click();
+      const selected = remote.dialog.showOpenDialog({
+        filters: [
+          {name: "Videos", extensions: COMMON_VIDEO_EXTENSIONS},
+          {name: "All files", extensions: ["*"]},
+        ],
+      });
+      if (!selected) return;
+      this.props.onSource({path: selected[0]});
     }
   }
   handleFileLoad = () => {
@@ -138,13 +145,6 @@ export default class extends React.PureComponent {
           onClick={this.handleFormClick}
         >
           <form className={classes.form} onSubmit={this.handleInfoGet}>
-            <input
-              ref="file"
-              type="file"
-              className={classes.file}
-              onChange={this.handleFileLoad}
-              accept="video/*"
-            />
             <div className={classes.text}>
               <div>Click/drag your input video here</div>
               <span>or </span>
