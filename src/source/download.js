@@ -3,6 +3,7 @@
  * @module boram/source/download
  */
 
+import fs from "fs";
 import React from "react";
 import cx from "classnames";
 import YouTubeDL from "../youtube-dl";
@@ -30,8 +31,10 @@ export default class extends React.PureComponent {
     this.props.events.addListener("cleanup", this.cleanup);
     const {afid, ext} = this.props.format;
     const postfix = afid ? ".mkv" : `.${ext}`;
-    this.tmp1 = tmp.fileSync({prefix: "boram-", postfix});
-    this.tmp2 = tmp.fileSync({prefix: "boram-", postfix: ".mkv"});
+    // ytdl might complain if its destination file exists, so we can't
+    // use `fileSync` helper.
+    this.tmpYTname = tmp.tmpNameSync({prefix: "boram-", postfix});
+    this.tmpFF = tmp.fileSync({prefix: "boram-", postfix: ".mkv"});
     this.handleDownload();
   }
   componentWillUnmount() {
@@ -42,36 +45,40 @@ export default class extends React.PureComponent {
     const url = this.props.info.webpage_url;
     const {vfid, afid} = this.props.format;
     const format = vfid + (afid ? `+${afid}` : "");
-    const outpath = this.tmp1.name;
+    const outpath = this.tmpYTname;
     this.ytdl = YouTubeDL.download({url, format, outpath}, (upd) => {
       const {progress, status} = upd;
       this.setState({progress, status});
     }).then(() => {
       this.setState({progress: 100, status: "writing title to metadata"});
-      const inpath = this.tmp1.name;
-      const outpath = this.tmp2.name;
+      const inpath = this.tmpYTname;
+      const outpath = this.tmpFF.name;
       // URL might be rather long to put it into title (e.g. extra query
       // args) but that's hard to fix in general case.
       const title = `${this.props.info.title} <${url}>`;
       this.ff = FFmpeg.setTitle({inpath, outpath, title});
       return this.ff;
     }).then(() => {
-      const source = {path: this.tmp2.name};
-      this.tmp1.removeCallback();
+      const source = {path: this.tmpFF.name};
       this.props.onLoad(source);
     }, (error) => {
       const progress = 0;
       this.setState({progress, error});
-    });
+    }).then(this.removeYT, this.removeYT);
   };
   cleanup = () => {
-    try { this.ytdl.kill("SIGKILL"); } catch (e) { /* skip */ }
+    // ytdl should have a chance to remote its temporary files, so we
+    // don't SIGKILL it.
+    try { this.ytdl.kill("SIGTERM"); } catch (e) { /* skip */ }
     try { this.ff.kill("SIGKILL"); } catch (e) { /* skip */ }
+  };
+  removeYT = () => {
+    try { fs.unlinkSync(this.tmpYTname); } catch (e) { /* skip */ }
   };
   handleCancel = () => {
     this.cleanup();
-    try { this.tmp1.removeCallback(); } catch (e) { /* skip */ }
-    try { this.tmp2.removeCallback(); } catch (e) { /* skip */ }
+    this.removeYT();
+    try { this.tmpFF.removeCallback(); } catch (e) { /* skip */ }
     this.props.onCancel();
   };
   render() {
