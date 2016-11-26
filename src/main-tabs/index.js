@@ -38,16 +38,22 @@ const KEY_9 = 57;
     color: "#999 !important",
     backgroundColor: "#eee !important",
   },
-  label: {
+  tabItem: {
     width: "100%",
-    padding: "0 5px",
     boxSizing: "border-box",
+    display: "flex",
+  },
+  label: {
+    flex: 1,
+    padding: "0 5px",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
   },
   icon: {
-    float: "right",
     fontSize: "30px",
     lineHeight: "40px",
-    marginTop: -1,
+    marginTop: -2,
+    marginRight: 5,
     cursor: "pointer",
   },
   iconNew: {
@@ -149,8 +155,10 @@ export default class extends React.Component {
   getLabelNode(label, i) {
     const {classes} = this.sheet;
     return (
-      <div className={classes.label}>
-        {label}
+      <div className={classes.tabItem}>
+        <div className={classes.label} title={label}>
+          {label}
+        </div>
         <Icon
           name="close"
           title="Close tab"
