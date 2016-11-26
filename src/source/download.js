@@ -33,7 +33,7 @@ export default class extends React.PureComponent {
     const postfix = afid ? ".mkv" : `.${ext}`;
     // ytdl complains if its destination file exists, so we can't use
     // `fileSync` helper.
-    this.tmpYTname = tmp.tmpNameSync({prefix: "boram-", postfix});
+    this.tmpYTName = tmp.tmpNameSync({prefix: "boram-", postfix});
     this.tmpFF = tmp.fileSync({prefix: "boram-", postfix: ".mkv"});
     this.handleDownload();
   }
@@ -45,13 +45,13 @@ export default class extends React.PureComponent {
     const url = this.props.info.webpage_url;
     const {vfid, afid} = this.props.format;
     const format = vfid + (afid ? `+${afid}` : "");
-    const outpath = this.tmpYTname;
+    const outpath = this.tmpYTName;
     this.ytdl = YouTubeDL.download({url, format, outpath}, (upd) => {
       const {progress, status} = upd;
       this.setState({progress, status});
     }).then(() => {
       this.setState({progress: 100, status: "writing title to metadata"});
-      const inpath = this.tmpYTname;
+      const inpath = this.tmpYTName;
       const outpath = this.tmpFF.name;
       // URL might be rather long to put it into title (e.g. extra query
       // args) but that's hard to fix in general case.
@@ -64,7 +64,7 @@ export default class extends React.PureComponent {
     }, (error) => {
       const progress = 0;
       this.setState({progress, error});
-    }).then(this.removeYT, this.removeYT);
+    }).then(this.cleanYT, this.cleanYT);
   };
   abort = () => {
     // ytdl should have a chance to remote its temporary files, so we
@@ -72,12 +72,12 @@ export default class extends React.PureComponent {
     try { this.ytdl.kill("SIGTERM"); } catch (e) { /* skip */ }
     try { this.ff.kill("SIGKILL"); } catch (e) { /* skip */ }
   };
-  removeYT = () => {
-    try { fs.unlinkSync(this.tmpYTname); } catch (e) { /* skip */ }
+  cleanYT = () => {
+    try { fs.unlinkSync(this.tmpYTName); } catch (e) { /* skip */ }
   };
   handleCancel = () => {
     this.abort();
-    this.removeYT();
+    this.cleanYT();
     try { this.tmpFF.removeCallback(); } catch (e) { /* skip */ }
     this.props.onCancel();
   };

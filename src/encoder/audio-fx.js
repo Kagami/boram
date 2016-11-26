@@ -31,7 +31,7 @@ export default class extends React.PureComponent {
           <SmallSelect
             hintText="no audio"
             value={this.props.atrackn}
-            disabled={!this.props.atracks.length}
+            disabled={!this.props.hasAudio}
             onChange={this.props.makeSelecter("atrackn")}
           >
           {this.props.atracks.map((t, i) =>

@@ -38,6 +38,7 @@ export default class extends React.PureComponent {
         </Prop>
         <Prop name="deinterlace" nameClassName={classes.prop}>
           <InlineCheckbox
+            title="Toggle deinterlacing filter"
             checked={this.props.deinterlace}
             onCheck={this.props.makeChecker("deinterlace")}
           />
@@ -109,7 +110,7 @@ export default class extends React.PureComponent {
           <SmallSelect
             hintText="no subs"
             value={this.props.strackn}
-            disabled={!this.props.stracks.length}
+            disabled={!this.props.burnSubs}
             onChange={this.props.makeSelecter("strackn")}
           >
           {this.props.stracks.map((t, i) =>

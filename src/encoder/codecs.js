@@ -103,7 +103,7 @@ export default class extends React.PureComponent {
             <Sep/>
             <InlineCheckbox
               label="limit"
-              title="Switch between fit-to-limit and manual-bitrate modes"
+              title="Toggle fit-to-limit/custom-bitrate modes"
               checked={this.props.modeLimit}
               disabled={this.props.modeCRF}
               onCheck={this.props.makeChecker("modeLimit")}

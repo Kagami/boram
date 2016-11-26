@@ -4,6 +4,7 @@
  */
 
 import assert from "assert";
+import fs from "fs";
 import {basename, extname} from "path";
 import {parse as parseArgs} from "shell-quote";
 import {shell, remote} from "electron";
@@ -69,19 +70,22 @@ export default class extends React.PureComponent {
   state = {progress: 0, log: ""}
   componentDidMount() {
     this.props.events.addListener("abort", this.abort);
-    this.tmpLog = tmp.fileSync({prefix: "boram-", postfix: "-0.log"});
-    this.tmpPreview = tmp.fileSync({prefix: "boram-", postfix: ".mkv"});
-    this.tmpEncode = tmp.fileSync({prefix: "boram-", postfix: ".webm"});
+    this.tmpLogName = tmp.tmpNameSync({prefix: "boram-", postfix: "-0.log"});
+    this.tmpEncodeName = tmp.tmpNameSync({prefix: "boram-", postfix: ".webm"});
+    this.tmpPreviewName = tmp.tmpNameSync({prefix: "boram-", postfix: ".mkv"});
   }
   componentWillUnmount() {
     this.props.events.removeListener("abort", this.abort);
     this.cleanup();
   }
   cleanup() {
-    try { this.tmpLog.removeCallback(); } catch (e) { /* skip */ }
-    try { this.tmpPreview.removeCallback(); } catch (e) { /* skip */ }
-    try { this.tmpEncode.removeCallback(); } catch (e) { /* skip */ }
+    try { fs.unlinkSync(this.tmpLogName); } catch (e) { /* skip */ }
+    try { fs.unlinkSync(this.tmpEncodeName); } catch (e) { /* skip */ }
+    this.cleanPreview();
   }
+  cleanPreview = () => {
+    try { fs.unlinkSync(this.tmpPreviewName); } catch (e) { /* skip */ }
+  };
   abort = () => {
     this.cancel();
     this.cleanup();
@@ -152,7 +156,7 @@ export default class extends React.PureComponent {
         const framem = line.match(frameRe);
         if (!framem) return 0;
         const frame = framem[1];
-        const did = frame - lastFrame;
+        const did = Math.max(0, frame - lastFrame);
         lastFrame = frame;
         return did;
       },
@@ -161,40 +165,55 @@ export default class extends React.PureComponent {
       },
     };
   }
-  updateProgress({passn, frames, totalFrames}) {
-    let inc = frames / totalFrames * 100;
-    if (passn) {
-      inc *= passn === 1 ? PASS1_COEFF : PASS2_COEFF;
-    }
-    const progress = Math.min(this.state.progress + inc, 100);
-    this.setState({progress});
-  }
   start({preview} = {}) {
     /* eslint-disable no-use-before-define */
+    const updateProgress = (frames) => {
+      let inc = frames / totalFrames * 100;
+      if (passn) {
+        inc *= passn === 1 ? PASS1_COEFF : PASS2_COEFF;
+      }
+      progress = Math.min(progress + inc, 99);
+      this.setState({progress});
+    };
     const handleLog = (chunk) => {
       // Emulate terminal caret behavior.
       // FIXME(Kagami): Windows \r\n?
-      let log = this.state.log.slice(0, curpos);
+      log = log.slice(0, curpos);
       chunk = chunk.toString();
-      const cr = chunk.lastIndexOf("\r", chunk.length - 2);
-      if (cr > -1) {
-        log = log.slice(0, lastnl + 1);
+      // console.log("@@@ IN", JSON.stringify(chunk));
+
+      for (;;) {
+        const cr = chunk.indexOf("\r");
+        if (cr < 0 || cr > chunk.length - 2) break;
+        const sub = chunk.slice(0, cr);
+        const nl = sub.lastIndexOf("\n");
+        if (nl > -1) {
+          log += sub.slice(0, nl + 1);
+          lastnl = log.length - 1;
+        } else {
+          log = log.slice(0, lastnl + 1);
+        }
         chunk = chunk.slice(cr + 1);
       }
-      if (chunk.endsWith("\r")) {
-        chunk = chunk.slice(0, -1) + "\n";
-        lastnl += chunk.length - 1;
-      } else {
-        curpos += chunk.length;
-        const nl = chunk.lastIndexOf("\n");
-        if (nl > -1) {
-          lastnl += nl;
-        }
+
+      const nl = chunk.lastIndexOf("\n");
+      if (nl > -1) {
+        lastnl = log.length + nl;
       }
-      log += chunk;
+
+      if (chunk.endsWith("\r")) {
+        // Log will be cut on next call.
+        chunk = chunk.slice(0, -1) + "\n";
+        log += chunk;
+        curpos = lastnl + 1;
+      } else {
+        log += chunk;
+        curpos = log.length;
+      }
+
       this.setState({log});
-      const frames = frameParser.feed(chunk);
-      this.updateProgress({passn, frames, totalFrames});
+      // TODO(Kagami): Feed every line?
+      updateProgress(frameParser.feed(chunk));
     };
     const run = (args) => {
       handleLog(this.showArgs(args));
@@ -207,11 +226,15 @@ export default class extends React.PureComponent {
     // the exact number of frames in video after first pass?
     const fps = parseFrameRate(this.props.vtrack.avg_frame_rate);
     const totalFrames = Math.ceil(this.props._duration * fps);
-    const passlog = this.tmpLog.name;
-    const outpath = preview ? this.tmpPreview.name : this.tmpEncode.name;
+    const passlog = this.tmpLogName;
+    const outpath = preview ? this.tmpPreviewName : this.tmpEncodeName;
     const output = {path: preview ? null : outpath};
     const frameParser = this.createFrameParser();
 
+    // progress/log might be updated several times at one go so we need
+    // to keep our local reference in addition to state's.
+    let progress = 0;
+    let log = "";
     let curpos = 0;
     let lastnl = 0;
     let passn = (this.props.mode2Pass && !preview) ? 1 : 0;
@@ -225,17 +248,22 @@ export default class extends React.PureComponent {
       });
     }
     videop.then(() => {
-      this.setState({output, progress: 100});
+      progress = 100;
+      this.setState({output, progress});
       this.props.onEncoding(false);
       if (preview) {
-        // XXX(Kagami): This blocks window until application quits, see
-        // <https://github.com/electron/electron/issues/6889>.
+        // XXX(Kagami): This blocks event loop until application quits,
+        // see <https://github.com/electron/electron/issues/6889>. If
+        // that behavior will change don't forget about `cleanPreview`
+        // which is currently synchronous too.
         shell.openItem(outpath);
       }
     }, (encodeError) => {
-      this.setState({encodeError, progress: 0});
+      progress = 0;
+      this.setState({encodeError, progress});
       this.props.onEncoding(false);
-    });
+    // Don't needed anymore, save some space.
+    }).then(this.cleanPreview, this.cleanPreview);
   }
   cancel() {
     // `start` will fail into error state automatically.
@@ -257,7 +285,7 @@ export default class extends React.PureComponent {
   toggleEncode = (opts) => {
     const encoding = !this.props.encoding;
     if (encoding) {
-      this.setState({progress: 0, log: "", output: null, encodeError: null});
+      this.setState({output: null, encodeError: null});
       this.props.onEncoding(encoding);
       this.start(opts);
     } else {
@@ -306,7 +334,7 @@ export default class extends React.PureComponent {
             <BigButton
               width={85}
               label={this.props.encoding ? "cancel" : "start"}
-              title="Start/stop encoding"
+              title="Start/cancel encoding"
               disabled={!this.props.allValid}
               onClick={this.toggleEncode}
             />
