@@ -18,9 +18,12 @@ import {showErr} from "../util";
     justifyContent: "center",
     textAlign: "center",
   },
+  inner: {
+    width: "70%",
+  },
   error: {
-    color: "red",
     marginBottom: 30,
+    color: "red",
   },
 })
 export default class extends React.Component {
@@ -44,18 +47,20 @@ export default class extends React.Component {
     const {classes} = this.sheet;
     return (
       <div className={classes.info}>
-        <ShowHide show={!this.state.error}>
-          <h2>Gathering video info…</h2>
-        </ShowHide>
-        <ShowHide show={!!this.state.error}>
-          <div className={classes.error}>{showErr(this.state.error)}</div>
-          <BigButton
-            width={250}
-            height={40}
-            label="cancel"
-            onClick={this.props.onCancel}
-          />
-        </ShowHide>
+        <div className={classes.inner}>
+          <ShowHide show={!this.state.error}>
+            <h2>Gathering video info…</h2>
+          </ShowHide>
+          <ShowHide show={!!this.state.error}>
+            <div className={classes.error}>{showErr(this.state.error)}</div>
+            <BigButton
+              width={250}
+              height={40}
+              label="cancel"
+              onClick={this.props.onCancel}
+            />
+          </ShowHide>
+        </div>
       </div>
     );
   }
