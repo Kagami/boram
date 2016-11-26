@@ -11,15 +11,12 @@ import React from "react";
 import Icon from "react-fa";
 import FFmpeg from "../ffmpeg";
 import {useSheet} from "../jss";
+import {BigProgress, BigButton, Pane, Sep} from "../theme";
 import {
   parseFrameRate, quoteArgs,
   tmp, moveSync,
   fixOpt, clearOpt,
-  // showErr,
 } from "../util";
-import {
-  BigProgress, BigButton, Pane, Sep,
-} from "../theme";
 
 @useSheet({
   output: {
@@ -72,9 +69,15 @@ export default class extends React.PureComponent {
   state = {progress: 0, log: ""}
   componentDidMount() {
     this.props.events.addListener("abort", this.abort);
+    this.tmpLog = tmp.fileSync({prefix: "boram-", postfix: "-0.log"});
+    this.tmpPreview = tmp.fileSync({prefix: "boram-", postfix: ".mkv"});
+    this.tmpEncode = tmp.fileSync({prefix: "boram-", postfix: ".webm"});
   }
   componentWillUnmount() {
     this.props.events.removeListener("abort", this.abort);
+    try { this.tmpLog.removeCallback(); } catch (e) { /* skip */ }
+    try { this.tmpPreview.removeCallback(); } catch (e) { /* skip */ }
+    try { this.tmpEncode.removeCallback(); } catch (e) { /* skip */ }
   }
   getOutput() {
     return (this.props.encoding || this.state.output || this.state.encodeError)
@@ -197,10 +200,9 @@ export default class extends React.PureComponent {
     // the exact number of frames in video after first pass?
     const fps = parseFrameRate(this.props.vtrack.avg_frame_rate);
     const totalFrames = Math.ceil(this.props._duration * fps);
-    const postfix = preview ? ".mkv" : ".webm";
-    const outpath = tmp.fileSync({prefix: "boram-", postfix}).name;
+    const passlog = this.tmpLog.name;
+    const outpath = preview ? this.tmpPreview.name : this.tmpEncode.name;
     const output = {path: preview ? null : outpath};
-    const passlog = tmp.fileSync({prefix: "boram-", postfix: "-0.log"}).name;
     const frameParser = this.createFrameParser();
 
     let curpos = 0;
@@ -226,7 +228,6 @@ export default class extends React.PureComponent {
     }, (encodeError) => {
       this.setState({encodeError, progress: 0});
       this.props.onEncoding(false);
-      // handleLog(showErr(encodeError));
     });
   }
   cancel() {
@@ -245,7 +246,9 @@ export default class extends React.PureComponent {
   handlePreview = () => {
     this.toggleEncode({preview: true});
   };
-  handleNewTab = () => {
+  handleCloneTab = () => {
+    const {source} = this.props;
+    this.props.onNewTab({source});
   };
   toggleEncode = (opts) => {
     const encoding = !this.props.encoding;
@@ -254,6 +257,12 @@ export default class extends React.PureComponent {
       this.props.onEncoding(encoding);
       this.start(opts);
     } else {
+      const choice = remote.dialog.showMessageBox({
+        title: "Confirm",
+        message: "Abort encoding?",
+        buttons: ["OK", "Cancel"],
+      });
+      if (choice !== 0) return;
       this.cancel();
     }
   };
@@ -262,6 +271,7 @@ export default class extends React.PureComponent {
     defaultPath = basename(defaultPath, extname(defaultPath));
     defaultPath += ".webm";
     const tmppath = this.state.output.path;
+    // TODO(Kagami): Check for the same path?
     const outpath = remote.dialog.showSaveDialog({defaultPath});
     if (!outpath) return;
     try {
@@ -277,16 +287,16 @@ export default class extends React.PureComponent {
         <Pane space={5}>
           <div>
             <BigButton
+              icon={<Icon name="files-o" />}
+              title="Open new tab for this source"
+              onClick={this.handleCloneTab}
+            />
+            <Sep margin={2.5} />
+            <BigButton
               icon={<Icon name="tv" />}
               title="Make preview encode"
               disabled={!this.props.allValid || this.props.encoding}
               onClick={this.handlePreview}
-            />
-            <Sep margin={2.5} />
-            <BigButton
-              icon={<Icon name="files-o" />}
-              title="Open new tab for this source"
-              onClick={this.handleNewTab}
             />
             <Sep margin={2.5} />
             <BigButton

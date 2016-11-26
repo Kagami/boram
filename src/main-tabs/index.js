@@ -88,10 +88,10 @@ export default class extends React.Component {
   getInstance(i) {
     return this.refs[`instance${i}`];
   }
-  addTab(label = DEFAULT_LABEL) {
+  addTab(opts) {
     const tabs = this.state.tabs;
     const key = this.tabKey++;
-    tabs.push({key, label});
+    tabs.push({key, label: DEFAULT_LABEL, source: null, ...opts});
     this.setState({tabs});
   }
   handleGlobalClose = (e) => {
@@ -129,9 +129,9 @@ export default class extends React.Component {
   handleSelect = (tabIndex) => {
     this.setState({tabIndex});
   };
-  handleNew = (e) => {
-    e.stopPropagation();
-    this.addTab();
+  handleNew = (e, opts) => {
+    if (e) e.stopPropagation();
+    this.addTab(opts);
     const tabIndex = this.state.tabs.length - 1;
     this.setState({tabIndex});
   };
@@ -210,8 +210,10 @@ export default class extends React.Component {
         >
           <Instance
             ref={`instance${i}`}
+            source={tab.source}
             active={this.state.tabIndex === i}
             onTabTitle={this.handleTitleChange.bind(null, i)}
+            onNewTab={this.handleNew.bind(null, null)}
           />
         </Tab>
       )}

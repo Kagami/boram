@@ -3,6 +3,7 @@
  * @module boram/main-tabs/instance
  */
 
+import {basename} from "path";
 import EventEmitter from "events";
 import React from "react";
 import Source from "../source";
@@ -11,12 +12,19 @@ import Encoder from "../encoder";
 import ShowHide from "../show-hide";
 
 export default class extends React.PureComponent {
-  state = {}
-  events = new EventEmitter();
+  state = {source: null}
+  componentWillMount() {
+    const {source} = this.props;
+    if (source) {
+      this.handleSourceLoad(source);
+    }
+  }
+  events = new EventEmitter()
   abort() {
     this.events.emit("abort");
   }
   handleSourceLoad = (source) => {
+    this.props.onTabTitle(basename(source.path));
     this.setState({source});
   }
   handleInfoLoad = (info) => {
@@ -51,6 +59,7 @@ export default class extends React.PureComponent {
             source={this.state.source}
             info={this.state.info}
             onTabTitle={this.props.onTabTitle}
+            onNewTab={this.props.onNewTab}
           />
         </ShowHide>
       </div>

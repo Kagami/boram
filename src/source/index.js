@@ -3,7 +3,6 @@
  * @module boram/source
  */
 
-import {basename} from "path";
 import React from "react";
 import {useSheet} from "../jss";
 import Source from "./source";
@@ -30,13 +29,9 @@ export default class extends React.PureComponent {
         info = require("fs").readFileSync(info, {encoding: "utf-8"});
         this.handleInfoLoad(JSON.parse(info));
       } else if (source) {
-        this.handleSourceLoad({path: require("path").resolve(source)});
+        this.props.onLoad({path: require("path").resolve(source)});
       }
     }
-  }
-  handleSourceLoad = (source) => {
-    this.props.onTabTitle(basename(source.path));
-    this.props.onLoad(source);
   }
   handleInfoLoad = (info) => {
     this.props.onTabTitle(info.title);
@@ -57,7 +52,7 @@ export default class extends React.PureComponent {
           <Source
             events={this.props.events}
             onInfo={this.handleInfoLoad}
-            onSource={this.handleSourceLoad}
+            onSource={this.props.onLoad}
           />
         </ShowHide>
         <ShowHide show={!!this.state.info && !this.state.format}>
