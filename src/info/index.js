@@ -32,6 +32,12 @@ export default class extends React.PureComponent {
     this.props.events.addListener("abort", this.abort);
     this.ff = FFprobe.getInfo(this.props.source.path);
     this.ff.then(info => {
+      const vtrack = info.streams.find(t =>
+        t.codec_type === "video" && !t.disposition.attached_pic
+      );
+      if (!vtrack) throw new Error("No video tracks found");
+      return info;
+    }).then(info => {
       this.props.onLoad(info);
     }, error => {
       this.setState({error});

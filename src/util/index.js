@@ -204,7 +204,7 @@ export function makeRunner(exe, obj) {
           child = null;
           if (code || code == null) {
             return reject(new Error(
-              `${exe} exited with code ${code} (${stderr})`
+              `${exe} exited with code ${code} (${stderr.trim()})`
             ));
           }
           resolve(stdout);

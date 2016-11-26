@@ -86,7 +86,9 @@ export default class extends React.PureComponent {
   }
 
   getVideoTracks() {
-    return this.props.info.streams.filter(t => t.codec_type === "video");
+    return this.props.info.streams.filter(t =>
+      t.codec_type === "video" && !t.disposition.attached_pic
+    );
   }
   getAudioTracks() {
     return this.props.info.streams.filter(t => t.codec_type === "audio");
@@ -173,7 +175,7 @@ export default class extends React.PureComponent {
     }
 
     // Streams.
-    args.push("-map", `0:v:${opts.vtrackn}`);
+    args.push("-map", `0:V:${opts.vtrackn}`);
     if (opts.hasAudio) {
       // TODO(Kagami): External track.
       args.push("-map", `0:a:${opts.atrackn}`);
