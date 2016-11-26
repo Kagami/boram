@@ -155,7 +155,10 @@ export default class extends React.PureComponent {
     switch (e.keyCode) {
     case KEY_ENTER:
       if (this.state.validTime) {
-        this.seek(parseTime(this.state.prettyTime));
+        const time = parseTime(this.state.prettyTime);
+        const prettyTime = showTime(time);
+        this.setState({prettyTime});
+        this.seek(time);
         this.refs.time.blur();
       }
       break;

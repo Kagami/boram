@@ -195,7 +195,7 @@ export default class extends React.PureComponent {
 
     // TODO(Kagami): This won't work with VFR or wrong FPS value. Use
     // the exact number of frames in video after first pass?
-    const fps = parseFrameRate(this.props.vtrack.r_frame_rate);
+    const fps = parseFrameRate(this.props.vtrack.avg_frame_rate);
     const totalFrames = Math.ceil(this.props._duration * fps);
     const postfix = preview ? ".mkv" : ".webm";
     const outpath = tmp.fileSync({prefix: "boram-", postfix}).name;
@@ -278,7 +278,7 @@ export default class extends React.PureComponent {
           <div>
             <BigButton
               icon={<Icon name="tv" />}
-              title="Make fast preview encode and play it"
+              title="Make preview encode"
               disabled={!this.props.allValid || this.props.encoding}
               onClick={this.handlePreview}
             />

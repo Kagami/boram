@@ -327,16 +327,8 @@ export function Sep(props) {
   );
 }
 
-/** Tips widget. */
-@useSheet({
-  icon: {
-    display: "inline-block",
-    marginRight: 15,
-    color: "blue",
-  },
-})
-export class Tip extends React.Component {
-  static styles = {
+export const Tip = (function() {
+  const styles = {
     tip: {
       position: "fixed",
       left: 50,
@@ -346,15 +338,18 @@ export class Tip extends React.Component {
       color: "#333",
       backgroundColor: BACKGROUND_COLOR,
     },
-  }
-  render() {
-    const {classes} = this.sheet;
-    const styles = this.constructor.styles;
+    icon: {
+      display: "inline-block",
+      marginRight: 15,
+      color: "blue",
+    },
+  };
+  return function(props) {
     return (
       <Paper style={styles.tip}>
-        <Icon name={this.props.icon} className={classes.icon} />
-        {this.props.children}
+        <Icon name={props.icon} style={styles.icon} />
+        {props.children}
       </Paper>
     );
-  }
-}
+  };
+})();

@@ -46,7 +46,7 @@ export default class extends React.PureComponent {
           <Prop name="stream index">{track.index}</Prop>
           <Prop name="resolution">{track.width}x{track.height}</Prop>
           <Prop name="frame rate">
-            {showFrameRate(parseFrameRate(track.r_frame_rate))}
+            {showFrameRate(parseFrameRate(track.avg_frame_rate))}
           </Prop>
           <Prop name="pixel format">{track.pix_fmt}</Prop>
         </div>
@@ -73,22 +73,21 @@ export default class extends React.PureComponent {
     }
   }
   handlePathClick = () => {
-    const fpath = this.props.format.filename;
-    shell.openItem(fpath);
+    shell.showItemInFolder(this.props.source.path);
   };
   render() {
     const {classes} = this.sheet;
-    const {format} = this.props;
+    const {source, format} = this.props;
     return (
       <div className={classes.info}>
         <div className={classes.general}>
           <Prop name="path">
             <span
-              title={format.filename}
+              title={source.path}
               style={{cursor: "pointer"}}
               onClick={this.handlePathClick}
             >
-              {format.filename}
+              {source.path}
             </span>
           </Prop>
           <Prop name="file size">{showSize(+format.size)}</Prop>

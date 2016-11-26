@@ -75,7 +75,7 @@ jss.createStyleSheet({
   },
 }, {named: false}).attach();
 
-class Index extends React.Component {
+class Index extends React.PureComponent {
   componentDidMount() {
     // Prevent default behavior from changing page on dropped file.
     window.ondragover = function(e) { e.preventDefault(); };

@@ -20,7 +20,7 @@ import ShowHide from "../show-hide";
     textAlign: "center",
   },
 })
-export default class extends React.Component {
+export default class extends React.PureComponent {
   state = {}
   componentWillMount() {
     if (BORAM_DEBUG) {

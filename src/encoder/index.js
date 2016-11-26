@@ -51,7 +51,7 @@ const MAX_VORBIS_Q = 10;
     flex: 1,
     height: 0,
     boxSizing: "border-box",
-    padding: "5px 10px",
+    padding: 10,
   },
 })
 export default class extends React.PureComponent {
@@ -565,7 +565,7 @@ export default class extends React.PureComponent {
   handleRawArgs = (e) => {
     this.setState({rawArgs: e.target.value});
   };
-  handleEncoding = (encoding) => {
+  handleEncodingState = (encoding) => {
     this.setState({encoding});
     if (encoding) {
       this.refs.player.pause();
@@ -622,6 +622,7 @@ export default class extends React.PureComponent {
           {this.getTabNode("info", 0,
             <Info
               ref="info"
+              source={this.props.source}
               format={this.props.info.format}
               vtracks={this.getVideoTracks()}
               atracks={this.getAudioTracks()}
@@ -680,7 +681,7 @@ export default class extends React.PureComponent {
               vtrack={this.getVideoTracks()[this.state.vtrackn]}
               mode2Pass={this.state.mode2Pass}
               rawArgs={this.state.rawArgs}
-              onEncoding={this.handleEncoding}
+              onEncoding={this.handleEncodingState}
             />
           )}
         </Tabs>

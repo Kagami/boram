@@ -5,7 +5,7 @@
 
 import tmp from "tmp";
 import {BrowserWindow, app} from "electron";
-import pkg from "json!../../package.json";
+import {name, version} from "json!../../package.json";
 import "file!./index.html";
 import "file!./icon.png";
 
@@ -16,12 +16,14 @@ if (BORAM_DEBUG) {
 tmp.setGracefulCleanup();
 
 app.on("ready", () => {
+  const width = 960;
+  const height = 960;
   const win = new BrowserWindow({
-    width: 960,
-    height: 960,
-    minWidth: 960,
-    minHeight: 960,
-    title: `${pkg.name} v${pkg.version}`,
+    width,
+    height,
+    minWidth: width,
+    minHeight: height,
+    title: `${name} v${version}`,
     icon: `${__dirname}/icon.png`,
   });
   win.setMenu(null);

@@ -65,7 +65,7 @@ const YTDL_SUPPORTED_URL =
     display: "none",
   },
 })
-export default class extends React.Component {
+export default class extends React.PureComponent {
   state = {url: ""}
   componentDidMount() {
     this.props.events.addListener("cleanup", this.cleanup);

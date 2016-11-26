@@ -14,7 +14,7 @@ import {showSize} from "../util";
     marginBottom: 100,
   },
 })
-export default class extends React.Component {
+export default class extends React.PureComponent {
   state = {
     vfid: this.getVideoFormats()[0].key,
     afid: this.getAudioFormats()[0].key,

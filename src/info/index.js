@@ -26,7 +26,7 @@ import {showErr} from "../util";
     color: "red",
   },
 })
-export default class extends React.Component {
+export default class extends React.PureComponent {
   state = {}
   componentDidMount() {
     this.props.events.addListener("cleanup", this.cleanup);

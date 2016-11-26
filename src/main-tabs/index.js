@@ -65,6 +65,7 @@ const KEY_9 = 57;
   },
 })
 export default class extends React.Component {
+  // NOTE(Kagami): This component is _not_ pure.
   state = {tabs: [], tabIndex: 0}
   componentWillMount() {
     this.addTab();

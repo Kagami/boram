@@ -24,8 +24,8 @@ import {tmp, showErr} from "../util";
     color: "red",
   },
 })
-export default class extends React.Component {
-  state = {progress: 0, status: ""}
+export default class extends React.PureComponent {
+  state = {progress: 0, status: "", error: null}
   componentDidMount() {
     this.props.events.addListener("cleanup", this.cleanup);
     const {afid, ext} = this.props.format;
@@ -47,9 +47,7 @@ export default class extends React.Component {
       const {progress, status} = upd;
       this.setState({progress, status});
     }).then(() => {
-      const progress = 100;
-      const status = "writing title to metadata";
-      this.setState({progress, status});
+      this.setState({progress: 100, status: "writing title to metadata"});
       const inpath = this.tmp1.name;
       const outpath = this.tmp2.name;
       // URL might be rather long to put it into title (e.g. extra query
