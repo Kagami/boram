@@ -71,10 +71,10 @@ export default class extends React.PureComponent {
   }
   state = {progress: 0, log: ""}
   componentDidMount() {
-    this.props.events.addListener("cleanup", this.cleanup);
+    this.props.events.addListener("abort", this.abort);
   }
   componentWillUnmount() {
-    this.props.events.removeListener("cleanup", this.cleanup);
+    this.props.events.removeListener("abort", this.abort);
   }
   getOutput() {
     return (this.props.encoding || this.state.output || this.state.encodeError)
@@ -239,7 +239,7 @@ export default class extends React.PureComponent {
       /* skip */
     }
   }
-  cleanup = () => {
+  abort = () => {
     this.cancel();
   };
   handlePreview = () => {

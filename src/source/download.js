@@ -28,7 +28,7 @@ import {tmp, showErr} from "../util";
 export default class extends React.PureComponent {
   state = {progress: 0, status: "", error: null}
   componentDidMount() {
-    this.props.events.addListener("cleanup", this.cleanup);
+    this.props.events.addListener("abort", this.abort);
     const {afid, ext} = this.props.format;
     const postfix = afid ? ".mkv" : `.${ext}`;
     // ytdl might complain if its destination file exists, so we can't
@@ -38,7 +38,7 @@ export default class extends React.PureComponent {
     this.handleDownload();
   }
   componentWillUnmount() {
-    this.props.events.removeListener("cleanup", this.cleanup);
+    this.props.events.removeListener("abort", this.abort);
   }
   handleDownload = () => {
     this.setState({progress: 0, status: "spawning youtube-dl", error: null});
@@ -66,7 +66,7 @@ export default class extends React.PureComponent {
       this.setState({progress, error});
     }).then(this.removeYT, this.removeYT);
   };
-  cleanup = () => {
+  abort = () => {
     // ytdl should have a chance to remote its temporary files, so we
     // don't SIGKILL it.
     try { this.ytdl.kill("SIGTERM"); } catch (e) { /* skip */ }
@@ -76,7 +76,7 @@ export default class extends React.PureComponent {
     try { fs.unlinkSync(this.tmpYTname); } catch (e) { /* skip */ }
   };
   handleCancel = () => {
-    this.cleanup();
+    this.abort();
     this.removeYT();
     try { this.tmpFF.removeCallback(); } catch (e) { /* skip */ }
     this.props.onCancel();

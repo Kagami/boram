@@ -29,7 +29,7 @@ import {showErr} from "../util";
 export default class extends React.PureComponent {
   state = {}
   componentDidMount() {
-    this.props.events.addListener("cleanup", this.cleanup);
+    this.props.events.addListener("abort", this.abort);
     this.ff = FFprobe.getInfo(this.props.source.path);
     this.ff.then(info => {
       this.props.onLoad(info);
@@ -38,9 +38,9 @@ export default class extends React.PureComponent {
     });
   }
   componentWillUnmount() {
-    this.props.events.removeListener("cleanup", this.cleanup);
+    this.props.events.removeListener("abort", this.abort);
   }
-  cleanup = () => {
+  abort = () => {
     try { this.ff.kill("SIGKILL"); } catch (e) { /* skip */ }
   };
   render() {

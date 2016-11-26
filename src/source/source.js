@@ -68,12 +68,12 @@ const COMMON_VIDEO_EXTENSIONS = [
 export default class extends React.PureComponent {
   state = {url: ""}
   componentDidMount() {
-    this.props.events.addListener("cleanup", this.cleanup);
+    this.props.events.addListener("abort", this.abort);
   }
   componentWillUnmount() {
-    this.props.events.removeListener("cleanup", this.cleanup);
+    this.props.events.removeListener("abort", this.abort);
   }
-  cleanup = () => {
+  abort = () => {
     try { this.ytdl.kill("SIGKILL"); } catch (e) { /* skip */ }
   };
   handleFormClick = () => {

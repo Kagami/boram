@@ -13,8 +13,8 @@ import ShowHide from "../show-hide";
 export default class extends React.PureComponent {
   state = {}
   events = new EventEmitter();
-  cleanup() {
-    this.events.emit("cleanup");
+  abort() {
+    this.events.emit("abort");
   }
   handleSourceLoad = (source) => {
     this.setState({source});

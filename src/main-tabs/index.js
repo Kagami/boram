@@ -109,7 +109,7 @@ export default class extends React.Component {
       }
     }
     for (let i = 0; i < this.state.tabs.length; i++) {
-      this.getInstance(i).cleanup();
+      this.getInstance(i).abort();
     }
   };
   handleGlobaKey = (e) => {
@@ -143,7 +143,7 @@ export default class extends React.Component {
       buttons: ["OK", "Cancel"],
     });
     if (choice !== 0) return;
-    this.getInstance(i).cleanup();
+    this.getInstance(i).abort();
     const tabs = this.state.tabs;
     tabs.splice(i, 1);
     let tabIndex = this.state.tabIndex;
