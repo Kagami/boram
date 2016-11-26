@@ -47,6 +47,9 @@ const MAX_VORBIS_Q = 10;
     color: "#999 !important",
     backgroundColor: "#eee !important",
   },
+  disabledTab: {
+    cursor: "not-allowed !important",
+  },
   tabContent: {
     flex: 1,
     height: 0,
@@ -63,7 +66,8 @@ export default class extends React.PureComponent {
     },
   }
   state = {
-    tabIndex: 0,
+    // Shouldn't be falsy because of Tabs component restrictions.
+    tabIndex: 1,
     encoding: false,
     allValid: true,
     mstart: 0,
@@ -583,16 +587,22 @@ export default class extends React.PureComponent {
     return <div style={style}>{children}</div>;
   }
   handleSelect = (tabIndex) => {
+    if (this.state.encoding) return;
     this.setState({tabIndex});
   };
   getTabNode(label, index, children) {
     const {classes} = this.sheet;
     const active = this.state.tabIndex === index;
+    const disabled = this.state.encoding && !active;
     return (
       <Tab
         value={index}
         label={label}
-        className={cx(classes.tab, active && classes.activeTab)}
+        className={cx({
+          [classes.tab]: true,
+          [classes.activeTab]: active,
+          [classes.disabledTab]: disabled,
+        })}
       >
         {children}
       </Tab>
@@ -615,13 +625,14 @@ export default class extends React.PureComponent {
           onMarkEnd={this.handleMarkEnd}
         />
         <Tabs
+          value={this.state.tabIndex}
           onChange={this.handleSelect}
           className={classes.tabs}
           inkBarStyle={{display: "none"}}
           contentContainerClassName={classes.tabContent}
           tabTemplate={this.getTabTemplate}
         >
-          {this.getTabNode("info", 0,
+          {this.getTabNode("info", 1,
             <Info
               ref="info"
               source={this.props.source}
@@ -632,7 +643,7 @@ export default class extends React.PureComponent {
               onUpdate={this.handleAll}
             />
           )}
-          {this.getTabNode("video fx", 1,
+          {this.getTabNode("video fx", 2,
             <VideoFX
               ref="videoFX"
               makeChecker={this.makeChecker}
@@ -646,7 +657,7 @@ export default class extends React.PureComponent {
               onUpdate={this.handleAll}
             />
           )}
-          {this.getTabNode("audio fx", 2,
+          {this.getTabNode("audio fx", 3,
             <AudioFX
               ref="audioFX"
               makeChecker={this.makeChecker}
@@ -657,7 +668,7 @@ export default class extends React.PureComponent {
               onUpdate={this.handleAll}
             />
           )}
-          {this.getTabNode("codecs", 3,
+          {this.getTabNode("codecs", 4,
             <Codecs
               ref="codecs"
               makeChecker={this.makeChecker}
@@ -672,7 +683,7 @@ export default class extends React.PureComponent {
               onRawArgs={this.handleRawArgs}
             />
           )}
-          {this.getTabNode("encode", 4,
+          {this.getTabNode("encode", 5,
             <Encode
               ref="encode"
               events={this.props.events}
