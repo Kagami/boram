@@ -32,7 +32,6 @@ export const BOX_WIDTH = 960;
 export const BOX_HEIGHT = 540;
 export const BACKGROUND_COLOR = "#eee";
 export const SECONDARY_COLOR = "#999";
-export const COMMON_MARGIN = 10;
 
 export function Pane(props) {
   assert.equal(React.Children.count(props.children), 2);
@@ -208,9 +207,11 @@ export const InlineCheckbox = (function() {
       display: "inline-block",
       width: "auto",
       verticalAlign: "middle",
+      // Adjust for displaced svg icon.
+      marginLeft: -3,
     },
     icon: {
-      marginRight: COMMON_MARGIN,
+      marginRight: 10,
     },
   };
   function handleKeyDown(e) {
@@ -385,10 +386,15 @@ export const HelpPane = useSheet({
   description: {
     fontSize: "16px",
   },
+  errorList: {
+    margin: 0,
+    fontSize: "16px",
+    color: "red",
+  },
 })(function(props, {classes}) {
   const {help, focused, errors} = props;
   const showHelp = !!(focused && help[focused]);
-  const showErrors = !!errors.length;
+  const showErrors = !!(errors && errors.length);
   const show = showHelp || showErrors;
   const style = {display: show ? "block" : "none"};
 
@@ -402,6 +408,20 @@ export const HelpPane = useSheet({
     );
   }
 
+  function getErrorNode() {
+    const marginTop = showHelp ? 10 : 0;
+    return (
+      <div style={{marginTop}}>
+        <h3 className={classes.title}>Errors</h3>
+        <ul className={classes.errorList}>
+        {errors.map(({name, message}) =>
+          <li key={name}>{help[name][0]}: {message}</li>
+        )}
+        </ul>
+      </div>
+    );
+  }
+
   return (
     <div className={classes.outer}>
       <div className={classes.first}>
@@ -409,6 +429,7 @@ export const HelpPane = useSheet({
       </div>
       <div className={classes.second} style={style}>
         {showHelp ? getHelpNode() : null}
+        {showErrors ? getErrorNode() : null}
       </div>
     </div>
   );

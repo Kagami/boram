@@ -344,32 +344,31 @@ export default class extends React.PureComponent {
     }
 
     let allValid = true;
-    const errors = {};
+    const errors = {
+      videoFX: [],
+      audioFX: [],
+      codecs: [],
+    };
     function requireInt(value) {
       value = value.toString();
-      if (!/^-?\d+$/.test(value)) {
-        throw new Error("Int required");
-      }
+      if (!/^-?\d+$/.test(value)) throw new Error("int required");
       return parseInt(value, 10);
     }
     function requireFloat(value) {
       value = value.toString();
-      if (!/^-?\d+(\.\d+)?$/.test(value)) {
-        throw new Error("Float required");
-      }
+      if (!/^-?\d+(\.\d+)?$/.test(value)) throw new Error("float required");
       return parseFloat(value);
     }
     function requireRange(value, min, max = Infinity) {
-      if (value < min || value > max) {
-        throw new Error("Bad range");
-      }
+      if (value < min || value > max) throw new Error("bad range");
       return value;
     }
-    const validate = (value, validator) => {
+    const validate = (tab, name, value, validator) => {
       try {
         return validator(value);
-      } catch (e) {
+      } catch ({message}) {
         allValid = false;
+        errors[tab].push({name, message});
         return null;
       }
     };
@@ -409,6 +408,7 @@ export default class extends React.PureComponent {
     const mode2Pass = get("mode2Pass");
     const modeLimit = get("modeLimit");
     const modeCRF = get("modeCRF");
+    let rawArgs = "";
     // Helpers.
     const mstart = get("mstart");
     const mend = get("mend");
@@ -420,39 +420,39 @@ export default class extends React.PureComponent {
     // Validate & transform.
     // Validation is poor and doesn't allow expressions, but user can
     // always edit raw arguments. So this is sort of "basic mode".
-    cropw = validate(cropw, v => {
+    cropw = validate("videoFX", "cropw", cropw, v => {
       if (!v) return null;
       v = requireInt(v);
       return requireRange(v, 1);
     });
-    croph = validate(croph, v => {
+    croph = validate("videoFX", "croph", croph, v => {
       if (!v) return null;
       v = requireInt(v);
       return requireRange(v, 1);
     });
-    cropx = validate(cropx, v => {
+    cropx = validate("videoFX", "cropx", cropx, v => {
       if (!v) return null;
       v = requireInt(v);
       return requireRange(v, 0);
     });
-    cropy = validate(cropy, v => {
+    cropy = validate("videoFX", "cropy", cropy, v => {
       if (!v) return null;
       v = requireInt(v);
       return requireRange(v, 0);
     });
-    scalew = validate(scalew, v => {
+    scalew = validate("videoFX", "scalew", scalew, v => {
       if (!v) return null;
       // Scale parameters can contain arbitrary expressions and `-1` but
       // we validate them as nat numbers for simplicity.
       v = requireInt(v);
       return requireRange(v, 1);
     });
-    scaleh = validate(scaleh, v => {
+    scaleh = validate("videoFX", "scaleh", scaleh, v => {
       if (!v) return null;
       v = requireInt(v);
       return requireRange(v, 1);
     });
-    speed = validate(speed, v => {
+    speed = validate("videoFX", "speed", speed, v => {
       if (!v) return null;
       v = requireFloat(v);
       // XXX(Kagami): 0.001 is a hack to emulate `> 0` because
@@ -460,22 +460,22 @@ export default class extends React.PureComponent {
       return requireRange(v, 0.001);
     });
     // TODO(Kagami): accept "num/den" form and abbreviations?
-    fps = validate(fps, v => {
+    fps = validate("videoFX", "fps", fps, v => {
       if (!v) return null;
       v = requireFloat(v);
       return requireRange(v, 0.001);
     });
-    fadeIn = validate(fadeIn, v => {
+    fadeIn = validate("audioFX", "fadeIn", fadeIn, v => {
       if (!v) return null;
       v = requireFloat(v);
       return requireRange(v, 0.001);
     });
-    fadeOut = validate(fadeOut, v => {
+    fadeOut = validate("audioFX", "fadeOut", fadeOut, v => {
       if (!v) return null;
       v = requireFloat(v);
       return requireRange(v, 0.001);
     });
-    amplify = validate(amplify, v => {
+    amplify = validate("audioFX", "amplify", amplify, v => {
       if (!v) return null;
       v = requireInt(v);
       return requireRange(v, 1, 64);
@@ -485,7 +485,7 @@ export default class extends React.PureComponent {
       setText("codecs", "start", start);
     }
     start = start || null;
-    _start = validate(start, (v) => {
+    _start = validate("codecs", "start", start, (v) => {
       if (!v) return 0;
       v = parseTime(v);
       return requireRange(v, 0, induration - 0.001);
@@ -495,28 +495,26 @@ export default class extends React.PureComponent {
       setText("codecs", "end", end);
     }
     end = end || null;
-    _duration = validate(end, (v) => {
+    _duration = validate("codecs", "end", end, (v) => {
       if (!allValid) return null;
       if (!v) return induration - _start;
       v = parseTime(v);
       v = requireRange(v, 0.001, induration);
       v -= _start;
-      if (v <= 0) {
-        throw new Error("Less than start");
-      }
+      if (v <= 0) throw new Error("less than start");
       return v;
     });
     if (what.checked === "modeCRF") {
       limit = modeCRF ? "0" : "";
       setText("codecs", "limit", limit);
     }
-    limit = validate(limit, v => {
+    limit = validate("codecs", "limit", limit, v => {
       if (modeCRF) return 0;
       v = v || (modeLimit ? DEFAULT_LIMIT : DEFAULT_BITRATE);
       v = requireFloat(v);
       return requireRange(v, 0.001);
     });
-    quality = validate(quality, v => {
+    quality = validate("codecs", "quality", quality, v => {
       if (modeCRF) {
         v = v || DEFAULT_Q;
       } else if (!v) {
@@ -535,7 +533,7 @@ export default class extends React.PureComponent {
       ab = "";
       setText("codecs", "ab", ab);
     }
-    ab = validate(ab, v => {
+    ab = validate("codecs", "ab", ab, v => {
       v = v || (acodec === "opus" ? DEFAULT_OPUS_BITRATE : DEFAULT_VORBIS_Q);
       if (acodec === "opus") {
         v = requireFloat(v);
@@ -548,8 +546,11 @@ export default class extends React.PureComponent {
       }
     });
     // This assumes we were called from `onBlur` handler.
-    this.setState({allValid, errors, focused: null});
-    if (!allValid) return;
+    this.setState({allValid, errors, rawArgs, focused: null});
+    if (!allValid) {
+      setText("codecs", "rawArgs", rawArgs);
+      return;
+    }
 
     const opts = {
       // vfx.
@@ -569,7 +570,7 @@ export default class extends React.PureComponent {
       acodec, ab,
       mode2Pass, modeLimit, modeCRF,
     };
-    const rawArgs = this.makeRawArgs(opts).join(" ");
+    rawArgs = this.makeRawArgs(opts).join(" ");
     setText("codecs", "rawArgs", rawArgs);
     this.setState({
       _duration,
@@ -661,7 +662,7 @@ export default class extends React.PureComponent {
               makeChecker={this.makeChecker}
               makeSelecter={this.makeSelecter}
               focused={this.state.focused}
-              errors={this.state.errors}
+              errors={this.state.errors.videoFX}
               vtracks={this.getVideoTracks()}
               stracks={this.getSubTracks()}
               vtrackn={this.state.vtrackn}
@@ -678,7 +679,7 @@ export default class extends React.PureComponent {
               makeChecker={this.makeChecker}
               makeSelecter={this.makeSelecter}
               focused={this.state.focused}
-              errors={this.state.errors}
+              errors={this.state.errors.audioFX}
               atracks={this.getAudioTracks()}
               hasAudio={this.state.hasAudio}
               atrackn={this.state.atrackn}
@@ -692,7 +693,7 @@ export default class extends React.PureComponent {
               makeChecker={this.makeChecker}
               makeSelecter={this.makeSelecter}
               focused={this.state.focused}
-              errors={this.state.errors}
+              errors={this.state.errors.codecs}
               vcodec={this.state.vcodec}
               hasAudio={this.state.hasAudio}
               acodec={this.state.acodec}
