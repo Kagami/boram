@@ -1,4 +1,4 @@
-# boram
+# boram ![](src/index/icon.png)
 
 Cross-platform WebM converter.
 
