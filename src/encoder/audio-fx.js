@@ -13,6 +13,17 @@ import {
 } from "../theme";
 
 const HELP = {
+  fadeIn: [
+    "Fade-in",
+    `Fade-in effect, in seconds. "1" is good value.`,
+  ], fadeOut: [
+    "Fade-out",
+    `Fade-out effect, in seconds. "1" is good value.`,
+  ], amplify: [
+    "Amplify",
+    `Compress and amplify quiet audio. Allowed range: 1÷64.
+     2÷4 are good values.`,
+  ],
 };
 
 export default class extends React.PureComponent {

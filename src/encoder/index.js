@@ -25,6 +25,8 @@ const MIN_VP8_Q = 4;
 const MAX_VP8_Q = 63;
 const MIN_VP9_Q = 0;
 const MAX_VP9_Q = 63;
+const MIN_OPUS_BITRATE = 6;
+const MAX_OPUS_BITRATE = 510;
 const MIN_VORBIS_Q = -1;
 const MAX_VORBIS_Q = 10;
 
@@ -537,7 +539,7 @@ export default class extends React.PureComponent {
       v = v || (acodec === "opus" ? DEFAULT_OPUS_BITRATE : DEFAULT_VORBIS_Q);
       if (acodec === "opus") {
         v = requireFloat(v);
-        return requireRange(v, 0.001);
+        return requireRange(v, MIN_OPUS_BITRATE, MAX_OPUS_BITRATE);
       } else if (acodec === "vorbis") {
         v = requireInt(v);
         return requireRange(v, MIN_VORBIS_Q, MAX_VORBIS_Q);

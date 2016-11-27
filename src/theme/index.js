@@ -368,7 +368,7 @@ export const HelpPane = useSheet({
     height: "100%",
   },
   first: {
-    width: "55%",
+    width: "50%",
     height: "100%",
   },
   second: {

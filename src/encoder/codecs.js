@@ -14,6 +14,27 @@ import {
 } from "../theme";
 
 const HELP = {
+  start: [
+    "Start time",
+    `Time of the fragment start.`,
+  ], end: [
+    "End time",
+    `Time of the fragment end.`,
+  ], limit: [
+    "Limit/video bitrate",
+    `In limit mode specifies the target file size in megabytes.
+     Video bitrate in kbits otherwise.
+     Set to 8/1000 by default respectfully.`,
+  ], quality: [
+    "Video quality",
+    `Generally useful for CRF mode and short clips.
+     0÷63 for VP9 ("0" is lossless), 4÷63 for VP8.
+     "25" is good value and thus default in CRF mode.`,
+  ], ab: [
+    "Audio bitrate/quality",
+    `Specifies bitrate in kbits for Opus codec or quality for Vorbis.
+     Ranges and defaults are 6÷510/-1÷10, 128/4 respectfully`,
+  ],
 };
 
 @useSheet({
@@ -113,7 +134,7 @@ export default class extends React.PureComponent {
             <Sep/>
             <InlineCheckbox
               label="limit"
-              title="Toggle fit-to-limit/custom-bitrate modes"
+              title="Toggle fit-to-limit and custom-bitrate modes"
               checked={this.props.modeLimit}
               disabled={this.props.modeCRF}
               onCheck={this.props.makeChecker("modeLimit")}
