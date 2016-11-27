@@ -23,7 +23,7 @@ app.on("ready", () => {
     height,
     minWidth: width,
     minHeight: height,
-    title: `${name} v${version}`,
+    title: `${name} v${version} by tiarathread`,
     icon: `${__dirname}/icon.png`,
   });
   win.setMenu(null);
