@@ -89,6 +89,17 @@ export function showErr(err) {
 }
 
 /**
+ * Escape shell argument.
+ */
+export function escapeArg(arg) {
+  arg = arg.replace(/\\/g, "\\\\");
+  arg = arg.replace(/"/g, '\\"');
+  arg = arg.replace(/\$/g, "\\$");
+  arg = arg.replace(/`/g, "\\`");
+  return `"${arg}"`;
+}
+
+/**
  * Analogue of `shell-quote.quote` with double quotes and more pretty
  * escaping.
  *
@@ -100,12 +111,10 @@ export function quoteArgs(args) {
   return args.map(arg => {
     // Reserved shell symbols.
     if (/[\s'"<>|&;()*\\\[\]]/.test(arg)) {
-      arg = arg.replace(/\\/g, "\\\\");
-      arg = arg.replace(/"/g, '\\"');
-      arg = arg.replace(/\$/g, "\\$");
-      arg = `"${arg}"`;
+      return escapeArg(arg);
+    } else {
+      return arg;
     }
-    return arg;
   }).join(" ");
 }
 

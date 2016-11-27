@@ -14,7 +14,7 @@ import VideoFX from "./video-fx";
 import AudioFX from "./audio-fx";
 import Codecs from "./codecs";
 import Encode from "./encode";
-import {parseTime, showTime} from "../util";
+import {parseTime, showTime, escapeArg} from "../util";
 
 const DEFAULT_LIMIT = 8;
 const DEFAULT_BITRATE = 1000;
@@ -133,19 +133,8 @@ export default class extends React.PureComponent {
     return vb > 0 ? vb : 1;
   }
   /**
-   * Escape shell argument.
-   */
-  escapeArg(arg) {
-    arg = arg.replace(/\\/g, "\\\\");
-    arg = arg.replace(/"/g, '\\"');
-    arg = arg.replace(/\$/g, "\\$");
-    return `"${arg}"`;
-  }
-  /**
-   * (Taken from webm.py)
-   *
    * Escape FFmpeg filter argument (see ffmpeg-filters(1), "Notes on
-   * filtergraph escaping"). Escaping rules are rather mad.
+   * filtergraph escaping").
    *
    * Known issues: names like :.ass, 1:.ass still don't work. Seems like
    * a bug in FFmpeg because _:.ass works ok.
@@ -174,7 +163,7 @@ export default class extends React.PureComponent {
 
     // Input.
     maybeSet("-ss", opts.start);
-    args.push("-i", this.escapeArg(inpath));
+    args.push("-i", escapeArg(inpath));
     if (opts.end != null) {
       // We always use `-t` in resulting command because `-ss` before
       // `-i` resets timestamps, see:
@@ -265,7 +254,7 @@ export default class extends React.PureComponent {
       vfilters.push(`setpts=PTS*${opts.speed}`);
     }
     if (vfilters.length) {
-      args.push("-vf", `"${vfilters.join(",")}"`);
+      args.push("-vf", escapeArg(vfilters.join(",")));
     }
 
     if (opts.hasAudio) {
