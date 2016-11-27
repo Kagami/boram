@@ -2,8 +2,10 @@
 
 set -ex
 
-cd "$( dirname -- "${BASH_SOURCE[0]}" )/bin"
-rm -rf youtube-dl.zip youtube-dl.exe ffmpeg-latest-win64-shared.7z ffmpeg-latest-win64-shared
+cd "$( dirname -- "${BASH_SOURCE[0]}" )"
+rm -rf bin
+mkdir bin
+cd bin
 
 wget https://yt-dl.org/latest/youtube-dl -O youtube-dl.zip
 wget https://yt-dl.org/latest/youtube-dl.exe
