@@ -23,6 +23,7 @@ const COMMON_PLUGINS = [
   new ExtractTextPlugin("index.css"),
 ];
 const PLUGINS = BORAM_DEBUG ? COMMON_PLUGINS : COMMON_PLUGINS.concat([
+  new webpack.DefinePlugin({"process.env.NODE_ENV": '"production"'}),
   new webpack.optimize.OccurenceOrderPlugin(),
   new webpack.optimize.UglifyJsPlugin({
     output: {comments: false},
