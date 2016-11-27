@@ -10,7 +10,7 @@ import which from "which";
 
 // Renderer process doesn't receive process exit events so need to setup
 // cleanup inside main process.
-export const tmp = require("electron").remote.require("tmp");
+export const tmp = require("electron").remote.getGlobal("tmp");
 
 export function showSize(size, opts = {}) {
   const space = opts.tight ? "" : " ";

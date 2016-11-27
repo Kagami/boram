@@ -3,17 +3,20 @@
  * @module boram/index
  */
 
-import tmp from "tmp";
 import {BrowserWindow, app} from "electron";
 import {name, version} from "json!../../package.json";
 import "file!./index.html";
 import "file!./icon.png";
+// Need to have some valid package.json, so provide empty stub.
+import "file!./package.json";
+
+// Used by renderer process.
+global.tmp = require("tmp");
+global.tmp.setGracefulCleanup();
 
 if (BORAM_DEBUG) {
   require("electron-debug")();
 }
-
-tmp.setGracefulCleanup();
 
 app.on("ready", () => {
   const win = new BrowserWindow({

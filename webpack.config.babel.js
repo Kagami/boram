@@ -2,16 +2,12 @@ import path from "path";
 import webpack from "webpack";
 import ExtractTextPlugin from "extract-text-webpack-plugin";
 
-function insrc(...parts) {
-  return new RegExp("^" + path.join(__dirname, "src", ...parts) + "$");
-}
-
-function inmodules(...parts) {
-  return new RegExp("^" + path.join(__dirname, "node_modules", ...parts) + "$");
+function intree(...parts) {
+  return new RegExp("^" + path.join(__dirname, ...parts) + "$");
 }
 
 function infa(...parts) {
-  return inmodules("font-awesome", ...parts);
+  return intree("node_modules", "font-awesome", ...parts);
 }
 
 const DIST_DIR = path.join("dist", "app");
@@ -50,13 +46,17 @@ export default {
   },
   module: {
     loaders: [
-      {test: insrc(".+\\.js"), loader: "babel"},
-      // Font Awesome.
+      // Latest node is almost ES2015-ready but need to transpile few
+      // unsupported features.
+      {test: intree("src", ".+\\.js"), loader: "babel"},
+      // Predefined loaders for Font Awesome because requires are inside
+      // libraries and we can't control them.
       {test: infa(".+\\.css"), loader: ExtractLoader},
       {test: infa(".+\\.woff2(\\?v=[\\d.]+)?"), loader: "file"},
       {test: infa(".+\\.(ttf|eot|svg|woff)(\\?v=[\\d.]+)?"), loader: "skip"},
-      // Binaries.
-      {test: /\.(exe|dll)$/, loader: "file"},
+      // Predefined loaders for FFmpeg binaries because we can't(?) add
+      // loaders to `require.context`.
+      {test: intree("bin", "ffmpeg.*", ".+\\.(exe|dll)"), loader: "file"},
     ],
   },
   fileLoader: {

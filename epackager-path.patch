@@ -1,0 +1,13 @@
+diff --git a/node_modules/electron-packager/common.js b/node_modules/electron-packager/common.js
+index 166c048..a06e668 100644
+--- a/node_modules/electron-packager/common.js
++++ b/node_modules/electron-packager/common.js
+@@ -92,7 +92,7 @@ function sanitizeAppName (name) {
+ }
+ 
+ function generateFinalBasename (opts) {
+-  return `${sanitizeAppName(opts.name)}-${opts.platform}-${opts.arch}`
++  return `${sanitizeAppName(opts.name)}-v${opts['app-version']}-${opts.platform}-${opts.arch}`
+ }
+ 
+ function generateFinalPath (opts) {

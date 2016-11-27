@@ -6,7 +6,7 @@
 import assert from "assert";
 import {makeRunner} from "../util";
 const YTDL = require(
-  "file?name=[name].[ext]!../../bin/youtube-dl." +
+  "file!../../bin/youtube-dl." +
   (BORAM_WIN_BUILD ? "exe" : "zip")
 );
 

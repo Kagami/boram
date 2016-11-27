@@ -15,6 +15,16 @@
 * Fast filters result preview, no need to go through trial and error
 * And more…
 
+## Install
+
+### Windows
+
+Download [latest release](https://github.com/Kagami/wybm/releases), unpack and run `boram.exe`.
+
+### Linux
+
+You need FFmpeg installed. Download [latest release](https://github.com/Kagami/wybm/releases), unpack and run `./boram`.
+
 ## License
 
 boram's own code is licensed under [CC0](COPYING) but the releases also include:
