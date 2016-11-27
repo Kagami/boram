@@ -209,9 +209,13 @@ export default class extends React.PureComponent {
     maybeSet("-crf", opts.quality);
     // Enabled for VP9 by default but always force it just in case.
     args.push("-auto-alt-ref", "1", "-lag-in-frames", "25");
-    // Default to 128 for both VP8 and VP9 but bigger keyframe interval
-    // saves bitrate a bit.
-    args.push("-g", "9999");
+    // Bigger keyframe interval saves bitrate but a lot of users will
+    // complain if they can't seek video and savings are not that high
+    // compared to disadvantages. It's still possible to enter any
+    // advanced options in raw args field.
+    // It should be default for both VP8 and VP9 in latest libvpx,
+    // passing it anyway for compatibility with old versions.
+    args.push("-g", "128");
     // Using other subsamplings require profile>0 which support
     // across various decoders is still poor.
     args.push("-pix_fmt", "yuv420p");
