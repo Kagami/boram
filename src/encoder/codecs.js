@@ -43,14 +43,11 @@ const HELP = {
     height: "100%",
     flexDirection: "column",
   },
-  nameArgs: {
+  valueCheck: {
     lineHeight: "48px",
-    verticalAlign: "top",
-    width: "15%",
   },
-  valueArgs: {
-    width: "85%",
-    maxWidth: "none",
+  nameArgs: {
+    verticalAlign: "top",
   },
 })
 export default class extends React.PureComponent {
@@ -124,7 +121,7 @@ export default class extends React.PureComponent {
               onBlur={this.props.onUpdate}
             />
           </Prop>
-          <Prop name="mode">
+          <Prop name="mode" valueClassName={classes.valueCheck}>
             <InlineCheckbox
               label="2pass"
               title="Use 2pass encode (recommended)"
@@ -148,11 +145,7 @@ export default class extends React.PureComponent {
             />
           </Prop>
         </HelpPane>
-        <Prop
-          name="raw args"
-          nameClassName={classes.nameArgs}
-          valueClassName={classes.valueArgs}
-        >
+        <Prop name="raw args" nameClassName={classes.nameArgs}>
           <ArgsInput
             ref="rawArgs"
             onChange={this.props.onRawArgs}

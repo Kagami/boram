@@ -19,7 +19,7 @@ const COMMON_VIDEO_EXTENSIONS = [
 
 @useSheet({
   source2: {
-    width: 650,
+    width: 600,
     height: 600,
     marginBottom: 50,
   },

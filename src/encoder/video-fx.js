@@ -4,6 +4,7 @@
  */
 
 import React from "react";
+import {useSheet} from "../jss";
 import {
   HelpPane,
   Prop, SmallInput,
@@ -42,9 +43,15 @@ const HELP = {
   ],
 };
 
-// Can't use stateless component because of refs.
+@useSheet({
+  valueCheck: {
+    lineHeight: "48px",
+  },
+})
 export default class extends React.PureComponent {
+  // Can't use stateless component because of refs.
   render() {
+    const {classes} = this.sheet;
     return (
       <HelpPane
         help={HELP}
@@ -65,7 +72,7 @@ export default class extends React.PureComponent {
           )}
           </SmallSelect>
         </Prop>
-        <Prop name="deinterlace">
+        <Prop name="deinterlace" valueClassName={classes.valueCheck}>
           <InlineCheckbox
             title="Toggle deinterlacing filter"
             checked={this.props.deinterlace}

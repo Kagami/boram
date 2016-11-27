@@ -16,13 +16,11 @@ if (BORAM_DEBUG) {
 tmp.setGracefulCleanup();
 
 app.on("ready", () => {
-  const width = 960;
-  const height = 960;
   const win = new BrowserWindow({
-    width,
-    height,
-    minWidth: width,
-    minHeight: height,
+    width: 960,
+    height: 960,
+    minWidth: 640,
+    minHeight: 780,
     title: `${name} v${version} by tiarathread`,
     icon: `${__dirname}/icon.png`,
   });

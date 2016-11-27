@@ -62,9 +62,11 @@ export function Pane(props) {
 
 function makeProp(nameStyles) {
   const styles = {
+    prop: {
+      display: "flex",
+    },
     name: {
-      display: "inline-block",
-      width: "30%",
+      width: 130,
       lineHeight: "48px",
       verticalAlign: "middle",
       cursor: "default",
@@ -75,18 +77,17 @@ function makeProp(nameStyles) {
       ...nameStyles,
     },
     value: {
-      display: "inline-block",
-      color: SECONDARY_COLOR,
-      maxWidth: "65%",
+      flex: 1,
       overflow: "hidden",
       verticalAlign: "middle",
       textOverflow: "ellipsis",
       whiteSpace: "nowrap",
+      color: SECONDARY_COLOR,
     },
   };
   return useSheet(styles)(function(props, {classes}) {
     return (
-      <div>
+      <div className={classes.prop}>
         <div className={cx(classes.name, props.nameClassName)}>
           {props.name}:
         </div>
@@ -367,17 +368,22 @@ export const HelpPane = useSheet({
   outer: {
     display: "flex",
     height: "100%",
+    flex: 1,
   },
   first: {
     width: "50%",
+    minWidth: 400,
     height: "100%",
   },
   second: {
-    borderLeft: "2px solid #ccc",
     flex: 1,
     height: "100%",
-    padding: "0 10px",
     overflowY: "auto",
+  },
+  secondInner: {
+    height: "100%",
+    padding: "0 10px",
+    borderLeft: "2px solid #ccc",
   },
   title: {
     margin: 0,
@@ -427,9 +433,11 @@ export const HelpPane = useSheet({
       <div className={classes.first}>
         {props.children}
       </div>
-      <div className={classes.second} style={style}>
-        {showHelp ? getHelpNode() : null}
-        {showErrors ? getErrorNode() : null}
+      <div className={classes.second}>
+        <div className={classes.secondInner} style={style}>
+          {showHelp ? getHelpNode() : null}
+          {showErrors ? getErrorNode() : null}
+        </div>
       </div>
     </div>
   );
