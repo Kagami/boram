@@ -2,7 +2,7 @@
   "name": "boram",
   "version": "0.0.0-dev",
   "private": true,
-  "description": "Cross-platform WebM converter",
+  "description": "Cross-platform WebM encoder",
   "scripts": {
     "start": "webpack --watch",
     "dev": "electron dist/app",

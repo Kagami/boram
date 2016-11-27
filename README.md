@@ -1,7 +1,5 @@
 # boram ![](src/index/icon.png)
 
-Cross-platform WebM converter.
-
 ![](https://raw.githubusercontent.com/Kagami/boram/assets/boram-source.png)
 ![](https://raw.githubusercontent.com/Kagami/boram/assets/boram-encode.png)
 
