@@ -89,12 +89,17 @@ export function showErr(err) {
 }
 
 /**
- * Analogue of `shell-quote.quote` but only uses double quotes.
- * Note: it might be broken in some extreme cases.
+ * Analogue of `shell-quote.quote` with double quotes and more pretty
+ * escaping.
+ *
+ * It's probably broken for extreme cases but this function is
+ * not that important anyway (basically to allow user to copypaste
+ * command from log into real console).
  */
 export function quoteArgs(args) {
   return args.map(arg => {
-    if (/[\s'"]/.test(arg)) {
+    // Reserved shell symbols.
+    if (/[\s'"<>|&;()*\\\[\]]/.test(arg)) {
       arg = arg.replace(/\\/g, "\\\\");
       arg = arg.replace(/"/g, '\\"');
       arg = arg.replace(/\$/g, "\\$");

@@ -4,25 +4,26 @@
  */
 
 import React from "react";
-import {useSheet} from "../jss";
 import {
-  MenuItem, Prop,
-  SmallSelect, SmallInput,
+  HelpPane,
+  Prop, SmallInput,
+  SmallSelect, MenuItem,
   InlineCheckbox, Sep,
   // SmallButton, BoldIcon,
 } from "../theme";
 
-@useSheet({
-  prop: {
-    lineHeight: "48px",
-  },
-})
+const HELP = {
+};
+
 export default class extends React.PureComponent {
   render() {
-    const {classes} = this.sheet;
     return (
-      <div style={{width: "50%"}}>
-        <Prop name="audio track" nameClassName={classes.prop}>
+      <HelpPane
+        help={HELP}
+        focused={this.props.focused}
+        errors={this.props.errors}
+      >
+        <Prop name="audio track">
           <InlineCheckbox
             checked={this.props.hasAudio}
             disabled={!this.props.atracks.length}
@@ -47,27 +48,30 @@ export default class extends React.PureComponent {
             title="Load external subtitle"
           />*/}
         </Prop>
-        <Prop name="fade" nameClassName={classes.prop}>
+        <Prop name="fade">
           <SmallInput
             ref="fadeIn"
             hintText="in"
+            onFocus={this.props.makeFocuser("fadeIn")}
             onBlur={this.props.onUpdate}
           />
           <Sep/>
           <SmallInput
             ref="fadeOut"
             hintText="out"
+            onFocus={this.props.makeFocuser("fadeOut")}
             onBlur={this.props.onUpdate}
           />
         </Prop>
-        <Prop name="amplify" nameClassName={classes.prop}>
+        <Prop name="amplify">
           <SmallInput
             ref="amplify"
             hintText="factor"
+            onFocus={this.props.makeFocuser("amplify")}
             onBlur={this.props.onUpdate}
           />
         </Prop>
-      </div>
+      </HelpPane>
     );
   }
 }

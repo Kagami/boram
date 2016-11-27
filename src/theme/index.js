@@ -61,38 +61,46 @@ export function Pane(props) {
   );
 }
 
-export const Prop = useSheet({
-  name: {
-    display: "inline-block",
-    width: "30%",
-    verticalAlign: "middle",
-    cursor: "default",
-    WebkitUserSelect: "none",
-    "&:first-letter": {
-      textTransform: "capitalize",
+function makeProp(nameStyles) {
+  const styles = {
+    name: {
+      display: "inline-block",
+      width: "30%",
+      lineHeight: "48px",
+      verticalAlign: "middle",
+      cursor: "default",
+      WebkitUserSelect: "none",
+      "&:first-letter": {
+        textTransform: "capitalize",
+      },
+      ...nameStyles,
     },
-  },
-  value: {
-    display: "inline-block",
-    color: SECONDARY_COLOR,
-    maxWidth: "65%",
-    overflow: "hidden",
-    verticalAlign: "middle",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-  },
-})(function(props, {classes}) {
-  return (
-    <div className={props.className}>
-      <div className={cx(classes.name, props.nameClassName)}>
-        {props.name}:
+    value: {
+      display: "inline-block",
+      color: SECONDARY_COLOR,
+      maxWidth: "65%",
+      overflow: "hidden",
+      verticalAlign: "middle",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+    },
+  };
+  return useSheet(styles)(function(props, {classes}) {
+    return (
+      <div>
+        <div className={cx(classes.name, props.nameClassName)}>
+          {props.name}:
+        </div>
+        <div className={cx(classes.value, props.valueClassName)}>
+          {props.children}
+        </div>
       </div>
-      <div className={cx(classes.value, props.valueClassName)}>
-        {props.children}
-      </div>
-    </div>
-  );
-});
+    );
+  });
+}
+
+export const Prop = makeProp();
+export const CompactProp = makeProp({lineHeight: "inherit"});
 
 export class SmallInput extends React.PureComponent {
   static styles = {
@@ -353,3 +361,55 @@ export const Tip = (function() {
     );
   };
 })();
+
+export const HelpPane = useSheet({
+  outer: {
+    display: "flex",
+    height: "100%",
+  },
+  first: {
+    width: "55%",
+    height: "100%",
+  },
+  second: {
+    borderLeft: "2px solid #ccc",
+    flex: 1,
+    height: "100%",
+    padding: "0 10px",
+    overflowY: "auto",
+  },
+  title: {
+    margin: 0,
+    marginBottom: 10,
+  },
+  description: {
+    fontSize: "16px",
+  },
+})(function(props, {classes}) {
+  const {help, focused, errors} = props;
+  const showHelp = !!(focused && help[focused]);
+  const showErrors = !!errors.length;
+  const show = showHelp || showErrors;
+  const style = {display: show ? "block" : "none"};
+
+  function getHelpNode() {
+    const [title, description] = help[focused];
+    return (
+      <div>
+        <h3 className={classes.title}>{title}</h3>
+        <span className={classes.description}>{description}</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className={classes.outer}>
+      <div className={classes.first}>
+        {props.children}
+      </div>
+      <div className={classes.second} style={style}>
+        {showHelp ? getHelpNode() : null}
+      </div>
+    </div>
+  );
+});

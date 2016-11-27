@@ -6,7 +6,7 @@
 import {shell} from "electron";
 import React from "react";
 import {useSheet} from "../jss";
-import {Prop} from "../theme";
+import {CompactProp as Prop} from "../theme";
 import {
   showTime, showBitrate, showSize,
   parseFrameRate, showFrameRate,

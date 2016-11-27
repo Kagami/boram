@@ -6,20 +6,21 @@
 import React from "react";
 import {useSheet} from "../jss";
 import {
-  MenuItem,
-  Prop,
-  SmallSelect, SmallInput,
-  InlineCheckbox,
+  HelpPane,
+  Prop, SmallInput,
+  SmallSelect, MenuItem,
+  InlineCheckbox, Sep,
   ArgsInput,
-  Sep,
 } from "../theme";
+
+const HELP = {
+};
 
 @useSheet({
   outer: {
+    display: "flex",
     height: "100%",
-  },
-  name: {
-    lineHeight: "48px",
+    flexDirection: "column",
   },
   nameArgs: {
     lineHeight: "48px",
@@ -36,12 +37,17 @@ export default class extends React.PureComponent {
     const {classes} = this.sheet;
     return (
       <div className={classes.outer}>
-        <div style={{width: "50%"}}>
-          <Prop name="fragment" nameClassName={classes.name}>
+        <HelpPane
+          help={HELP}
+          focused={this.props.focused}
+          errors={this.props.errors}
+        >
+          <Prop name="fragment">
             <SmallInput
               ref="start"
               width={75}
               hintText="start"
+              onFocus={this.props.makeFocuser("start")}
               onBlur={this.props.onUpdate}
             />
             <Sep>÷</Sep>
@@ -49,10 +55,11 @@ export default class extends React.PureComponent {
               ref="end"
               hintText="end"
               width={75}
+              onFocus={this.props.makeFocuser("end")}
               onBlur={this.props.onUpdate}
             />
           </Prop>
-          <Prop name="video codec" nameClassName={classes.name}>
+          <Prop name="video codec">
             <SmallSelect
               width={75}
               value={this.props.vcodec}
@@ -66,16 +73,18 @@ export default class extends React.PureComponent {
               ref="limit"
               hintText={this.props.modeLimit ? "limit" : "bitrate"}
               disabled={this.props.modeCRF}
+              onFocus={this.props.makeFocuser("limit")}
               onBlur={this.props.onUpdate}
             />
             <Sep/>
             <SmallInput
-              ref="crf"
+              ref="quality"
               hintText="quality"
+              onFocus={this.props.makeFocuser("quality")}
               onBlur={this.props.onUpdate}
             />
           </Prop>
-          <Prop name="audio codec" nameClassName={classes.name}>
+          <Prop name="audio codec">
             <SmallSelect
               width={75}
               value={this.props.acodec}
@@ -90,10 +99,11 @@ export default class extends React.PureComponent {
               ref="ab"
               hintText={this.props.acodec === "opus" ? "bitrate" : "quality"}
               disabled={!this.props.hasAudio}
+              onFocus={this.props.makeFocuser("ab")}
               onBlur={this.props.onUpdate}
             />
           </Prop>
-          <Prop name="mode" nameClassName={classes.name}>
+          <Prop name="mode">
             <InlineCheckbox
               label="2pass"
               title="Use 2pass encode (recommended)"
@@ -116,7 +126,7 @@ export default class extends React.PureComponent {
               onCheck={this.props.makeChecker("modeCRF")}
             />
           </Prop>
-        </div>
+        </HelpPane>
         <Prop
           name="raw args"
           nameClassName={classes.nameArgs}

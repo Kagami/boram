@@ -69,7 +69,9 @@ export default class extends React.PureComponent {
     // Shouldn't be falsy because of Tabs component restrictions.
     tabIndex: 1,
     encoding: false,
+    focused: null,
     allValid: true,
+    errors: {},
     mstart: 0,
     mend: 0,
     vtrackn: 0,
@@ -202,7 +204,7 @@ export default class extends React.PureComponent {
       assert(false);
     }
     args.push("-b:v", vb ? `${vb}k` : "0");
-    maybeSet("-crf", opts.crf);
+    maybeSet("-crf", opts.quality);
     // Enabled for VP9 by default but always force it just in case.
     args.push("-auto-alt-ref", "1", "-lag-in-frames", "25");
     // Default to 128 for both VP8 and VP9 but bigger keyframe interval
@@ -216,13 +218,6 @@ export default class extends React.PureComponent {
     // Deinterlacing must be always first.
     if (opts.deinterlace) {
       vfilters.push("yadif");
-    }
-    // Both values must be set if any is specified.
-    // TODO(Kagami): clear SAR?
-    if (opts.scalew != null || opts.scaleh != null) {
-      scale.push(opts.scalew == null ? -1 : opts.scalew);
-      scale.push(opts.scaleh == null ? -1 : opts.scaleh);
-      vfilters.push(`scale=${scale.join(":")}`);
     }
     // Any combination of crop params is ok.
     if (opts.cropw != null) {
@@ -239,6 +234,13 @@ export default class extends React.PureComponent {
     }
     if (crop.length) {
       vfilters.push(`crop=${crop.join(":")}`);
+    }
+    // Both values must be set if any is specified.
+    // TODO(Kagami): clear SAR?
+    if (opts.scalew != null || opts.scaleh != null) {
+      scale.push(opts.scalew == null ? -1 : opts.scalew);
+      scale.push(opts.scaleh == null ? -1 : opts.scaleh);
+      vfilters.push(`scale=${scale.join(":")}`);
     }
     if (opts.burnSubs) {
       // Workaround for <https://trac.ffmpeg.org/ticket/2067>.
@@ -293,6 +295,11 @@ export default class extends React.PureComponent {
     return args;
   }
 
+  makeFocuser = (name) => {
+    return () => {
+      this.setState({focused: name});
+    };
+  };
   makeChecker = (name) => {
     return (e, checked) => {
       const upd = {[name]: checked};
@@ -335,6 +342,7 @@ export default class extends React.PureComponent {
     }
 
     let allValid = true;
+    const errors = {};
     function requireInt(value) {
       value = value.toString();
       if (!/^-?\d+$/.test(value)) {
@@ -359,7 +367,6 @@ export default class extends React.PureComponent {
       try {
         return validator(value);
       } catch (e) {
-        // FIXME(Kagami): Accumulate errors.
         allValid = false;
         return null;
       }
@@ -373,12 +380,12 @@ export default class extends React.PureComponent {
     // vfx.
     const vtrackn = get("vtrackn");
     const deinterlace = get("deinterlace");
-    let scalew = getText("videoFX", "scalew");
-    let scaleh = getText("videoFX", "scaleh");
     let cropw = getText("videoFX", "cropw");
     let croph = getText("videoFX", "croph");
     let cropx = getText("videoFX", "cropx");
     let cropy = getText("videoFX", "cropy");
+    let scalew = getText("videoFX", "scalew");
+    let scaleh = getText("videoFX", "scaleh");
     let speed = ""; //getText("videoFX", "speed");
     let fps = ""; //getText("videoFX", "fps");
     const burnSubs = get("burnSubs");
@@ -394,7 +401,7 @@ export default class extends React.PureComponent {
     let end = getText("codecs", "end");
     const vcodec = get("vcodec");
     let limit = getText("codecs", "limit");
-    let crf = getText("codecs", "crf");
+    let quality = getText("codecs", "quality");
     const acodec = get("acodec");
     let ab = getText("codecs", "ab");
     const mode2Pass = get("mode2Pass");
@@ -409,18 +416,6 @@ export default class extends React.PureComponent {
     let _duration = null;
 
     // Validate & transform.
-    scalew = validate(scalew, v => {
-      if (!v) return null;
-      // Scale parameters can contain arbitrary expressions and `-1` but
-      // we validate them as nat numbers for simplicity.
-      v = requireInt(v);
-      return requireRange(v, 1);
-    });
-    scaleh = validate(scaleh, v => {
-      if (!v) return null;
-      v = requireInt(v);
-      return requireRange(v, 1);
-    });
     // Validation is poor and doesn't allow expressions, but user can
     // always edit raw arguments. So this is sort of "basic mode".
     cropw = validate(cropw, v => {
@@ -442,6 +437,18 @@ export default class extends React.PureComponent {
       if (!v) return null;
       v = requireInt(v);
       return requireRange(v, 0);
+    });
+    scalew = validate(scalew, v => {
+      if (!v) return null;
+      // Scale parameters can contain arbitrary expressions and `-1` but
+      // we validate them as nat numbers for simplicity.
+      v = requireInt(v);
+      return requireRange(v, 1);
+    });
+    scaleh = validate(scaleh, v => {
+      if (!v) return null;
+      v = requireInt(v);
+      return requireRange(v, 1);
     });
     speed = validate(speed, v => {
       if (!v) return null;
@@ -507,7 +514,7 @@ export default class extends React.PureComponent {
       v = requireFloat(v);
       return requireRange(v, 0.001);
     });
-    crf = validate(crf, v => {
+    quality = validate(quality, v => {
       if (modeCRF) {
         v = v || DEFAULT_Q;
       } else if (!v) {
@@ -538,15 +545,16 @@ export default class extends React.PureComponent {
         assert(false);
       }
     });
-    this.setState({allValid});
+    // This assumes we were called from `onBlur` handler.
+    this.setState({allValid, errors, focused: null});
     if (!allValid) return;
 
     const opts = {
       // vfx.
       vtrackn,
       deinterlace,
-      scalew, scaleh,
       cropw, croph, cropx, cropy,
+      scalew, scaleh,
       speed, fps,
       burnSubs, strackn,
       // afx.
@@ -555,7 +563,7 @@ export default class extends React.PureComponent {
       amplify,
       // codecs.
       start, end, _start, _duration,
-      vcodec, limit, crf,
+      vcodec, limit, quality,
       acodec, ab,
       mode2Pass, modeLimit, modeCRF,
     };
@@ -647,8 +655,11 @@ export default class extends React.PureComponent {
           {this.getTabNode("video fx", 2,
             <VideoFX
               ref="videoFX"
+              makeFocuser={this.makeFocuser}
               makeChecker={this.makeChecker}
               makeSelecter={this.makeSelecter}
+              focused={this.state.focused}
+              errors={this.state.errors}
               vtracks={this.getVideoTracks()}
               stracks={this.getSubTracks()}
               vtrackn={this.state.vtrackn}
@@ -661,8 +672,11 @@ export default class extends React.PureComponent {
           {this.getTabNode("audio fx", 3,
             <AudioFX
               ref="audioFX"
+              makeFocuser={this.makeFocuser}
               makeChecker={this.makeChecker}
               makeSelecter={this.makeSelecter}
+              focused={this.state.focused}
+              errors={this.state.errors}
               atracks={this.getAudioTracks()}
               hasAudio={this.state.hasAudio}
               atrackn={this.state.atrackn}
@@ -672,8 +686,11 @@ export default class extends React.PureComponent {
           {this.getTabNode("codecs", 4,
             <Codecs
               ref="codecs"
+              makeFocuser={this.makeFocuser}
               makeChecker={this.makeChecker}
               makeSelecter={this.makeSelecter}
+              focused={this.state.focused}
+              errors={this.state.errors}
               vcodec={this.state.vcodec}
               hasAudio={this.state.hasAudio}
               acodec={this.state.acodec}

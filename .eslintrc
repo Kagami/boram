@@ -89,7 +89,7 @@
     "no-extra-label": 2,
     "no-unused-labels": 2,
     "keyword-spacing": 2,
-    "quotes": [2, "double", {"avoidEscape": true}],
+    "quotes": [2, "double", {"avoidEscape": true, "allowTemplateLiterals": true}],
 
     // React.
     "jsx-quotes": 2,
