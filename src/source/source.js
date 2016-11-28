@@ -146,7 +146,7 @@ export default class extends React.PureComponent {
         >
           <form className={classes.form} onSubmit={this.handleInfoGet}>
             <div className={classes.text}>
-              <div>Click/drag your input video here</div>
+              <div>Click/drag your source video here</div>
               <span>or </span>
               <input
                 autoFocus
