@@ -92,20 +92,20 @@ export default class extends React.Component {
     this.setState({tabs});
   }
   handleGlobalClose = (e) => {
-    if (!BORAM_DEBUG) {
-      const choice = remote.dialog.showMessageBox({
-        icon: ICON_PATH,
-        title: "Confirm",
-        message: "Close all tabs and quit?",
-        buttons: ["OK", "Cancel"],
-      });
-      // TODO(Kagami): Doesn't work reliable right now, see
-      // <https://github.com/electron/electron/issues/7977>.
-      if (choice !== 0) {
-        e.returnValue = false;
-        return;
-      }
-    }
+    // if (!BORAM_DEBUG) {
+    //   const choice = remote.dialog.showMessageBox({
+    //     icon: ICON_PATH,
+    //     title: "Confirm",
+    //     message: "Close all tabs and quit?",
+    //     buttons: ["OK", "Cancel"],
+    //   });
+    //   // TODO(Kagami): Doesn't work reliable right now, see
+    //   // <https://github.com/electron/electron/issues/7977>.
+    //   if (choice !== 0) {
+    //     e.returnValue = false;
+    //     return;
+    //   }
+    // }
     for (let i = 0; i < this.state.tabs.length; i++) {
       this.getInstance(i).abort();
     }
