@@ -73,7 +73,7 @@ export default class extends React.PureComponent {
     }
   }
   handlePathClick = () => {
-    shell.showItemInFolder(this.props.source.path);
+    shell.openItem(this.props.source.path);
   };
   render() {
     const {classes} = this.sheet;
