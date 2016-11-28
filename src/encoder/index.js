@@ -187,7 +187,6 @@ export default class extends React.PureComponent {
       // frame-parallel should be disabled.
       args.push("-frame-parallel", "0");
     } else if (opts.vcodec === "vp8") {
-      // VP8 is fast enough to use -speed=0 for both passes.
       // TODO(Kagami): Auto-insert colormatrix conversion?
       // TODO(Kagami): Slices?
       args.push("-c:v", "libvpx", "-speed", "0");
