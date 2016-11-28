@@ -295,14 +295,20 @@ export default class extends React.PureComponent {
     defaultPath = basename(defaultPath, extname(defaultPath));
     defaultPath += ".webm";
     const tmppath = this.state.output.path;
-    // TODO(Kagami): Check for the same path?
     const outpath = remote.dialog.showSaveDialog({defaultPath});
     if (!outpath) return;
     try {
+      // rename(2) returns success on Linux for the same path so no need
+      // to bother with additional checkings. The worse thing is that
+      // user may overwrite current source but we can't prevent this on
+      // OS level.
       moveSync(tmppath, outpath);
     } catch (encodeError) {
       this.setState({encodeError});
     }
+    // Encoded file is gone.
+    const output = {path: null};
+    this.setState({output});
   };
   render() {
     const {styles} = this.constructor;

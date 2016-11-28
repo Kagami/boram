@@ -77,7 +77,9 @@ function makeProp(nameStyles) {
       ...nameStyles,
     },
     value: {
+      boxSizing: "border-box",
       flex: 1,
+      paddingRight: 5,
       overflow: "hidden",
       verticalAlign: "middle",
       textOverflow: "ellipsis",
