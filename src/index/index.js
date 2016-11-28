@@ -24,6 +24,10 @@ app.on("ready", () => {
     height: 960,
     minWidth: 640,
     minHeight: 780,
+    // Works strangely on Linux. useContentSize=false enlarges window to
+    // include borders and useContentSize=true enlarges even more. WM
+    // issue?
+    useContentSize: BORAM_WIN_BUILD,
     title: `${name} v${version} by tiarathread`,
     icon: `${__dirname}/icon.png`,
   });
