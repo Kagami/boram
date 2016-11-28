@@ -14,7 +14,7 @@ import FFmpeg from "../ffmpeg";
 import {useSheet} from "../jss";
 import {BigProgress, BigButton, Pane, Sep} from "../theme";
 import {
-  ICON_PATH, tmp, moveSync,
+  tmp, moveSync,
   parseFrameRate, quoteArgs,
   fixOpt, clearOpt,
 } from "../util";
@@ -287,13 +287,6 @@ export default class extends React.PureComponent {
       this.props.onEncoding(encoding);
       this.start(opts);
     } else {
-      const choice = remote.dialog.showMessageBox({
-        icon: ICON_PATH,
-        title: "Confirm",
-        message: "Abort encoding?",
-        buttons: ["OK", "Cancel"],
-      });
-      if (choice !== 0) return;
       this.cancel();
     }
   };
