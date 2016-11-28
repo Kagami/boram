@@ -14,6 +14,9 @@ import {remote} from "electron";
 // cleanup inside main process.
 export const tmp = remote.getGlobal("tmp");
 
+// __dirname === getAppPath in our case.
+export const ICON_PATH = path.join(__dirname, "icon.png");
+
 export function showSize(size, opts = {}) {
   const space = opts.tight ? "" : " ";
   if (size < 1024) {

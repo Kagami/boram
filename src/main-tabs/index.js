@@ -9,6 +9,7 @@ import cx from "classnames";
 import Icon from "react-fa";
 import {useSheet} from "../jss";
 import {Tabs, Tab} from "../theme";
+import {ICON_PATH} from "../util";
 import Instance from "./instance";
 
 const DEFAULT_LABEL = "untitled";
@@ -93,6 +94,7 @@ export default class extends React.Component {
   handleGlobalClose = (e) => {
     if (!BORAM_DEBUG) {
       const choice = remote.dialog.showMessageBox({
+        icon: ICON_PATH,
         title: "Confirm",
         message: "Close all tabs and quit?",
         buttons: ["OK", "Cancel"],
@@ -134,6 +136,7 @@ export default class extends React.Component {
   handleClose = (i, e) => {
     e.stopPropagation();
     const choice = remote.dialog.showMessageBox({
+      icon: ICON_PATH,
       title: "Confirm",
       message: "Close tab?",
       buttons: ["OK", "Cancel"],
