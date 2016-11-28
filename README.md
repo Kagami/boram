@@ -27,7 +27,7 @@ You need FFmpeg installed. Download [latest release](https://github.com/Kagami/w
 
 ## License
 
-boram's own code is licensed under [CC0](COPYING) but the releases also include:
+boram's own code is licensed under [CC0](legal/LICENSE.BORAM) but the releases also include:
 
 * Libraries in dependencies section of [package.json](package.json)
 * [Roboto font](https://fonts.google.com/specimen/Roboto)
