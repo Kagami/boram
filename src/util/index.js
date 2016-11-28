@@ -5,12 +5,14 @@
 
 import assert from "assert";
 import fs from "fs";
+import path from "path";
 import {spawn} from "child_process";
 import which from "which";
+import {remote} from "electron";
 
 // Renderer process doesn't receive process exit events so need to setup
 // cleanup inside main process.
-export const tmp = require("electron").remote.getGlobal("tmp");
+export const tmp = remote.getGlobal("tmp");
 
 export function showSize(size, opts = {}) {
   const space = opts.tight ? "" : " ";
@@ -167,18 +169,15 @@ export function tryRun(fn, arg, def) {
   }
 }
 
-export function getRunPath(cmd) {
+export function getRunPath(exe) {
   try {
-    if (BORAM_WIN_BUILD) {
-      const paths = which.sync(cmd, {all: true});
-      // Windows has CWD in PATH at top so we need this little kludge in
-      // order to spawn system version if available.
-      return paths[paths.length > 1 ? 1 : 0];
-    } else {
-      return which.sync(cmd);
-    }
+    return which.sync(exe);
   } catch (e) {
-    return null;
+    if (BORAM_WIN_BUILD) {
+      return path.join(remote.app.getAppPath(), exe);
+    } else {
+      return null;
+    }
   }
 }
 

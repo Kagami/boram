@@ -81,11 +81,8 @@ export default class extends React.PureComponent {
   cleanup() {
     try { fs.unlinkSync(this.tmpLogName); } catch (e) { /* skip */ }
     try { fs.unlinkSync(this.tmpEncodeName); } catch (e) { /* skip */ }
-    this.cleanPreview();
-  }
-  cleanPreview = () => {
     try { fs.unlinkSync(this.tmpPreviewName); } catch (e) { /* skip */ }
-  };
+  }
   abort = () => {
     this.cancel();
     this.cleanup();
@@ -177,10 +174,12 @@ export default class extends React.PureComponent {
     };
     const handleLog = (chunk) => {
       // Emulate terminal caret behavior.
-      // FIXME(Kagami): Windows \r\n?
       log = log.slice(0, curpos);
       chunk = chunk.toString();
       // console.log("@@@ IN", JSON.stringify(chunk));
+      if (BORAM_WIN_BUILD) {
+        chunk = chunk.replace(/\r\n/g, "\n");
+      }
 
       for (;;) {
         const cr = chunk.indexOf("\r");
@@ -201,6 +200,8 @@ export default class extends React.PureComponent {
         lastnl = log.length + nl;
       }
 
+      // TODO(Kagami): Implement chunk1="...\r" chunk2="\n..." special
+      // case. On Windows this should be a newline.
       if (chunk.endsWith("\r")) {
         // Log will be cut on next call.
         chunk = chunk.slice(0, -1) + "\n";
@@ -252,18 +253,15 @@ export default class extends React.PureComponent {
       this.setState({output, progress});
       this.props.onEncoding(false);
       if (preview) {
-        // XXX(Kagami): This blocks event loop until application quits,
-        // see <https://github.com/electron/electron/issues/6889>. If
-        // that behavior will change don't forget about `cleanPreview`
-        // which is currently synchronous too.
+        // XXX(Kagami): This blocks event loop on Linux and Mac, see
+        // <https://github.com/electron/electron/issues/6889>.
         shell.openItem(outpath);
       }
     }, (encodeError) => {
       progress = 0;
       this.setState({encodeError, progress});
       this.props.onEncoding(false);
-    // Don't needed anymore, save some space.
-    }).then(this.cleanPreview, this.cleanPreview);
+    });
   }
   cancel() {
     // `start` will fail into error state automatically.

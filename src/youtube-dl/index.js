@@ -37,8 +37,11 @@ export default makeRunner("youtube-dl", {
     let log = "";
     let progress = 0;
     return this._run(args, (chunk) => {
-      // FIXME(Kagami): Windows \r\n?
+      // Extract last printed line (status).
+      // This work equally well on Windows and Linux/Mac because we
+      // search for string surrounded by [\r\n].
       chunk = chunk.toString();
+      // console.log("@@@ IN", JSON.stringify(chunk));
       const cr = chunk.lastIndexOf("\r");
       const nl = chunk.lastIndexOf("\n");
       const lastnl = Math.max(cr, nl);
