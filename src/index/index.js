@@ -15,7 +15,7 @@ global.tmp = require("tmp");
 global.tmp.setGracefulCleanup();
 
 if (BORAM_DEBUG) {
-  require("electron-debug")();
+  require("electron-debug")({enabled: true});
 }
 
 app.on("ready", () => {

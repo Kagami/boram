@@ -4,7 +4,7 @@
   "private": true,
   "description": "Cross-platform WebM encoder",
   "scripts": {
-    "start": "webpack --watch",
+    "start": "rm -rf dist/app && webpack --watch",
     "dev": "electron dist/app",
     "test": "eslint .",
     "build-app": "rm -rf dist/app && NODE_ENV=production webpack",
