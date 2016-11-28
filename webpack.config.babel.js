@@ -34,8 +34,12 @@ export default {
     // Don't mess with node's dirname variable.
     __dirname: false,
   },
-  // Mute warning.
-  externals: ["devtron"],
+  externals: [
+    // Mute warning.
+    "devtron",
+    // Brings tons of useless code.
+    {"pretty-error": "Error"},
+  ],
   entry: {
     index: "./src/index/index",
     renderer: "./src/index/renderer",

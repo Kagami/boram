@@ -3,18 +3,19 @@
  * @module boram/index/renderer
  */
 
+import inputMenu from "electron-input-menu";
+import context from "electron-contextmenu-middleware";
 import React from "react";
 import ReactDOM from "react-dom";
 import injectTapEventPlugin from "react-tap-event-plugin";
-import jss from "../jss";
+import {useSheet} from "../jss";
 import {MuiThemeProvider, BACKGROUND_COLOR} from "../theme";
 import MainTabs from "../main-tabs";
 import "file!./roboto-light.ttf";
 import "file!./roboto-regular.ttf";
 import "file!./roboto-medium.ttf";
 
-// Global styles.
-jss.createStyleSheet({
+@useSheet({
   body: {
     margin: 0,
     fontSize: "18px",
@@ -73,8 +74,7 @@ jss.createStyleSheet({
   "a[href]:hover": {
     color: "red",
   },
-}, {named: false}).attach();
-
+}, {named: false})
 class Index extends React.PureComponent {
   componentDidMount() {
     // Prevent default behavior from changing page on dropped file.
@@ -88,5 +88,11 @@ class Index extends React.PureComponent {
   }
 }
 
+// See <https://github.com/electron/electron/issues/4068>.
+context.use(inputMenu);
+context.activate();
+
+// Required for material-ui.
 injectTapEventPlugin();
+
 ReactDOM.render(<Index/>, document.querySelector(".boram-index"));
