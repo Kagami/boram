@@ -38,10 +38,11 @@ export default makeRunner("youtube-dl", {
     let progress = 0;
     return this._run(args, (chunk) => {
       // Extract last printed line (status).
-      // This work equally well on Windows and Linux/Mac because we
-      // search for string surrounded by [\r\n].
       chunk = chunk.toString();
       // console.log("@@@ IN", JSON.stringify(chunk));
+      if (BORAM_WIN_BUILD) {
+        chunk = chunk.replace(/\r\n/g, "\n");
+      }
       const cr = chunk.lastIndexOf("\r");
       const nl = chunk.lastIndexOf("\n");
       const lastnl = Math.max(cr, nl);
