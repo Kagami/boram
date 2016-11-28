@@ -27,10 +27,11 @@ You need FFmpeg installed. Download [latest release](https://github.com/Kagami/w
 
 ## License
 
-boram's own code is licensed under [CC0](legal/LICENSE.BORAM) but the releases also include:
+boram's own code is licensed under [CC0](legal/LICENSE.BORAM) but releases also include:
 
-* Libraries in dependencies section of [package.json](package.json)
+* Libraries from dependencies section of [package.json](package.json)
 * [Roboto font](https://fonts.google.com/specimen/Roboto)
 * [Font Awesome font](https://github.com/FortAwesome/Font-Awesome)
 * [youtube-dl binaries](https://rg3.github.io/youtube-dl/)
 * [Zeranoe FFmpeg binaries](http://ffmpeg.zeranoe.com/builds/)
+* [Chromium](LICENSE.CHROMIUM) and [Electron](LICENSE.ELECTRON) components
