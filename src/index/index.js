@@ -28,7 +28,7 @@ app.on("ready", () => {
     // include borders and useContentSize=true enlarges even more. WM
     // issue?
     useContentSize: BORAM_WIN_BUILD,
-    title: `${name} v${version} by tiarathread`,
+    title: `${name} v${version} by T-ara Industries`,
     icon: `${__dirname}/icon.png`,
   });
   win.setMenu(null);
