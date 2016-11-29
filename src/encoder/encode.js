@@ -295,7 +295,12 @@ export default class extends React.PureComponent {
     defaultPath = basename(defaultPath, extname(defaultPath));
     defaultPath += ".webm";
     const tmppath = this.state.output.path;
-    const outpath = remote.dialog.showSaveDialog({defaultPath});
+    const outpath = remote.dialog.showSaveDialog({
+      defaultPath,
+      filters: [
+        {name: "WebM", extensions: ["webm"]},
+      ],
+    });
     if (!outpath) return;
     try {
       // rename(2) returns success on Linux for the same path so no need
