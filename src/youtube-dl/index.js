@@ -4,7 +4,7 @@
  */
 
 import assert from "assert";
-import {makeRunner} from "../util";
+import {makeRunner, getRunPath} from "../util";
 const YTDL = require(
   "file!../../bin/youtube-dl." +
   (BORAM_WIN_BUILD ? "exe" : "zip")
@@ -16,7 +16,7 @@ export default makeRunner("youtube-dl", {
       return [runpath, args];
     } else {
       assert(!BORAM_WIN_BUILD, "youtube-dl must always be in PATH on Windows");
-      return ["python", [YTDL].concat(args)];
+      return [getRunPath("python"), [YTDL].concat(args)];
     }
   },
   getInfo(url) {

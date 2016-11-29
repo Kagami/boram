@@ -195,6 +195,9 @@ export function makeRunner(exe, obj) {
       }
       let child = null;
       const runner = new Promise((resolve, reject) => {
+        if (!runpath) {
+          throw new Error(`Failed to run ${exe}: not found`);
+        }
         try {
           child = spawn(runpath, args, {stdio: ["ignore", "pipe", "pipe"]});
         } catch (err) {
