@@ -24,6 +24,13 @@ import {showErr} from "../util";
   error: {
     marginBottom: 30,
     color: "red",
+    // <https://stackoverflow.com/q/15909489>.
+    display: "-webkit-box",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    WebkitLineClamp: 10,
+    WebkitBoxOrient: "vertical",
+    WebkitBoxPack: "center",
   },
 })
 export default class extends React.PureComponent {
