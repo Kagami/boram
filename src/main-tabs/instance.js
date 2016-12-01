@@ -3,7 +3,6 @@
  * @module boram/main-tabs/instance
  */
 
-import {basename} from "path";
 import EventEmitter from "events";
 import React from "react";
 import Source from "../source";
@@ -24,7 +23,6 @@ export default class extends React.PureComponent {
     this.events.emit("abort");
   }
   handleSourceLoad = (source) => {
-    this.props.onTabTitle(basename(source.path));
     this.setState({source});
   }
   handleInfoLoad = (info) => {
