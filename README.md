@@ -19,11 +19,11 @@
 
 ### Windows
 
-Download [latest release](https://github.com/Kagami/wybm/releases), unpack and run `boram.exe`.
+Download [latest release](https://github.com/Kagami/boram/releases), unpack and run `boram.exe`.
 
 ### Linux
 
-Download [latest release](https://github.com/Kagami/wybm/releases), unpack and run `./boram`.  
+Download [latest release](https://github.com/Kagami/boram/releases), unpack and run `./boram`.  
 **NOTE:** You need Python (2 or 3) and FFmpeg (2+, with libvpx 1.5.0+) installed.
 
 ## License
