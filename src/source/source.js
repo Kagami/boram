@@ -5,6 +5,7 @@
 
 import {shell, remote} from "electron";
 import React from "react";
+import cx from "classnames";
 import Icon from "react-fa";
 import {useSheet} from "../jss";
 import YouTubeDL from "../youtube-dl";
@@ -33,6 +34,9 @@ const COMMON_VIDEO_EXTENSIONS = [
     alignItems: "center",
     fontSize: "20px",
     padding: 10,
+  },
+  borderDisabled: {
+    cursor: "not-allowed",
   },
   form: {
     margin: "0 auto",
@@ -138,7 +142,8 @@ export default class extends React.PureComponent {
     return (
       <div className={classes.source2}>
         <div
-          className={classes.border}
+          className={cx(classes.border,
+                        this.state.infoLoading && classes.borderDisabled)}
           onDrop={this.handleDrop}
           onClick={this.handleFormClick}
         >
