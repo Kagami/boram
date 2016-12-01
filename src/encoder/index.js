@@ -267,7 +267,10 @@ export default class extends React.PureComponent {
       } else {
         assert(false);
       }
-      args.push("-ac", "2");
+      const atrack = this.getAudioTracks()[opts.atrackn];
+      if (atrack.channels > 2) {
+        args.push("-ac", "2");
+      }
 
       // Audio filters.
       // Amplify should go before fade.
