@@ -30,7 +30,6 @@ import {showErr} from "../util";
     textOverflow: "ellipsis",
     WebkitLineClamp: 10,
     WebkitBoxOrient: "vertical",
-    WebkitBoxPack: "center",
   },
 })
 export default class extends React.PureComponent {

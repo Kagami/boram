@@ -25,7 +25,9 @@ import {tmp, showErr} from "../util";
     color: "red",
     height: "auto",
     lineHeight: "inherit",
-    overflow: "inherit",
+    display: "-webkit-box",
+    WebkitLineClamp: 10,
+    WebkitBoxOrient: "vertical",
   },
 })
 export default class extends React.PureComponent {

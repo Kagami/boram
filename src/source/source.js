@@ -52,13 +52,11 @@ const COMMON_VIDEO_EXTENSIONS = [
     marginTop: 20,
     wordBreak: "break-all",
     cursor: "initial",
-    // <https://stackoverflow.com/q/15909489>.
     display: "-webkit-box",
     overflow: "hidden",
     textOverflow: "ellipsis",
     WebkitLineClamp: 10,
     WebkitBoxOrient: "vertical",
-    WebkitBoxPack: "center",
   },
   icon: {
     fontSize: "200px",
