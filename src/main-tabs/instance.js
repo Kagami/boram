@@ -3,6 +3,7 @@
  * @module boram/main-tabs/instance
  */
 
+import {basename} from "path";
 import EventEmitter from "events";
 import React from "react";
 import Source from "../source";
@@ -15,6 +16,7 @@ export default class extends React.PureComponent {
   componentWillMount() {
     const {source} = this.props;
     if (source) {
+      this.props.onTabTitle(basename(source.path));
       this.handleSourceLoad(source);
     }
   }
@@ -22,15 +24,20 @@ export default class extends React.PureComponent {
   abort() {
     this.events.emit("abort");
   }
+  getSource() {
+    return this.state.source;
+  }
   handleSourceLoad = (source) => {
-    this.setState({source});
+    this.setState({source}, this.props.onSourceUpdate);
   }
   handleInfoLoad = (info) => {
     this.setState({info});
   }
+  // Can only happen in single case: info component failed to
+  // parse/validate provided source.
   handleSourceClear = () => {
     this.props.onTabTitle();
-    this.setState({source: null, info: null});
+    this.setState({source: null, info: null}, this.props.onSourceUpdate);
   }
   render() {
     return (
@@ -57,7 +64,6 @@ export default class extends React.PureComponent {
             source={this.state.source}
             info={this.state.info}
             onTabTitle={this.props.onTabTitle}
-            onNewTab={this.props.onNewTab}
           />
         </ShowHide>
       </div>

@@ -8,6 +8,7 @@ import React from "react";
 import cx from "classnames";
 import Icon from "react-fa";
 import {useSheet} from "../jss";
+import ShowHide from "../show-hide";
 import {Tabs, Tab} from "../theme";
 import {ICON_BIG_PATH} from "../util";
 import Instance from "./instance";
@@ -133,6 +134,16 @@ export default class extends React.Component {
     const tabIndex = this.state.tabs.length - 1;
     this.setState({tabIndex});
   };
+  // XXX(Kagami): This is hackish, source should be passed to instance
+  // via props, but it's more convenient to keep source there.
+  handleSourceUpdate = () => {
+    this.forceUpdate();
+  };
+  handleClone = (i, e) => {
+    e.stopPropagation();
+    const source = this.getInstance(i).getSource();
+    this.handleNew(null, {source});
+  };
   handleClose = (i, e) => {
     e.stopPropagation();
     const choice = remote.dialog.showMessageBox({
@@ -155,11 +166,21 @@ export default class extends React.Component {
   };
   getLabelNode(label, i) {
     const {classes} = this.sheet;
+    const instance = this.getInstance(i);
+    const hasSource = !!(instance && instance.getSource());
     return (
       <div className={classes.tabItem}>
         <div className={classes.label} title={label}>
           {label}
         </div>
+        <ShowHide show={hasSource}>
+          <Icon
+            name="copy"
+            title="Clone tab"
+            className={classes.icon}
+            onTouchTap={this.handleClone.bind(null, i)}
+          />
+        </ShowHide>
         <Icon
           name="close"
           title="Close tab"
@@ -211,8 +232,8 @@ export default class extends React.Component {
             ref={`instance${i}`}
             source={tab.source}
             active={this.state.tabIndex === i}
+            onSourceUpdate={this.handleSourceUpdate}
             onTabTitle={this.handleTitleChange.bind(null, i)}
-            onNewTab={this.handleNew.bind(null, null)}
           />
         </Tab>
       )}

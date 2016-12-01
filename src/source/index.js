@@ -34,6 +34,8 @@ export default class extends React.PureComponent {
       }
     }
   }
+  // We set filename only if file was selected. For external sources
+  // keep video title.
   handleSourcePathLoad = (source) => {
     this.props.onTabTitle(basename(source.path));
     this.props.onLoad(source);
