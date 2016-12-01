@@ -23,6 +23,9 @@ import {tmp, showErr} from "../util";
   },
   error: {
     color: "red",
+    height: "auto",
+    lineHeight: "inherit",
+    overflow: "inherit",
   },
 })
 export default class extends React.PureComponent {
