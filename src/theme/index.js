@@ -279,6 +279,9 @@ export const BigButton = (function() {
       color: "#fff",
       borderRadius: 0,
     },
+    buttonDisabled: {
+      backgroundColor: "#ddd",
+    },
     overlay: {
       borderRadius: 0,
     },
@@ -294,7 +297,7 @@ export const BigButton = (function() {
     }, styles.buttonOuter, style);
     const buttonStyle = Object.assign({
       height: height || 30,
-    }, styles.button);
+    }, styles.button, other.disabled && styles.buttonDisabled);
     return (
       <RaisedButton
         {...other}

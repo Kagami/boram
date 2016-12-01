@@ -87,13 +87,6 @@ export default class extends React.PureComponent {
     this.cancel();
     this.cleanup();
   };
-  getOutput() {
-    return (this.props.encoding || this.state.output || this.state.encodeError)
-      ? this.state.log
-      : this.props.allValid
-        ? "Ready to start."
-        : "Fix invalid settings.";
-  }
   /** Fixed arguments being passed to FFmpeg. */
   getCommonArgs() {
     // TODO(Kagami): shell-quote doesn't throw on unmatched quotes and
@@ -162,7 +155,7 @@ export default class extends React.PureComponent {
       },
     };
   }
-  start({preview} = {}) {
+  start({preview}) {
     /* eslint-disable no-use-before-define */
     const updateProgress = (frames) => {
       let inc = frames / totalFrames * 100;
@@ -229,7 +222,7 @@ export default class extends React.PureComponent {
     const totalFrames = Math.ceil(this.props._duration * fps);
     const passlog = this.tmpLogName;
     const outpath = preview ? this.tmpPreviewName : this.tmpEncodeName;
-    const output = {path: preview ? null : outpath};
+    const output = {preview, path: outpath};
     const frameParser = this.createFrameParser();
 
     // progress/log might be updated several times at one go so we need
@@ -253,9 +246,7 @@ export default class extends React.PureComponent {
       this.setState({output, progress});
       this.props.onEncoding(false);
       if (preview) {
-        // XXX(Kagami): This blocks event loop on Linux and Mac, see
-        // <https://github.com/electron/electron/issues/6889>.
-        shell.openItem(outpath);
+        this.handlePlay();
       }
     }, (encodeError) => {
       progress = 0;
@@ -273,22 +264,30 @@ export default class extends React.PureComponent {
       /* skip */
     }
   }
-  handlePreview = () => {
-    this.toggleEncode({preview: true});
-  };
-  handleCloneTab = () => {
-    const {source} = this.props;
-    this.props.onNewTab({source});
-  };
-  toggleEncode = (opts) => {
+  isPreviewEncoding() {
+    return this.props.encoding && this.state.preview;
+  }
+  isNormalEncoding() {
+    return this.props.encoding && !this.state.preview;
+  }
+  toggleEncode({preview}) {
     const encoding = !this.props.encoding;
     if (encoding) {
-      this.setState({output: null, encodeError: null});
+      this.setState({preview, output: null, encodeError: null});
       this.props.onEncoding(encoding);
-      this.start(opts);
+      this.start({preview});
     } else {
       this.cancel();
     }
+  }
+  handlePreviewToggle = () => {
+    this.toggleEncode({preview: true});
+  };
+  handleNormalToggle = () => {
+    this.toggleEncode({preview: false});
+  };
+  handlePlay = () => {
+    shell.openItem(this.state.output.path);
   };
   handleSave = () => {
     let defaultPath = this.props.source.saveAs ||
@@ -311,8 +310,7 @@ export default class extends React.PureComponent {
       this.setState({encodeError});
     }
     // Encoded file is gone.
-    const output = {path: null};
-    this.setState({output});
+    this.setState({output: null});
   };
   render() {
     const {styles} = this.constructor;
@@ -321,37 +319,43 @@ export default class extends React.PureComponent {
         <Pane space={5}>
           <div>
             <BigButton
-              icon={<Icon name="files-o" />}
-              title="Open new tab for this source"
-              onClick={this.handleCloneTab}
+              width={85}
+              label={this.isPreviewEncoding() ? "cancel" : "preview"}
+              title="Make preview encode"
+              disabled={!this.props.allValid || this.isNormalEncoding()}
+              onClick={this.handlePreviewToggle}
+            />
+            <Sep margin={2.5} />
+            <BigButton
+              width={85}
+              label={this.isNormalEncoding() ? "cancel" : "normal"}
+              title="Make normal encode"
+              disabled={!this.props.allValid || this.isPreviewEncoding()}
+              onClick={this.handleNormalToggle}
             />
             <Sep margin={2.5} />
             <BigButton
               icon={<Icon name="tv" />}
-              title="Make preview encode"
-              disabled={!this.props.allValid || this.props.encoding}
-              onClick={this.handlePreview}
+              title="Play result"
+              disabled={!this.state.output}
+              onClick={this.handlePlay}
             />
             <Sep margin={2.5} />
             <BigButton
-              width={85}
-              label={this.props.encoding ? "cancel" : "start"}
-              title="Start/cancel encoding"
-              disabled={!this.props.allValid}
-              onClick={this.toggleEncode}
-            />
-            <Sep margin={2.5} />
-            <BigButton
-              width={85}
-              label="save"
+              icon={<Icon name="save" />}
               title="Save result"
-              disabled={!this.state.output || !this.state.output.path}
+              disabled={!this.state.output || this.state.output.preview}
               onClick={this.handleSave}
             />
           </div>
           <BigProgress value={this.state.progress} />
         </Pane>
-        <Output value={this.getOutput()} />
+        <Output
+          value={this.state.log ||
+                 (this.props.allValid
+                   ? "Ready to start."
+                   : "Fix invalid settings.")}
+        />
       </Pane>
     );
   }
