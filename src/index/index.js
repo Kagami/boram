@@ -40,7 +40,7 @@ app.on("ready", () => {
     // issue?
     useContentSize: BORAM_WIN_BUILD,
     title: `${name} v${version} by T-ara Industries`,
-    icon: `${__dirname}/icon.png`,
+    icon: `${__dirname}/icon-big.png`,
   });
   win.setMenu(null);
   win.loadURL(`file://${__dirname}/index.html`);
