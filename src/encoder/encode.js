@@ -5,7 +5,7 @@
 
 import assert from "assert";
 import fs from "fs";
-import {basename, extname} from "path";
+import path from "path";
 import {parse as parseArgs} from "shell-quote";
 import {shell, remote} from "electron";
 import React from "react";
@@ -291,9 +291,8 @@ export default class extends React.PureComponent {
     }
   };
   handleSave = () => {
-    let defaultPath = this.props.source.path;
-    defaultPath = basename(defaultPath, extname(defaultPath));
-    defaultPath += ".webm";
+    let defaultPath = this.props.source.saveAs ||
+                      `${path.parse(this.props.source.path).name}.webm`;
     const tmppath = this.state.output.path;
     const outpath = remote.dialog.showSaveDialog({
       defaultPath,

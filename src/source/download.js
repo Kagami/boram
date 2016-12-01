@@ -4,6 +4,7 @@
  */
 
 import fs from "fs";
+import path from "path";
 import React from "react";
 import cx from "classnames";
 import YouTubeDL from "../youtube-dl";
@@ -47,7 +48,8 @@ export default class extends React.PureComponent {
   }
   handleDownload = () => {
     this.setState({progress: 0, status: "spawning youtube-dl", error: null});
-    const url = this.props.info.webpage_url;
+    const {info} = this.props;
+    const url = info.webpage_url;
     const {vfid, afid} = this.props.format;
     const format = vfid + (afid ? `+${afid}` : "");
     const outpath = this.tmpYTName;
@@ -60,11 +62,13 @@ export default class extends React.PureComponent {
       const outpath = this.tmpFF.name;
       // URL might be rather long to put it into title (e.g. extra query
       // args) but that's hard to fix in general case.
-      const title = `${this.props.info.title} <${url}>`;
+      const title = `${info.title} <${url}>`;
       this.ff = FFmpeg.setTitle({inpath, outpath, title});
       return this.ff;
     }).then(() => {
-      const source = {path: this.tmpFF.name};
+      // We hope ytdl already made all correct escapings.
+      const saveAs = `${path.parse(info._filename).name}.webm`;
+      const source = {saveAs, path: this.tmpFF.name};
       this.props.onLoad(source);
     }, (error) => {
       const progress = 0;
