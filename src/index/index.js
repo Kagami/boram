@@ -5,6 +5,7 @@
 
 import {BrowserWindow, app} from "electron";
 import {name, version} from "json!../../package.json";
+import {checkLinuxDeps} from "./deps";
 import "file!./index.html";
 import "file!./icon.png";
 import "file!./icon-big.png";
@@ -20,6 +21,15 @@ if (BORAM_DEBUG) {
 }
 
 app.on("ready", () => {
+  if (!BORAM_WIN_BUILD) {
+    if (!checkLinuxDeps()) {
+      /* eslint-disable no-console */
+      console.error("Dependencies check failed. Exiting.");
+      /* eslint-enable no-console */
+      return app.exit(1);
+    }
+  }
+
   const win = new BrowserWindow({
     width: 960,
     height: 960,

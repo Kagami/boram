@@ -23,7 +23,8 @@ Download [latest release](https://github.com/Kagami/wybm/releases), unpack and r
 
 ### Linux
 
-You need FFmpeg installed. Download [latest release](https://github.com/Kagami/wybm/releases), unpack and run `./boram`.
+Download [latest release](https://github.com/Kagami/wybm/releases), unpack and run `./boram`.  
+**NOTE:** You need Python (2 or 3) and FFmpeg (2+, with libvpx 1.5.0+) installed.
 
 ## License
 
