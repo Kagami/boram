@@ -22,6 +22,10 @@ export function checkLinuxDeps() {
     console.error("Please install ffmpeg.");
     return false;
   }
+  if (!hasBinary("ffprobe")) {
+    console.error("ffprobe not found.");
+    return false;
+  }
   // No need to check versions - anything should be fine.
   if (!hasBinary("youtube-dl") && !hasBinary("python")) {
     console.error("Please install youtube-dl or python.");
