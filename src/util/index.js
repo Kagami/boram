@@ -10,12 +10,12 @@ import {spawn} from "child_process";
 import which from "which";
 import {remote} from "electron";
 
+export const APP_PATH = remote.app.getAppPath();
+export const ICON_BIG_PATH = path.join(APP_PATH, "icon-big.png");
+
 // Renderer process doesn't receive process exit events so need to setup
 // cleanup inside main process.
 export const tmp = remote.getGlobal("tmp");
-
-// __dirname === getAppPath in our case.
-export const ICON_BIG_PATH = path.join(__dirname, "icon-big.png");
 
 export function showSize(size, opts = {}) {
   const space = opts.tight ? "" : " ";
@@ -176,8 +176,12 @@ export function getRunPath(exe) {
   try {
     return which.sync(exe);
   } catch (e) {
+    // We ship all required binaries with Windows version, on Linux few
+    // deps should be installed separately.
+    // TODO(Kagami): Ship static ffmpeg build in Linux version too? Some
+    // distros have too old libvpx, making it impractical to use VP9.
     if (BORAM_WIN_BUILD) {
-      return path.join(remote.app.getAppPath(), exe);
+      return path.join(APP_PATH, exe);
     } else {
       return null;
     }

@@ -3,20 +3,18 @@
  * @module boram/youtube-dl
  */
 
-import assert from "assert";
-import {makeRunner, getRunPath} from "../util";
-const YTDL = require(
-  "file!../../bin/youtube-dl." +
-  (BORAM_WIN_BUILD ? "exe" : "zip")
-);
+import path from "path";
+import {APP_PATH, makeRunner, getRunPath} from "../util";
+require("file!../../bin/youtube-dl." + (BORAM_WIN_BUILD ? "exe" : "zip"));
 
 export default makeRunner("youtube-dl", {
   _fixPathArgs(runpath, args) {
-    if (runpath) {
+    // youtube-dl must always be in PATH on Windows.
+    if (runpath || BORAM_WIN_BUILD) {
       return [runpath, args];
     } else {
-      assert(!BORAM_WIN_BUILD, "youtube-dl must always be in PATH on Windows");
-      return [getRunPath("python"), [YTDL].concat(args)];
+      const zippath = path.join(APP_PATH, "youtube-dl.zip");
+      return [getRunPath("python"), [zippath].concat(args)];
     }
   },
   getInfo(url) {

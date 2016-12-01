@@ -91,7 +91,7 @@ export default class extends React.Component {
     tabs.push({key, label: DEFAULT_LABEL, source: null, ...opts});
     this.setState({tabs});
   }
-  handleGlobalClose = (e) => {
+  handleGlobalClose = (/*e*/) => {
     // if (!BORAM_DEBUG) {
     //   const choice = remote.dialog.showMessageBox({
     //     icon: ICON_BIG_PATH,
