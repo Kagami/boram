@@ -89,10 +89,12 @@ export default class extends React.PureComponent {
       .concat({key: null, text: "none"});
   }
   isNoVideo() {
-    return this.getVideoFormats().length <= 1;
+    const formats = this.getVideoFormats();
+    return formats.length === 1 && formats[0].key == null;
   }
   isNoAudio() {
-    return this.getAudioFormats().length <= 1;
+    const formats = this.getAudioFormats();
+    return formats.length === 1 && formats[0].key == null;
   }
   handleVideoFormatChange = (e, _, vfid) => {
     this.setState({vfid});
