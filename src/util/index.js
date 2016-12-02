@@ -224,12 +224,14 @@ export function makeRunner(exe, obj) {
           child = null;
           reject(new Error(`Failed to run ${exe}: ${err.message}`));
         });
-        child.on("close", code => {
+        child.on("close", (code, signal) => {
           child = null;
           if (code || code == null) {
-            return reject(new Error(
-              `${exe} exited with code ${code} (${stderr.trim()})`
-            ));
+            const err = new Error(`${exe} exited with code ${code} ` +
+                                  `(${stderr.trim()})`);
+            err.code = code;
+            err.signal = signal;
+            return reject(err);
           }
           resolve(stdout);
         });

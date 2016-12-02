@@ -12,7 +12,7 @@ import Icon from "react-fa";
 import FFmpeg from "../ffmpeg";
 import {useSheet} from "../jss";
 import {BigProgress, BigButton, Pane, Sep} from "../theme";
-import {tmp, moveSync, parseFrameRate} from "../util";
+import {tmp, moveSync, parseFrameRate, showErr} from "../util";
 
 @useSheet({
   output: {
@@ -197,10 +197,13 @@ export default class extends React.PureComponent {
       if (preview) {
         this.handlePlay();
       }
-    }, (encodeError) => {
+    }, ({code, signal}) => {
       progress = 0;
-      this.setState({encodeError, progress});
+      this.setState({progress});
       this.props.onEncoding(false);
+      const msg = code == null ? `killed by ${signal}`
+                               : `exited with ${code}`;
+      handleLog(`\nffmpeg ${msg}\n`);
     });
   }
   cancel() {
@@ -222,7 +225,7 @@ export default class extends React.PureComponent {
   toggleEncode({preview}) {
     const encoding = !this.props.encoding;
     if (encoding) {
-      this.setState({preview, output: null, encodeError: null});
+      this.setState({preview, output: null});
       this.props.onEncoding(encoding);
       this.start({preview});
     } else {
@@ -249,18 +252,20 @@ export default class extends React.PureComponent {
       ],
     });
     if (!outpath) return;
+    const output = {path: outpath, moved: true};
     try {
       // rename(2) returns success on Linux for the same path so no need
       // to bother with additional checkings. The worse thing is that
       // user may overwrite current source but we can't prevent this on
       // OS level.
       moveSync(tmppath, outpath);
-    } catch (encodeError) {
-      this.setState({encodeError});
+      // Encoded file is moved.
+      this.setState({output});
+    } catch (err) {
+      const msg = `Failed to save (${showErr(err)})`;
+      const log = `${this.state.log}\n${msg}\n`;
+      this.setState({log});
     }
-    // Encoded file is moved.
-    const output = {path: outpath};
-    this.setState({output});
   };
   render() {
     const {styles} = this.constructor;
@@ -294,7 +299,9 @@ export default class extends React.PureComponent {
             <BigButton
               icon={<Icon name="save" />}
               title="Save result"
-              disabled={!this.state.output || this.state.output.preview}
+              disabled={!this.state.output ||
+                        this.state.output.preview ||
+                        this.state.output.moved}
               onClick={this.handleSave}
             />
           </div>
