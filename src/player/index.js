@@ -287,7 +287,7 @@ export default class extends React.PureComponent {
           />
           <Seek
             value={Math.floor(this.state.time)}
-            max={Math.floor(this.duration)}
+            max={Math.max(1, Math.floor(this.duration))}
             mstart={Math.floor(this.props.mstart)}
             mend={Math.floor(this.props.mend)}
             onMouseDown={this.handleSeekMouseDown}
