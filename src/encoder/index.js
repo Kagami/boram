@@ -124,9 +124,13 @@ export default class extends React.PureComponent {
     assert(bitrate);
     return bitrate;
   }
-  calcVideoBitrate({limit, _duration, acodec, ab}) {
-    if (acodec === "vorbis") {
-      ab = this.getVorbisBitrate(ab);
+  calcVideoBitrate({limit, _duration, hasAudio, acodec, ab}) {
+    if (hasAudio) {
+      if (acodec === "vorbis") {
+        ab = this.getVorbisBitrate(ab);
+      }
+    } else {
+      ab = 0;
     }
     const limitKbits = limit * 8 * 1024;
     const vb = Math.floor(limitKbits / _duration - ab);
