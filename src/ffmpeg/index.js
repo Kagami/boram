@@ -4,7 +4,7 @@
  */
 
 import assert from "assert";
-import {makeRunner, escapeArg, quoteArgs, fixOpt, clearOpt} from "../util";
+import {makeRunner, escapeArg, fixOpt, clearOpt} from "../util";
 if (BORAM_WIN_BUILD) {
   require.context(
     "../../bin/ffmpeg-latest-win64-shared/bin",
@@ -214,13 +214,11 @@ export default makeRunner("ffmpeg", {
 
     return args;
   },
-  _getCommonArgs(rawArgs) {
-    const args = rawArgs.filter(arg => typeof arg === "string");
-    args.unshift("-hide_banner", "-nostdin", "-y");
-    return args;
+  _getCommonArgs(baseArgs) {
+    return ["-hide_banner", "-nostdin", "-y"].concat(baseArgs);
   },
-  getPreviewArgs({rawArgs, outpath}) {
-    const args = this._getCommonArgs(rawArgs);
+  getPreviewArgs({baseArgs, outpath}) {
+    const args = this._getCommonArgs(baseArgs);
     fixOpt(args, "-c:v", "libx264");
     fixOpt(args, "-crf", "18", {add: true});
     // Not needed or libvpx-specific.
@@ -237,8 +235,8 @@ export default makeRunner("ffmpeg", {
     args.push("-f", "matroska", "--", outpath);
     return args;
   },
-  getEncodeArgs({rawArgs, passn, passlog, outpath}) {
-    const args = this._getCommonArgs(rawArgs);
+  getEncodeArgs({baseArgs, passn, passlog, outpath}) {
+    const args = this._getCommonArgs(baseArgs);
     if (passn === 1) {
       // <http://wiki.webmproject.org/ffmpeg/vp9-encoding-guide>.
       fixOpt(args, "-speed", "4");
@@ -256,8 +254,5 @@ export default makeRunner("ffmpeg", {
       assert(false);
     }
     return args;
-  },
-  showArgs(args) {
-    return `$ ffmpeg ${quoteArgs(args)}\n`;
   },
 });

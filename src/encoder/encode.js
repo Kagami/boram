@@ -5,14 +5,17 @@
 
 import fs from "fs";
 import path from "path";
-import {parse as parseArgs} from "shell-quote";
 import {shell, remote} from "electron";
 import React from "react";
 import Icon from "react-fa";
 import FFmpeg from "../ffmpeg";
 import {useSheet} from "../jss";
 import {BigProgress, BigButton, Pane, Sep} from "../theme";
-import {tmp, moveSync, parseFrameRate, showErr} from "../util";
+import {
+  tmp, moveSync,
+  parseFrameRate, parseArgs,
+  getOpt, showErr, showTime, showSize, quoteArgs,
+} from "../util";
 
 @useSheet({
   output: {
@@ -151,11 +154,13 @@ export default class extends React.PureComponent {
       }
 
       this.setState({log});
-      // TODO(Kagami): Feed every line?
-      updateProgress(frameParser.feed(chunk));
+      if (encoding) {
+        // TODO(Kagami): Feed every line?
+        updateProgress(frameParser.feed(chunk));
+      }
     };
     const run = (args) => {
-      handleLog(FFmpeg.showArgs(args));
+      handleLog(this.showArgs(args));
       this.ff = FFmpeg._run(args, handleLog);
       return this.ff;
     };
@@ -168,11 +173,9 @@ export default class extends React.PureComponent {
     const passlog = this.tmpLogName;
     const outpath = preview ? this.tmpPreviewName : this.tmpEncodeName;
     const output = {preview, path: outpath};
+    const baseArgs = parseArgs(this.props.rawArgs);
     const frameParser = this.createFrameParser();
-    // TODO(Kagami): shell-quote doesn't throw on unmatched quotes and
-    // also parses things like stream redirections and pipes which we
-    // don't need. Use some better parser.
-    const rawArgs = parseArgs(this.props.rawArgs);
+    const startTime = this.now();
 
     // progress/log might be updated several times at one go so we need
     // to keep our local reference in addition to state's.
@@ -181,29 +184,35 @@ export default class extends React.PureComponent {
     let curpos = 0;
     let lastnl = 0;
     let passn = (this.props.mode2Pass && !preview) ? 1 : 0;
+    let encoding = true;
     let videop = preview
-      ? run(FFmpeg.getPreviewArgs({rawArgs, outpath}))
-      : run(FFmpeg.getEncodeArgs({rawArgs, outpath, passlog, passn}));
+      ? run(FFmpeg.getPreviewArgs({baseArgs, outpath}))
+      : run(FFmpeg.getEncodeArgs({baseArgs, outpath, passlog, passn}));
     if (this.props.mode2Pass && !preview) {
       videop = videop.then(() => {
         frameParser.reset();
         passn = 2;
-        return run(FFmpeg.getEncodeArgs({rawArgs, outpath, passlog, passn}));
+        handleLog(this.sep() + "\n");
+        return run(FFmpeg.getEncodeArgs({baseArgs, outpath, passlog, passn}));
       });
     }
     videop.then(() => {
       progress = 100;
+      encoding = false;
       this.setState({output, progress});
       this.props.onProgress(progress);
-      this.props.onEncoding(false);
+      this.props.onEncoding(encoding);
       if (preview) {
         this.handlePlay();
+      } else {
+        handleLog(this.showStats(startTime));
       }
     }, ({code, signal}) => {
       progress = 0;
+      encoding = false;
       this.setState({progress});
       this.props.onProgress(progress);
-      this.props.onEncoding(false);
+      this.props.onEncoding(encoding);
       const msg = code == null ? `killed by ${signal}`
                                : `exited with ${code}`;
       handleLog(`\nffmpeg ${msg}\n`);
@@ -218,6 +227,29 @@ export default class extends React.PureComponent {
     } catch (e) {
       /* skip */
     }
+  }
+  now() {
+    return (new Date()).getTime() / 1000;
+  }
+  sep() {
+    return Array(51).join("=");
+  }
+  showArgs(args) {
+    return `$ ffmpeg ${quoteArgs(args)}\n`;
+  }
+  showStats(startTime) {
+    const args = parseArgs(this.props.rawArgs);
+    const {size} = fs.statSync(this.state.output.path);
+    const runTime = this.now() - startTime;
+    return [
+      this.sep(),
+      `Output duration: ${showTime(this.props._duration)}`,
+      `Output video bitrate: ${getOpt(args, "-b:v", "0")}`,
+      `Output audio bitrate: ${getOpt(args, "-b:a", "0")}`,
+      `Output file size: ${showSize(size)}`,
+      `Overall time spent: ${showTime(runTime)}`,
+      "",
+    ].join("\n");
   }
   isPreviewEncoding() {
     return this.props.encoding && this.state.preview;

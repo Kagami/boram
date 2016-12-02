@@ -8,6 +8,7 @@ import fs from "fs";
 import path from "path";
 import {spawn} from "child_process";
 import which from "which";
+import {parse as _parseArgs} from "shell-quote";
 import {remote} from "electron";
 
 export const APP_PATH = remote.app.getAppPath();
@@ -42,11 +43,6 @@ export function showBitrate(bitrate) {
   }
 }
 
-function pad2(n) {
-  n |= 0;
-  return n < 10 ? "0" + n : n.toString();
-}
-
 export function parseTime(time) {
   if (Number.isFinite(time)) return time;
   // [hh]:[mm]:[ss[.xxx]]
@@ -67,8 +63,13 @@ export function parseTime(time) {
   return duration;
 }
 
-export function showTime(duration, sep) {
-  let ts = pad2(duration / 60) + (sep || ":");
+function pad2(n) {
+  n |= 0;
+  return n < 10 ? "0" + n : n.toString();
+}
+
+export function showTime(duration, sep = ":") {
+  let ts = pad2(duration / 60) + sep;
   ts += pad2(duration % 60);
   ts += (duration % 1).toFixed(3).slice(1, 5);
   return ts;
@@ -109,6 +110,13 @@ export function escapeArg(arg) {
   return `"${arg}"`;
 }
 
+// TODO(Kagami): shell-quote doesn't throw on unmatched quotes and
+// also parses things like stream redirections and pipes which we
+// don't need. Use some better parser.
+export function parseArgs(rawArgs) {
+  return _parseArgs(rawArgs).filter(arg => typeof arg === "string");
+}
+
 /**
  * Analogue of `shell-quote.quote` with double quotes and more pretty
  * escaping.
@@ -126,6 +134,18 @@ export function quoteArgs(args) {
       return arg;
     }
   }).join(" ");
+}
+
+export function getOpt(arr, key, def) {
+  let prev = false;
+  const res = arr.find(v => {
+    if (prev) {
+      return true;
+    } else if (v === key) {
+      prev = true;
+    }
+  });
+  return res == null ? def : res;
 }
 
 export function fixOpt(arr, key, newval, opts = {}) {
