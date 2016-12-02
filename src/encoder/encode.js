@@ -309,8 +309,9 @@ export default class extends React.PureComponent {
     } catch (encodeError) {
       this.setState({encodeError});
     }
-    // Encoded file is gone.
-    this.setState({output: null});
+    // Encoded file is moved.
+    const output = {path: outpath};
+    this.setState({output});
   };
   render() {
     const {styles} = this.constructor;
