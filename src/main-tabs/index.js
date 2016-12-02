@@ -3,6 +3,7 @@
  * @module boram/main-tabs
  */
 
+import {basename} from "path";
 import {remote} from "electron";
 import React from "react";
 import cx from "classnames";
@@ -134,15 +135,16 @@ export default class extends React.Component {
     const tabIndex = this.state.tabs.length - 1;
     this.setState({tabIndex});
   };
-  // XXX(Kagami): This is hackish, source should be passed to instance
-  // via props, but it's more convenient to keep source there.
-  handleSourceUpdate = () => {
-    this.forceUpdate();
+  handleSourceUpdate = (i, source) => {
+    const tabs = this.state.tabs;
+    tabs[i].source = source;
+    this.setState({tabs});
   };
   handleClone = (i, e) => {
     e.stopPropagation();
-    const source = this.getInstance(i).getSource();
-    this.handleNew(null, {source});
+    const {source} = this.state.tabs[i];
+    const label = basename(source.path);
+    this.handleNew(null, {label, source});
   };
   handleClose = (i, e) => {
     e.stopPropagation();
@@ -166,8 +168,7 @@ export default class extends React.Component {
   };
   getLabelNode(label, i) {
     const {classes} = this.sheet;
-    const instance = this.getInstance(i);
-    const hasSource = !!(instance && instance.getSource());
+    const hasSource = !!this.state.tabs[i].source;
     return (
       <div className={classes.tabItem}>
         <div className={classes.label} title={label}>
@@ -232,8 +233,8 @@ export default class extends React.Component {
             ref={`instance${i}`}
             source={tab.source}
             active={this.state.tabIndex === i}
-            onSourceUpdate={this.handleSourceUpdate}
             onTabTitle={this.handleTitleChange.bind(null, i)}
+            onSourceUpdate={this.handleSourceUpdate.bind(null, i)}
           />
         </Tab>
       )}
