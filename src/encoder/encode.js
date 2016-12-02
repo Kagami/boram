@@ -53,7 +53,7 @@ class Output extends React.PureComponent {
 }
 
 // Approximate correlations between various encoding stages.
-const PASS1_COEFF = 0.4;
+const PASS1_COEFF = 0.3;
 const PASS2_COEFF = 1 - PASS1_COEFF;
 
 export default class extends React.PureComponent {
@@ -108,6 +108,7 @@ export default class extends React.PureComponent {
       }
       progress = Math.min(progress + inc, 99);
       this.setState({progress});
+      this.props.onProgress(progress);
     };
     const handleLog = (chunk) => {
       // Emulate terminal caret behavior.
@@ -193,6 +194,7 @@ export default class extends React.PureComponent {
     videop.then(() => {
       progress = 100;
       this.setState({output, progress});
+      this.props.onProgress(progress);
       this.props.onEncoding(false);
       if (preview) {
         this.handlePlay();
@@ -200,6 +202,7 @@ export default class extends React.PureComponent {
     }, ({code, signal}) => {
       progress = 0;
       this.setState({progress});
+      this.props.onProgress(progress);
       this.props.onEncoding(false);
       const msg = code == null ? `killed by ${signal}`
                                : `exited with ${code}`;

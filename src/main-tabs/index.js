@@ -11,7 +11,7 @@ import Icon from "react-fa";
 import {useSheet} from "../jss";
 import ShowHide from "../show-hide";
 import {Tabs, Tab} from "../theme";
-import {ICON_BIG_PATH} from "../util";
+import {ICON_BIG_PATH, showProgress} from "../util";
 import Instance from "./instance";
 
 const DEFAULT_LABEL = "untitled";
@@ -89,8 +89,13 @@ export default class extends React.Component {
   }
   addTab(opts) {
     const tabs = this.state.tabs;
-    const key = this.tabKey++;
-    tabs.push({key, label: DEFAULT_LABEL, source: null, ...opts});
+    tabs.push({
+      key: this.tabKey++,
+      label: DEFAULT_LABEL,
+      progress: 0,
+      source: null,
+      ...opts,
+    });
     this.setState({tabs});
   }
   handleGlobalClose = (/*e*/) => {
@@ -124,6 +129,11 @@ export default class extends React.Component {
   handleTitleChange = (i, label = DEFAULT_LABEL) => {
     const tabs = this.state.tabs;
     tabs[i].label = label;
+    this.setState({tabs});
+  };
+  handleProgressChange = (i, progress = 0) => {
+    const tabs = this.state.tabs;
+    tabs[i].progress = progress;
     this.setState({tabs});
   };
   handleSelect = (tabIndex) => {
@@ -166,15 +176,18 @@ export default class extends React.Component {
       this.addTab();
     }
   };
-  getLabelNode(label, i) {
+  getLabelNode(i) {
     const {classes} = this.sheet;
-    const hasSource = !!this.state.tabs[i].source;
+    const {label, progress, source} = this.state.tabs[i];
+    const title = progress > 0 && progress < 100
+      ? `[${showProgress(progress)}] ${label}`
+      : label;
     return (
       <div className={classes.tabItem}>
-        <div className={classes.label} title={label}>
-          {label}
+        <div className={classes.label} title={title}>
+          {title}
         </div>
-        <ShowHide show={hasSource}>
+        <ShowHide show={!!source}>
           <Icon
             name="copy"
             title="Clone tab"
@@ -224,7 +237,7 @@ export default class extends React.Component {
           key={tab.key}
           tabKey={tab.key}
           value={i}
-          label={this.getLabelNode(tab.label, i)}
+          label={this.getLabelNode(i)}
           className={cx(classes.tab,
                         this.state.tabIndex === i && classes.activeTab)}
           disableTouchRipple
@@ -234,6 +247,7 @@ export default class extends React.Component {
             source={tab.source}
             active={this.state.tabIndex === i}
             onTabTitle={this.handleTitleChange.bind(null, i)}
+            onProgress={this.handleProgressChange.bind(null, i)}
             onSourceUpdate={this.handleSourceUpdate.bind(null, i)}
           />
         </Tab>

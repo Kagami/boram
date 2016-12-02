@@ -93,6 +93,11 @@ export function showErr(err) {
   return err ? err.message : null;
 }
 
+export function showProgress(progress) {
+  const space = progress < 10 ? " " : "";
+  return `${space}${progress.toFixed(1)}%`;
+}
+
 /**
  * Escape shell argument.
  */

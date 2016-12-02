@@ -34,6 +34,7 @@ export default class extends React.PureComponent {
             events={this.events}
             onLoad={this.props.onSourceUpdate}
             onTabTitle={this.props.onTabTitle}
+            onProgress={this.props.onProgress}
           />
         </ShowHide>
         <ShowHide show={!!this.props.source && !this.state.info}>
@@ -51,6 +52,7 @@ export default class extends React.PureComponent {
             source={this.props.source}
             info={this.state.info}
             onTabTitle={this.props.onTabTitle}
+            onProgress={this.props.onProgress}
           />
         </ShowHide>
       </div>

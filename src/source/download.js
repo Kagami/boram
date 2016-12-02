@@ -47,7 +47,9 @@ export default class extends React.PureComponent {
     this.props.events.removeListener("abort", this.abort);
   }
   handleDownload = () => {
-    this.setState({progress: 0, status: "spawning youtube-dl", error: null});
+    const progress = 0;
+    this.setState({progress, status: "spawning youtube-dl", error: null});
+    this.props.onProgress(progress);
     const {info} = this.props;
     const url = info.webpage_url;
     const {vfid, afid} = this.props.format;
@@ -56,8 +58,11 @@ export default class extends React.PureComponent {
     this.ytdl = YouTubeDL.download({url, format, outpath}, (upd) => {
       const {progress, status} = upd;
       this.setState({progress, status});
+      this.props.onProgress(progress);
     }).then(() => {
-      this.setState({progress: 100, status: "writing title to metadata"});
+      const progress = 100;
+      this.setState({progress, status: "writing title to metadata"});
+      this.props.onProgress(progress);
       const inpath = this.tmpYTName;
       const outpath = this.tmpFF.name;
       // URL might be rather long to put it into title (e.g. extra query
@@ -73,6 +78,7 @@ export default class extends React.PureComponent {
     }, (error) => {
       const progress = 0;
       this.setState({progress, error});
+      this.props.onProgress(progress);
     }).then(this.cleanYT, this.cleanYT);
   };
   abort = () => {

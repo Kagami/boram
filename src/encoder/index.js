@@ -530,6 +530,7 @@ export default class extends React.PureComponent {
               mode2Pass={this.state.mode2Pass}
               rawArgs={this.state.rawArgs}
               onEncoding={this.handleEncodingState}
+              onProgress={this.props.onProgress}
             />
           )}
         </Tabs>

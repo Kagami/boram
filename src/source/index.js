@@ -76,6 +76,7 @@ export default class extends React.PureComponent {
             format={this.state.format}
             onLoad={this.props.onLoad}
             onCancel={this.handleCancel}
+            onProgress={this.props.onProgress}
           />
         </ShowHide>
       </div>
