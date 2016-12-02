@@ -3,7 +3,6 @@
  * @module boram/encoder/encode
  */
 
-import assert from "assert";
 import fs from "fs";
 import path from "path";
 import {parse as parseArgs} from "shell-quote";
@@ -13,11 +12,7 @@ import Icon from "react-fa";
 import FFmpeg from "../ffmpeg";
 import {useSheet} from "../jss";
 import {BigProgress, BigButton, Pane, Sep} from "../theme";
-import {
-  tmp, moveSync,
-  parseFrameRate, quoteArgs,
-  fixOpt, clearOpt,
-} from "../util";
+import {tmp, moveSync, parseFrameRate} from "../util";
 
 @useSheet({
   output: {
@@ -87,57 +82,6 @@ export default class extends React.PureComponent {
     this.cancel();
     this.cleanup();
   };
-  /** Fixed arguments being passed to FFmpeg. */
-  getCommonArgs() {
-    // TODO(Kagami): shell-quote doesn't throw on unmatched quotes and
-    // also parses things like stream redirections and pipes which we
-    // don't need. Use some better parser.
-    const args = parseArgs(this.props.rawArgs)
-      .filter(arg => typeof arg === "string");
-    args.unshift("-hide_banner", "-nostdin", "-y");
-    return args;
-  }
-  getPreviewArgs({outpath}) {
-    const args = this.getCommonArgs();
-    fixOpt(args, "-c:v", "libx264");
-    fixOpt(args, "-crf", "18", {add: true});
-    // Not needed or libvpx-specific.
-    clearOpt(args, [
-      "-b:v",
-      "-speed",
-      "-tile-columns",
-      "-frame-parallel",
-      "-auto-alt-ref",
-      "-lag-in-frames",
-      "-g",
-    ]);
-    args.push("-preset", "ultrafast");
-    args.push("-f", "matroska", "--", outpath);
-    return args;
-  }
-  getEncodeArgs({passn, passlog, outpath}) {
-    const args = this.getCommonArgs();
-    if (passn === 1) {
-      // <http://wiki.webmproject.org/ffmpeg/vp9-encoding-guide>.
-      fixOpt(args, "-speed", "4");
-      // Should be without suffix.
-      passlog = passlog.slice(0, -6);
-      args.push("-an", "-pass", "1", "-passlogfile", passlog);
-      args.push("-f", "null", "-");
-    } else if (passn === 2) {
-      passlog = passlog.slice(0, -6);
-      args.push("-pass", "2", "-passlogfile", passlog);
-      args.push("-f", "webm", "--", outpath);
-    } else if (passn === 0) {
-      args.push("-f", "webm", "--", outpath);
-    } else {
-      assert(false);
-    }
-    return args;
-  }
-  showArgs(args) {
-    return `$ ffmpeg ${quoteArgs(args)}\n`;
-  }
   createFrameParser() {
     const frameRe = /^frame=\s*(\d+)\b/;
     let lastFrame = 0;
@@ -210,7 +154,7 @@ export default class extends React.PureComponent {
       updateProgress(frameParser.feed(chunk));
     };
     const run = (args) => {
-      handleLog(this.showArgs(args));
+      handleLog(FFmpeg.showArgs(args));
       this.ff = FFmpeg._run(args, handleLog);
       return this.ff;
     };
@@ -224,6 +168,10 @@ export default class extends React.PureComponent {
     const outpath = preview ? this.tmpPreviewName : this.tmpEncodeName;
     const output = {preview, path: outpath};
     const frameParser = this.createFrameParser();
+    // TODO(Kagami): shell-quote doesn't throw on unmatched quotes and
+    // also parses things like stream redirections and pipes which we
+    // don't need. Use some better parser.
+    const rawArgs = parseArgs(this.props.rawArgs);
 
     // progress/log might be updated several times at one go so we need
     // to keep our local reference in addition to state's.
@@ -232,13 +180,14 @@ export default class extends React.PureComponent {
     let curpos = 0;
     let lastnl = 0;
     let passn = (this.props.mode2Pass && !preview) ? 1 : 0;
-    let videop = preview ? run(this.getPreviewArgs({outpath}))
-                         : run(this.getEncodeArgs({outpath, passlog, passn}));
+    let videop = preview
+      ? run(FFmpeg.getPreviewArgs({rawArgs, outpath}))
+      : run(FFmpeg.getEncodeArgs({rawArgs, outpath, passlog, passn}));
     if (this.props.mode2Pass && !preview) {
       videop = videop.then(() => {
         frameParser.reset();
         passn = 2;
-        return run(this.getEncodeArgs({outpath, passlog, passn}));
+        return run(FFmpeg.getEncodeArgs({rawArgs, outpath, passlog, passn}));
       });
     }
     videop.then(() => {

@@ -190,6 +190,7 @@ export function getRunPath(exe) {
 
 export function makeRunner(exe, obj) {
   return {
+    ...obj,
     _run(args, onLog) {
       let stdout = "";
       let stderr = "";
@@ -239,7 +240,7 @@ export function makeRunner(exe, obj) {
         }
       };
       return runner;
-    }, ...obj,
+    },
   };
 }
 
