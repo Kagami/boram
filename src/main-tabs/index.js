@@ -15,8 +15,6 @@ import {ICON_BIG_PATH, showProgress} from "../util";
 import Instance from "./instance";
 
 const DEFAULT_LABEL = "untitled";
-const KEY_0 = 48;
-const KEY_9 = 57;
 
 @useSheet({
   tab: {
@@ -81,7 +79,6 @@ export default class extends React.Component {
   }
   componentDidMount() {
     window.addEventListener("beforeunload", this.handleGlobalClose, false);
-    document.addEventListener("keydown", this.handleGlobaKey, false);
   }
   tabKey = 0
   getInstance(i) {
@@ -115,15 +112,6 @@ export default class extends React.Component {
     // }
     for (let i = 0; i < this.state.tabs.length; i++) {
       this.getInstance(i).abort();
-    }
-  };
-  handleGlobaKey = (e) => {
-    if (e.keyCode >= KEY_0 && e.keyCode <= KEY_9 && e.altKey) {
-      let tabIndex = e.keyCode - KEY_0;
-      tabIndex = (tabIndex === 0 ? 10 : tabIndex) - 1;
-      if (tabIndex < this.state.tabs.length) {
-        this.setState({tabIndex});
-      }
     }
   };
   handleTitleChange = (i, label = DEFAULT_LABEL) => {
