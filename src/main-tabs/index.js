@@ -80,6 +80,10 @@ export default class extends React.Component {
   componentDidMount() {
     window.addEventListener("beforeunload", this.handleGlobalClose, false);
   }
+  componentWillUnmount() {
+    window.removeEventListener("beforeunload", this.handleGlobalClose, false);
+    this.handleGlobalClose();
+  }
   tabKey = 0
   getInstance(i) {
     return this.refs[`instance${i}`];
@@ -95,8 +99,8 @@ export default class extends React.Component {
     });
     this.setState({tabs});
   }
-  handleGlobalClose = (/*e*/) => {
-    // if (!BORAM_DEBUG) {
+  handleGlobalClose = (e = null) => {
+    if (e && !BORAM_DEBUG) {
     //   const choice = remote.dialog.showMessageBox({
     //     icon: ICON_BIG_PATH,
     //     title: "Confirm",
@@ -109,7 +113,7 @@ export default class extends React.Component {
     //     e.returnValue = false;
     //     return;
     //   }
-    // }
+    }
     for (let i = 0; i < this.state.tabs.length; i++) {
       this.getInstance(i).abort();
     }
