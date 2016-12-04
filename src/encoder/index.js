@@ -122,7 +122,7 @@ export default class extends React.PureComponent {
     }
   }
   // Heuristics below are up to further tuninig. Especially in relation
-  // to vertical videos and high fps.
+  // to vertical videos and high fps. Also VP8 vs VP9.
   isShortClip(opts = null) {
     const duration = opts ? opts._duration : this.getFullDuration();
     return duration < 6;
@@ -140,8 +140,8 @@ export default class extends React.PureComponent {
     const vb = FFmpeg.getVideoBitrate(opts);
     const width = this.getFinalWidth(opts);
     return (
-      (width <= 1280 && vb > 8000) ||
-      (width <= 1920 && vb > 16000) ||
+      (width <= 1280 && vb > 10000) ||
+      (width <= 1920 && vb > 20000) ||
       vb > 30000
     );
   }
