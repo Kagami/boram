@@ -60,7 +60,7 @@ export default class extends React.PureComponent {
   }
   getVideoFormats() {
     const formats = this.props.info.formats
-      .filter(f => !f.acodec || f.acodec === "none")
+      .filter(f => !f.acodec || f.vcodec !== "none")
       .sort(this.compareVideo)
       .map(f => ({
         key: f.format_id,
