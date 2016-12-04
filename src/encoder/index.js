@@ -87,7 +87,7 @@ export default class extends React.PureComponent {
     acodec: "opus",
     mode2Pass: true,
     modeLimit: true,
-    modeCRF: false,
+    modeCRF: this.okToCRF(),
     rawArgs: "",
   }
   componentDidMount() {
@@ -104,6 +104,18 @@ export default class extends React.PureComponent {
   }
   getSubTracks() {
     return this.props.info.streams.filter(t => t.codec_type === "subtitle");
+  }
+  getFullDuration() {
+    return parseFloat(this.props.info.format.duration);
+  }
+  okToCRF() {
+    const induration = this.getFullDuration();
+    const {width} = this.getVideoTracks()[0];
+    return (
+      (width <= 1280 && induration < 11) ||
+      (width <= 1920 && induration < 6) ||
+      induration < 4
+    );
   }
 
   makeFocuser = (name) => {
@@ -223,7 +235,7 @@ export default class extends React.PureComponent {
     const atracks = this.getAudioTracks();
     const mstart = get("mstart");
     const mend = get("mend");
-    const induration = parseFloat(this.props.info.format.duration);
+    const induration = this.getFullDuration();
     // Will contain exact values.
     let _start = null;
     let _duration = null;
