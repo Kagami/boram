@@ -168,7 +168,7 @@ export default class extends React.PureComponent {
         />
         <Tip icon="info-circle">
           <span>Formats with highest resolution/fps are recommended </span>
-          <span>(overall quality will be higher).</span><br/>
+          <span>(overall quality will be better).</span><br/>
           <span>You can shrink them on encoding if needed.</span>
         </Tip>
       </div>
