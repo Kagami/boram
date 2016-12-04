@@ -201,6 +201,9 @@ export default class extends React.PureComponent {
       audioFX: [],
       codecs: [],
     };
+    function warn(tab, message) {
+      warnings[tab].push(message);
+    }
     function requireInt(value) {
       value = value.toString();
       if (!/^-?\d+$/.test(value)) throw new Error("int required");
@@ -430,14 +433,14 @@ export default class extends React.PureComponent {
     };
     if (!modeCRF) {
       if (this.isSmallBitrate(opts)) {
-        warnings.codecs.push(`Your video bitrate seems to be too small.
-                              Consider fixing limit.`);
+        warn("codecs", `Video bitrate seems to be too small,
+                        consider fixing limit`);
       } else if (this.isBigBitrate(opts)) {
-        warnings.codecs.push(`Your video bitrate seems to be too big.
-                              Consider CRF mode or fixing limit.`);
+        warn("codecs", `Video bitrate seems to be too big,
+                        consider CRF mode or fixing limit`);
       }
       if (this.isShortClip(opts)) {
-        warnings.codecs.push(`Consider CRF mode for such short fragment.`);
+        warn("codecs", `Consider CRF mode for such short fragment`);
       }
     }
     rawArgs = FFmpeg.getRawArgs(opts).join(" ");
@@ -529,10 +532,11 @@ export default class extends React.PureComponent {
           {this.getTabNode("video fx", 2,
             <VideoFX
               ref="videoFX"
-              source={this.props.source}
               makeFocuser={this.makeFocuser}
               makeChecker={this.makeChecker}
               makeSelecter={this.makeSelecter}
+              source={this.props.source}
+              mstart={this.state.mstart}
               focused={this.state.focused}
               encoding={this.state.encoding}
               errors={this.state.errors.videoFX}

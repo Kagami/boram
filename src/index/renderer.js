@@ -52,21 +52,12 @@ import "file!./roboto-medium.ttf";
   "body, input": {
     fontFamily: "'Roboto', sans-serif",
   },
-  "input, select:focus, button:focus": {
+  "input, select:focus, button:focus, input[type=range]:focus": {
     outline: "none",
   },
   "select:disabled": {
     opacity: 0.5,
     cursor: "not-allowed",
-  },
-  "input[type=range]:focus": {
-    outline: "none",
-  },
-  "input[type=button]:focus": {
-    outline: "none",
-  },
-  "input[type=button]:disabled": {
-    cursor: "auto !important",
   },
   "a[href]": {
     textDecoration: "none",

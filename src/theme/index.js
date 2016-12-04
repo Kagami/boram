@@ -245,6 +245,10 @@ export const SmallButton = (function() {
       backgroundColor: "#bbb",
       color: "#fff",
     },
+    buttonDisabled: {
+      backgroundColor: "#ddd",
+      cursor: "not-allowed",
+    },
     label: {
       fontSize: "inherit",
       textTransform: "none",
@@ -256,12 +260,16 @@ export const SmallButton = (function() {
   return function(props) {
     const {style, ...other} = props;
     const mainStyle = Object.assign({}, styles.buttonOuter, style);
+    const buttonStyle = Object.assign(
+      {}, styles.button,
+      other.disabled && styles.buttonDisabled
+    );
     return (
       <RaisedButton
         {...other}
         secondary
         style={mainStyle}
-        buttonStyle={styles.button}
+        buttonStyle={buttonStyle}
         labelStyle={styles.label}
         onKeyDown={handleKeyDown}
       />
@@ -281,6 +289,7 @@ export const BigButton = (function() {
     },
     buttonDisabled: {
       backgroundColor: "#ddd",
+      cursor: "not-allowed",
     },
     overlay: {
       borderRadius: 0,

@@ -11,7 +11,7 @@ import {
   Prop, SmallInput,
   SmallSelect, MenuItem,
   InlineCheckbox, Sep,
-  SmallButton,
+  SmallButton, BoldIcon,
 } from "../theme";
 
 const HELP = {
@@ -50,22 +50,38 @@ const HELP = {
   },
 })
 export default class extends React.PureComponent {
-  state = {intDetecting: false, cropDetecting: false}
   handleInterlaceDetect = () => {
     const inpath = this.props.source.path;
     const {vtrackn} = this.props;
-    this.setState({intDetecting: true});
+    const start = this.props.mstart;
     this.props.onEncoding(true);
-    FFmpeg.hasInterlace({inpath, vtrackn}).then(interlaced => {
+    FFmpeg.hasInterlace({inpath, vtrackn, start}).then(interlaced => {
       this.props.makeChecker("deinterlace")(null, interlaced);
+      this.props.onEncoding(false);
     }, () => {
-      /* skip */
-    }).then(() => {
-      this.setState({intDetecting: false});
+      // TODO(Kagami): Indicate error somewhere?
       this.props.onEncoding(false);
     });
   };
   handleCropDetect = () => {
+    const inpath = this.props.source.path;
+    const {vtrackn} = this.props;
+    const vtrack = this.props.vtracks[vtrackn];
+    const start = this.props.mstart;
+    this.props.onEncoding(true);
+    FFmpeg.getCropArea({inpath, vtrackn, start}).then(({w, h, x, y}) => {
+      if (vtrack.width === w && vtrack.height === h) {
+        w = h = x = y = "";
+      }
+      this.refs.cropw.setValue(w);
+      this.refs.croph.setValue(h);
+      this.refs.cropx.setValue(x);
+      this.refs.cropy.setValue(y);
+      this.props.onUpdate();
+      this.props.onEncoding(false);
+    }, () => {
+      this.props.onEncoding(false);
+    });
   };
   render() {
     const {classes} = this.sheet;
@@ -98,9 +114,9 @@ export default class extends React.PureComponent {
             onCheck={this.props.makeChecker("deinterlace")}
           />
           <SmallButton
+            icon={<BoldIcon name="refresh" />}
+            title="Auto-detect interlaced video"
             style={{marginLeft: 0}}
-            title="Run interlace auto-detection"
-            label={this.state.intDetecting ? "detecting" : "detect"}
             disabled={this.props.encoding}
             onClick={this.handleInterlaceDetect}
           />
@@ -137,9 +153,14 @@ export default class extends React.PureComponent {
             onFocus={this.props.makeFocuser("cropy")}
             onBlur={this.props.onUpdate}
           />
-          {/*<SmallButton
-            label="detect"
-          />*/}
+          <Sep/>
+          <SmallButton
+            icon={<BoldIcon name="refresh" />}
+            title="Auto-detect black borders"
+            style={{marginLeft: 0}}
+            disabled={this.props.encoding}
+            onClick={this.handleCropDetect}
+          />
         </Prop>
         <Prop name="scale">
           <SmallInput

@@ -23,11 +23,12 @@ export default makeRunner("ffmpeg", {
       "-f", "matroska", "--", outpath,
     ]);
   },
-  hasInterlace({inpath, vtrackn}) {
+  hasInterlace({inpath, vtrackn, start}) {
     // TODO(Kagami): BFF?
+    start = (start + 5).toString();
     return this._run([
       "-v", "error", "-nostdin", "-y",
-      "-ss", "10", "-i", inpath,
+      "-ss", start, "-i", inpath,
       "-map", `0:v:${vtrackn}`,
       "-vf", "idet,metadata=print:lavfi.idet.multiple.tff:file=-",
       "-frames:v", "10", "-f", "null", "-",
@@ -41,6 +42,24 @@ export default makeRunner("ffmpeg", {
         }
       }
       return false;
+    });
+  },
+  getCropArea({inpath, vtrackn, start}) {
+    // TODO(Kagami): Use more frames?
+    start = (start + 5).toString();
+    return this._run([
+      "-v", "error", "-nostdin", "-y",
+      "-ss", start, "-i", inpath,
+      "-map", `0:v:${vtrackn}`,
+      "-vf", "cropdetect=round=2,metadata=print:file=-",
+      "-frames:v", "2", "-f", "null", "-",
+    ]).then(log => {
+      // OK to fail here, caller will just ignore us.
+      const w = +log.match(/^lavfi.cropdetect.w=(\d+)/m)[1];
+      const h = +log.match(/^lavfi.cropdetect.h=(\d+)/m)[1];
+      const x = +log.match(/^lavfi.cropdetect.x=(\d+)/m)[1];
+      const y = +log.match(/^lavfi.cropdetect.y=(\d+)/m)[1];
+      return {w, h, x, y};
     });
   },
   _getVorbisBitrate(vorbisq) {
