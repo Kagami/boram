@@ -135,7 +135,6 @@ export default makeRunner("ffmpeg", {
     // Streams.
     args.push("-map", `0:V:${opts.vtrackn}`);
     if (opts.hasAudio) {
-      // TODO(Kagami): External track.
       args.push("-map", `0:a:${opts.atrackn}`);
     }
 
@@ -191,7 +190,7 @@ export default makeRunner("ffmpeg", {
       vfilters.push(`crop=${crop.join(":")}`);
     }
     // Both values must be set if any is specified.
-    // TODO(Kagami): clear SAR?
+    // TODO(Kagami): Clear SAR?
     if (opts.scalew != null || opts.scaleh != null) {
       scale.push(opts.scalew == null ? -1 : opts.scalew);
       scale.push(opts.scaleh == null ? -1 : opts.scaleh);
@@ -202,7 +201,6 @@ export default makeRunner("ffmpeg", {
       if (opts._start) {
         vfilters.push(`setpts=PTS+${opts._start}/TB`);
       }
-      // TODO(Kagami): External track.
       const subpath = this._escapeFilterArg(opts.inpath);
       vfilters.push(`subtitles=${subpath}:si=${opts.strackn}`);
       if (opts._start) {

@@ -369,7 +369,7 @@ export default class extends React.PureComponent {
       if (modeCRF) return 0;
       v = v || (modeLimit ? DEFAULT_LIMIT : DEFAULT_BITRATE);
       v = requireFloat(v);
-      return requireRange(v, 1);
+      return requireRange(v, modeLimit ? 0.001 : 1);
     });
     quality = validate("codecs", "quality", quality, v => {
       if (modeCRF) {
@@ -433,11 +433,11 @@ export default class extends React.PureComponent {
     };
     if (!modeCRF) {
       if (this.isSmallBitrate(opts)) {
-        warn("codecs", `Video bitrate seems to be too small,
+        warn("codecs", `Video bitrate seems too small,
                         consider fixing limit`);
       } else if (this.isBigBitrate(opts)) {
-        warn("codecs", `Video bitrate seems to be too big,
-                        consider CRF mode or fixing limit`);
+        warn("codecs", `Video bitrate seems too big,
+                        consider CRF mode or fix limit`);
       }
       if (this.isShortClip(opts)) {
         warn("codecs", `Consider CRF mode for such short fragment`);

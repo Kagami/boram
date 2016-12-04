@@ -396,7 +396,7 @@ export const HelpPane = useSheet({
   },
   secondInner: {
     height: "100%",
-    padding: "0 10px",
+    paddingLeft: 10,
     borderLeft: "2px solid #ccc",
   },
   title: {
@@ -409,6 +409,7 @@ export const HelpPane = useSheet({
   list: {
     margin: 0,
     fontSize: "16px",
+    paddingLeft: 30,
   },
   warnings: {
     color: "orange",
