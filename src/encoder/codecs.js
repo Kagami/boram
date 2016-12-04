@@ -58,6 +58,7 @@ export default class extends React.PureComponent {
         <HelpPane
           help={HELP}
           focused={this.props.focused}
+          warnings={this.props.warnings}
           errors={this.props.errors}
         >
           <Prop name="fragment">

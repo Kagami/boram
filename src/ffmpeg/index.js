@@ -43,7 +43,9 @@ export default makeRunner("ffmpeg", {
     assert(bitrate);
     return bitrate;
   },
-  _getVideoBitrate({limit, _duration, hasAudio, acodec, ab}) {
+  getVideoBitrate({modeLimit, modeCRF, limit, _duration,
+                   hasAudio, acodec, ab}) {
+    if (!modeLimit || modeCRF) return limit;
     if (hasAudio) {
       if (acodec === "vorbis") {
         ab = this._getVorbisBitrate(ab);
@@ -53,7 +55,7 @@ export default makeRunner("ffmpeg", {
     }
     const limitKbits = limit * 8 * 1024;
     const vb = Math.floor(limitKbits / _duration - ab);
-    return vb > 0 ? vb : 1;
+    return Math.max(1, vb);
   },
   /**
    * Escape FFmpeg filter argument (see ffmpeg-filters(1), "Notes on
@@ -74,14 +76,12 @@ export default makeRunner("ffmpeg", {
     const crop = [];
     const vfilters = [];
     const afilters = [];
-    const vb = (opts.modeLimit && !opts.modeCRF)
-      ? this._getVideoBitrate(opts)
-      : opts.limit;
-    function maybeSet(name, value) {
+    const vb = this.getVideoBitrate(opts);
+    const maybeSet = (name, value) => {
       if (value != null) {
         args.push(name, value.toString());
       }
-    }
+    };
 
     // Input.
     maybeSet("-ss", opts.start);

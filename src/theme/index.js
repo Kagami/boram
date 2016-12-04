@@ -397,16 +397,22 @@ export const HelpPane = useSheet({
   description: {
     fontSize: "16px",
   },
-  errorList: {
+  list: {
     margin: 0,
     fontSize: "16px",
+  },
+  warnings: {
+    color: "orange",
+  },
+  errors: {
     color: "red",
   },
 })(function(props, {classes}) {
-  const {help, focused, errors} = props;
+  const {help, focused, warnings, errors} = props;
   const showHelp = !!(focused && help[focused]);
   const showErrors = !!(errors && errors.length);
-  const show = showHelp || showErrors;
+  const showWarnings = !!(warnings && warnings.length);
+  const show = showHelp || showWarnings || showErrors;
   const style = {display: show ? "block" : "none"};
 
   function getHelpNode() {
@@ -419,12 +425,26 @@ export const HelpPane = useSheet({
     );
   }
 
-  function getErrorNode() {
+  function getWarningNode() {
     const marginTop = showHelp ? 10 : 0;
     return (
       <div style={{marginTop}}>
+        <h3 className={classes.title}>Warnings</h3>
+        <ul className={cx(classes.list, classes.warnings)}>
+        {warnings.map((message, i) =>
+          <li key={i}>{message}</li>
+        )}
+        </ul>
+      </div>
+    );
+  }
+
+  function getErrorNode() {
+    const marginTop = (showHelp || showWarnings) ? 10 : 0;
+    return (
+      <div style={{marginTop}}>
         <h3 className={classes.title}>Errors</h3>
-        <ul className={classes.errorList}>
+        <ul className={cx(classes.list, classes.errors)}>
         {errors.map(({name, message}) =>
           <li key={name}>{help[name][0]}: {message}</li>
         )}
@@ -441,6 +461,7 @@ export const HelpPane = useSheet({
       <div className={classes.second}>
         <div className={classes.secondInner} style={style}>
           {showHelp ? getHelpNode() : null}
+          {showWarnings ? getWarningNode() : null}
           {showErrors ? getErrorNode() : null}
         </div>
       </div>

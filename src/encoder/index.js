@@ -74,6 +74,7 @@ export default class extends React.PureComponent {
     encoding: false,
     focused: null,
     allValid: true,
+    warnings: {},
     errors: {},
     mstart: 0,
     mend: 0,
@@ -87,7 +88,7 @@ export default class extends React.PureComponent {
     acodec: "opus",
     mode2Pass: true,
     modeLimit: true,
-    modeCRF: this.okToCRF(),
+    modeCRF: this.isShortClip(),
     rawArgs: "",
   }
   componentDidMount() {
@@ -108,13 +109,40 @@ export default class extends React.PureComponent {
   getFullDuration() {
     return parseFloat(this.props.info.format.duration);
   }
-  okToCRF() {
-    const induration = this.getFullDuration();
-    const {width} = this.getVideoTracks()[0];
+  getFinalWidth({vtrackn, scalew, scaleh, cropw}) {
+    const {width, height} = this.getVideoTracks()[vtrackn];
+    if (scalew) {
+      return scalew;
+    } else if (scaleh) {
+      return Math.floor(width * scaleh / height);
+    } else if (cropw) {
+      return cropw;
+    } else {
+      return width;
+    }
+  }
+  // Heuristics below are up to further tuninig. Especially in relation
+  // to vertical videos and high fps.
+  isShortClip(opts = null) {
+    const duration = opts ? opts._duration : this.getFullDuration();
+    return duration < 6;
+  }
+  isSmallBitrate(opts) {
+    const vb = FFmpeg.getVideoBitrate(opts);
+    const width = this.getFinalWidth(opts);
     return (
-      (width <= 1280 && induration < 11) ||
-      (width <= 1920 && induration < 6) ||
-      induration < 4
+      (width >= 1920 && vb < 800) ||
+      (width >= 1280 && vb < 400) ||
+      vb < 200
+    );
+  }
+  isBigBitrate(opts) {
+    const vb = FFmpeg.getVideoBitrate(opts);
+    const width = this.getFinalWidth(opts);
+    return (
+      (width <= 1280 && vb > 8000) ||
+      (width <= 1920 && vb > 16000) ||
+      vb > 30000
     );
   }
 
@@ -165,6 +193,9 @@ export default class extends React.PureComponent {
     }
 
     let allValid = true;
+    const warnings = {
+      codecs: [],
+    };
     const errors = {
       videoFX: [],
       audioFX: [],
@@ -266,7 +297,7 @@ export default class extends React.PureComponent {
     scalew = validate("videoFX", "scalew", scalew, v => {
       if (!v) return null;
       // Scale parameters can contain arbitrary expressions and `-1` but
-      // we validate them as nat numbers for simplicity.
+      // we validate them as Nat numbers for simplicity.
       v = requireInt(v);
       return requireRange(v, 1);
     });
@@ -335,7 +366,7 @@ export default class extends React.PureComponent {
       if (modeCRF) return 0;
       v = v || (modeLimit ? DEFAULT_LIMIT : DEFAULT_BITRATE);
       v = requireFloat(v);
-      return requireRange(v, 0.001);
+      return requireRange(v, 1);
     });
     quality = validate("codecs", "quality", quality, v => {
       if (modeCRF) {
@@ -369,7 +400,8 @@ export default class extends React.PureComponent {
       }
     });
     // This assumes we were called from `onBlur` handler.
-    this.setState({allValid, errors, rawArgs, focused: null});
+    // This clears warnings if errors are present.
+    this.setState({allValid, warnings, errors, rawArgs, focused: null});
     if (!allValid) {
       setText("codecs", "rawArgs", rawArgs);
       return;
@@ -396,10 +428,23 @@ export default class extends React.PureComponent {
       inpath, atracks,
       _start, _duration,
     };
+    if (!modeCRF) {
+      if (this.isSmallBitrate(opts)) {
+        warnings.codecs.push(`Your video bitrate seems to be too small.
+                              Consider fixing limit.`);
+      } else if (this.isBigBitrate(opts)) {
+        warnings.codecs.push(`Your video bitrate seems to be too big.
+                              Consider CRF mode or fixing limit.`);
+      }
+      if (this.isShortClip(opts)) {
+        warnings.codecs.push(`Consider CRF mode for such short fragment.`);
+      }
+    }
     rawArgs = FFmpeg.getRawArgs(opts).join(" ");
     setText("codecs", "rawArgs", rawArgs);
     this.setState({
       _duration,
+      warnings,
       rawArgs,
       mstart: _start,
       mend: _duration < induration ? _start + _duration : 0,
@@ -519,6 +564,7 @@ export default class extends React.PureComponent {
               makeChecker={this.makeChecker}
               makeSelecter={this.makeSelecter}
               focused={this.state.focused}
+              warnings={this.state.warnings.codecs}
               errors={this.state.errors.codecs}
               vcodec={this.state.vcodec}
               hasAudio={this.state.hasAudio}
