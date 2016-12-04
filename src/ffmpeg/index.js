@@ -113,6 +113,7 @@ export default makeRunner("ffmpeg", {
     const args = [];
     const scale = [];
     const crop = [];
+    const subtitles = [];
     const vfilters = [];
     const afilters = [];
     const vb = this.getVideoBitrate(opts);
@@ -201,8 +202,13 @@ export default makeRunner("ffmpeg", {
       if (opts._start) {
         vfilters.push(`setpts=PTS+${opts._start}/TB`);
       }
-      const subpath = this._escapeFilterArg(opts.inpath);
-      vfilters.push(`subtitles=${subpath}:si=${opts.strackn}`);
+      const useExtSub = opts.strackn < 0;
+      const subpath = useExtSub ? opts.extSubPath : opts.inpath;
+      subtitles.push(this._escapeFilterArg(subpath));
+      if (!useExtSub) {
+        subtitles.push(`si=${opts.strackn}`);
+      }
+      vfilters.push(`subtitles=${subtitles.join(":")}`);
       if (opts._start) {
         vfilters.push("setpts=PTS-STARTPTS");
       }

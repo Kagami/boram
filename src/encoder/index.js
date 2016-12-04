@@ -82,6 +82,7 @@ export default class extends React.PureComponent {
     deinterlace: false,
     burnSubs: false,
     strackn: this.getSubTracks().length ? 0 : null,
+    extSubPath: null,
     hasAudio: !!this.getAudioTracks().length,
     atrackn: this.getAudioTracks().length ? 0 : null,
     vcodec: "vp9",
@@ -177,6 +178,11 @@ export default class extends React.PureComponent {
     this.setState(upd);
     this.handleAll(upd, {marked: "mend"});
   };
+  handleSubLoad = (extSubPath) => {
+    const upd = {extSubPath, burnSubs: true, strackn: -1};
+    this.setState(upd);
+    this.handleAll(upd);
+  };
   handleAll = (upd, what = {}) => {
     const nextState = Object.assign({}, this.state, upd);
     const get = (name) => {
@@ -246,6 +252,7 @@ export default class extends React.PureComponent {
     let fps = ""; //getText("videoFX", "fps");
     const burnSubs = get("burnSubs");
     const strackn = get("strackn");
+    const extSubPath = get("extSubPath");
     // afx.
     const hasAudio = get("hasAudio");
     const atrackn = get("atrackn");
@@ -417,7 +424,7 @@ export default class extends React.PureComponent {
       cropw, croph, cropx, cropy,
       scalew, scaleh,
       speed, fps,
-      burnSubs, strackn,
+      burnSubs, strackn, extSubPath,
       // afx.
       hasAudio, atrackn,
       fadeIn, fadeOut,
@@ -546,7 +553,9 @@ export default class extends React.PureComponent {
               deinterlace={this.state.deinterlace}
               burnSubs={this.state.burnSubs}
               strackn={this.state.strackn}
+              extSubPath={this.state.extSubPath}
               onUpdate={this.handleAll}
+              onSubLoad={this.handleSubLoad}
               onEncoding={this.handleEncodingState}
             />
           )}

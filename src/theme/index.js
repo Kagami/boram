@@ -195,11 +195,9 @@ export const SmallSelect = (function() {
       style,
     );
     return (
-      <SelectField
-        {...other}
-        style={mainStyle}
-        menuStyle={styles.item}
-      />
+      <SelectField {...other} style={mainStyle} menuStyle={styles.item}>
+        {props.children}
+      </SelectField>
     );
   };
 })();
@@ -253,6 +251,9 @@ export const SmallButton = (function() {
       fontSize: "inherit",
       textTransform: "none",
     },
+    overlay: {
+      height: 26,
+    },
   };
   function handleKeyDown(e) {
     e.preventDefault();
@@ -271,6 +272,7 @@ export const SmallButton = (function() {
         style={mainStyle}
         buttonStyle={buttonStyle}
         labelStyle={styles.label}
+        overlayStyle={styles.overlay}
         onKeyDown={handleKeyDown}
       />
     );

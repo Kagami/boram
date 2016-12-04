@@ -3,6 +3,8 @@
  * @module boram/encoder/video-fx
  */
 
+import {basename} from "path";
+import {remote} from "electron";
 import React from "react";
 import {useSheet} from "../jss";
 import FFmpeg from "../ffmpeg";
@@ -13,6 +15,8 @@ import {
   InlineCheckbox, Sep,
   SmallButton, BoldIcon,
 } from "../theme";
+
+const COMMON_SUB_EXTENSIONS = ["ass", "srt", "webvtt", "vtt"];
 
 const HELP = {
   cropw: [
@@ -82,6 +86,15 @@ export default class extends React.PureComponent {
     }, () => {
       this.props.onEncoding(false);
     });
+  };
+  handleSubLoad = () => {
+    const selected = remote.dialog.showOpenDialog({
+      filters: [
+        {name: "Subtitles", extensions: COMMON_SUB_EXTENSIONS},
+      ],
+    });
+    if (!selected) return;
+    this.props.onSubLoad(selected[0]);
   };
   render() {
     const {classes} = this.sheet;
@@ -197,7 +210,8 @@ export default class extends React.PureComponent {
         <Prop name="burn subs">
           <InlineCheckbox
             checked={this.props.burnSubs}
-            disabled={this.props.encoding || !this.props.stracks.length}
+            disabled={this.props.encoding ||
+                      (!this.props.stracks.length && !this.props.extSubPath)}
             onCheck={this.props.makeChecker("burnSubs")}
           />
           <SmallSelect
@@ -213,11 +227,20 @@ export default class extends React.PureComponent {
               primaryText={`#${i} (${t.codec_name})`}
             />
           )}
+          {this.props.extSubPath ?
+            /* ShowHide doesn't work inside SelectField. */
+            <MenuItem
+              value={-1}
+              primaryText={basename(this.props.extSubPath)}
+            />
+          : null}
           </SmallSelect>
-          {/*<SmallButton
+          <SmallButton
             icon={<BoldIcon name="folder-open-o" />}
             title="Load external subtitle"
-          />*/}
+            disabled={this.props.encoding}
+            onClick={this.handleSubLoad}
+          />
         </Prop>
       </HelpPane>
     );
