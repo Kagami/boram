@@ -237,7 +237,7 @@ export const SmallButton = (function() {
     buttonOuter: {
       margin: "0 10px",
       minWidth: 35,
-      height: 26,
+      lineHeight: "26px",
     },
     button: {
       height: 26,

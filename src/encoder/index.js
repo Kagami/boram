@@ -529,10 +529,12 @@ export default class extends React.PureComponent {
           {this.getTabNode("video fx", 2,
             <VideoFX
               ref="videoFX"
+              source={this.props.source}
               makeFocuser={this.makeFocuser}
               makeChecker={this.makeChecker}
               makeSelecter={this.makeSelecter}
               focused={this.state.focused}
+              encoding={this.state.encoding}
               errors={this.state.errors.videoFX}
               vtracks={this.getVideoTracks()}
               stracks={this.getSubTracks()}
@@ -541,6 +543,7 @@ export default class extends React.PureComponent {
               burnSubs={this.state.burnSubs}
               strackn={this.state.strackn}
               onUpdate={this.handleAll}
+              onEncoding={this.handleEncodingState}
             />
           )}
           {this.getTabNode("audio fx", 3,

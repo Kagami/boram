@@ -5,12 +5,13 @@
 
 import React from "react";
 import {useSheet} from "../jss";
+import FFmpeg from "../ffmpeg";
 import {
   HelpPane,
   Prop, SmallInput,
   SmallSelect, MenuItem,
   InlineCheckbox, Sep,
-  // SmallButton, BoldIcon,
+  SmallButton,
 } from "../theme";
 
 const HELP = {
@@ -49,7 +50,23 @@ const HELP = {
   },
 })
 export default class extends React.PureComponent {
-  // Can't use stateless component because of refs.
+  state = {intDetecting: false, cropDetecting: false}
+  handleInterlaceDetect = () => {
+    const inpath = this.props.source.path;
+    const {vtrackn} = this.props;
+    this.setState({intDetecting: true});
+    this.props.onEncoding(true);
+    FFmpeg.hasInterlace({inpath, vtrackn}).then(interlaced => {
+      this.props.makeChecker("deinterlace")(null, interlaced);
+    }, () => {
+      /* skip */
+    }).then(() => {
+      this.setState({intDetecting: false});
+      this.props.onEncoding(false);
+    });
+  };
+  handleCropDetect = () => {
+  };
   render() {
     const {classes} = this.sheet;
     return (
@@ -62,6 +79,7 @@ export default class extends React.PureComponent {
           <SmallSelect
             value={this.props.vtrackn}
             onChange={this.props.makeSelecter("vtrackn")}
+            disabled={this.props.encoding}
           >
           {this.props.vtracks.map((t, i) =>
             <MenuItem
@@ -76,17 +94,22 @@ export default class extends React.PureComponent {
           <InlineCheckbox
             title="Toggle deinterlacing filter"
             checked={this.props.deinterlace}
+            disabled={this.props.encoding}
             onCheck={this.props.makeChecker("deinterlace")}
           />
-          {/*<SmallButton
-            label="detect"
+          <SmallButton
             style={{marginLeft: 0}}
-            />*/}
+            title="Run interlace auto-detection"
+            label={this.state.intDetecting ? "detecting" : "detect"}
+            disabled={this.props.encoding}
+            onClick={this.handleInterlaceDetect}
+          />
         </Prop>
         <Prop name="crop">
           <SmallInput
             ref="cropw"
             hintText="width"
+            disabled={this.props.encoding}
             onFocus={this.props.makeFocuser("cropw")}
             onBlur={this.props.onUpdate}
           />
@@ -94,6 +117,7 @@ export default class extends React.PureComponent {
           <SmallInput
             ref="croph"
             hintText="height"
+            disabled={this.props.encoding}
             onFocus={this.props.makeFocuser("croph")}
             onBlur={this.props.onUpdate}
           />
@@ -101,6 +125,7 @@ export default class extends React.PureComponent {
           <SmallInput
             ref="cropx"
             hintText="left"
+            disabled={this.props.encoding}
             onFocus={this.props.makeFocuser("cropx")}
             onBlur={this.props.onUpdate}
           />
@@ -108,6 +133,7 @@ export default class extends React.PureComponent {
           <SmallInput
             ref="cropy"
             hintText="top"
+            disabled={this.props.encoding}
             onFocus={this.props.makeFocuser("cropy")}
             onBlur={this.props.onUpdate}
           />
@@ -119,6 +145,7 @@ export default class extends React.PureComponent {
           <SmallInput
             ref="scalew"
             hintText="width"
+            disabled={this.props.encoding}
             onFocus={this.props.makeFocuser("scalew")}
             onBlur={this.props.onUpdate}
           />
@@ -126,6 +153,7 @@ export default class extends React.PureComponent {
           <SmallInput
             ref="scaleh"
             hintText="height"
+            disabled={this.props.encoding}
             onFocus={this.props.makeFocuser("scaleh")}
             onBlur={this.props.onUpdate}
           />
@@ -148,13 +176,13 @@ export default class extends React.PureComponent {
         <Prop name="burn subs">
           <InlineCheckbox
             checked={this.props.burnSubs}
-            disabled={!this.props.stracks.length}
+            disabled={this.props.encoding || !this.props.stracks.length}
             onCheck={this.props.makeChecker("burnSubs")}
           />
           <SmallSelect
             hintText="no subs"
             value={this.props.strackn}
-            disabled={!this.props.burnSubs}
+            disabled={this.props.encoding || !this.props.burnSubs}
             onChange={this.props.makeSelecter("strackn")}
           >
           {this.props.stracks.map((t, i) =>

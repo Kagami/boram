@@ -15,13 +15,33 @@ if (BORAM_WIN_BUILD) {
 export default makeRunner("ffmpeg", {
   setTitle({inpath, outpath, title}) {
     return this._run([
-      "-v", "error", "-y",
+      "-v", "error", "-nostdin", "-y",
       "-i", inpath,
       "-map", "0",
       "-c", "copy",
       "-metadata", `title=${title}`,
       "-f", "matroska", "--", outpath,
     ]);
+  },
+  hasInterlace({inpath, vtrackn}) {
+    // TODO(Kagami): BFF?
+    return this._run([
+      "-v", "error", "-nostdin", "-y",
+      "-ss", "10", "-i", inpath,
+      "-map", `0:v:${vtrackn}`,
+      "-vf", "idet,metadata=print:lavfi.idet.multiple.tff:file=-",
+      "-frames:v", "10", "-f", "null", "-",
+    ]).then(log => {
+      const lines = log.trim().split(/\r?\n/g).reverse();
+      for (const line of lines) {
+        const match = line.match(/^lavfi.idet.multiple.tff=(\d+)/);
+        if (match) {
+          // At least 4 of 10 frames are interlaced.
+          return parseInt(match[1], 10) > 3;
+        }
+      }
+      return false;
+    });
   },
   _getVorbisBitrate(vorbisq) {
     /* eslint-disable indent */
