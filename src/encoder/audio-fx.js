@@ -9,7 +9,6 @@ import {
   Prop, SmallInput,
   SmallSelect, MenuItem,
   InlineCheckbox, Sep,
-  // SmallButton, BoldIcon,
 } from "../theme";
 
 const HELP = {
@@ -54,10 +53,6 @@ export default class extends React.PureComponent {
             />
           )}
           </SmallSelect>
-          {/*<SmallButton
-            icon={<BoldIcon name="folder-open-o" />}
-            title="Load external subtitle"
-          />*/}
         </Prop>
         <Prop name="fade">
           <SmallInput

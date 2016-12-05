@@ -13,7 +13,7 @@ import {
   Prop, SmallInput,
   SmallSelect, MenuItem,
   InlineCheckbox, Sep,
-  SmallButton, BoldIcon,
+  SmallButton, Icon,
 } from "../theme";
 
 const COMMON_SUB_EXTENSIONS = ["ass", "srt", "webvtt", "vtt"];
@@ -127,7 +127,7 @@ export default class extends React.PureComponent {
             onCheck={this.props.makeChecker("deinterlace")}
           />
           <SmallButton
-            icon={<BoldIcon name="refresh" />}
+            icon={<Icon name="refresh" />}
             title="Auto-detect interlaced video"
             style={{marginLeft: 0}}
             disabled={this.props.encoding}
@@ -168,7 +168,7 @@ export default class extends React.PureComponent {
           />
           <Sep/>
           <SmallButton
-            icon={<BoldIcon name="refresh" />}
+            icon={<Icon name="refresh" />}
             title="Auto-detect black borders"
             style={{marginLeft: 0}}
             disabled={this.props.encoding}
@@ -236,7 +236,7 @@ export default class extends React.PureComponent {
           : null}
           </SmallSelect>
           <SmallButton
-            icon={<BoldIcon name="folder-open-o" />}
+            icon={<Icon name="folder-open-o" />}
             title="Load external subtitle"
             disabled={this.props.encoding}
             onClick={this.handleSubLoad}

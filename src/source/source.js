@@ -6,10 +6,9 @@
 import {shell, remote} from "electron";
 import React from "react";
 import cx from "classnames";
-import Icon from "react-fa";
 import {useSheet} from "../jss";
 import YouTubeDL from "../youtube-dl";
-import {Tip} from "../theme";
+import {Icon, Tip} from "../theme";
 import {showErr} from "../util";
 
 const YTDL_SUPPORTED_URL =

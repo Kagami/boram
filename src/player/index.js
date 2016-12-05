@@ -5,8 +5,8 @@
 
 import React from "react";
 import cx from "classnames";
-import Icon from "react-fa";
 import {useSheet} from "../jss";
+import {Icon} from "../theme";
 import {parseTime, showTime, parseTimeBase, tryRun} from "../util";
 
 const KEY_SPACE = 32;

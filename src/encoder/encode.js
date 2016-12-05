@@ -7,10 +7,9 @@ import fs from "fs";
 import path from "path";
 import {shell, remote} from "electron";
 import React from "react";
-import Icon from "react-fa";
 import FFmpeg from "../ffmpeg";
 import {useSheet} from "../jss";
-import {BigProgress, BigButton, Pane, Sep} from "../theme";
+import {Icon, BigProgress, BigButton, Pane, Sep} from "../theme";
 import {
   tmp, moveSync,
   parseFrameRate, parseArgs,

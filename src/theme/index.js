@@ -19,6 +19,7 @@ import LinearProgress from "material-ui/LinearProgress";
 import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 import {useSheet} from "../jss";
 // Reexport stuff.
+export {Icon};
 export {Paper};
 export {Tabs, Tab};
 export {MenuItem};
@@ -329,12 +330,6 @@ export function BigProgress(props) {
       mode="determinate"
       style={{height: 30, borderRadius: 0, backgroundColor: "#ccc"}}
     />
-  );
-}
-
-export function BoldIcon(props) {
-  return (
-    <Icon {...props} style={{fontWeight: "bold"}} />
   );
 }
 

@@ -7,10 +7,9 @@ import {basename} from "path";
 import {remote} from "electron";
 import React from "react";
 import cx from "classnames";
-import Icon from "react-fa";
 import {useSheet} from "../jss";
 import ShowHide from "../show-hide";
-import {Tabs, Tab} from "../theme";
+import {Tabs, Tab, Icon} from "../theme";
 import {ICON_BIG_PATH, showProgress} from "../util";
 import Instance from "./instance";
 
