@@ -8,7 +8,8 @@
 * Open-source, cross-platform, works on Windows and Linux
 * VP9/VP8/Opus/Vorbis/2pass/limit/CRF/CQ/raw-args support
 * Industry-grade codec settings, considered defaults
-* Can download source from almost any streaming site, thanks to youtube-dl
+* Can download source from almost any streaming site, thanks to [youtube-dl](https://rg3.github.io/youtube-dl/)
+* Can show almost any source with internal player, thanks to [mpv](https://mpv.io/)
 * Simple yet powerful interface, source video centric design
 * Multiple encodes at once in single window
 * Most popular effects are built-in and possible to use [any available ffmpeg filter](https://ffmpeg.org/ffmpeg-filters.html)
@@ -35,4 +36,5 @@ boram's own code is licensed under [CC0](legal/LICENSE.BORAM) but releases also 
 * [Font Awesome font](legal/LICENSE.FONTAWESOME)
 * [youtube-dl binaries](legal/LICENSE.PYTHON)
 * [Zeranoe FFmpeg binaries](legal/LICENSE.FFMPEG)
+* [lachs0r mpv binaries](legal/LICENSE.MPV)
 * [Chromium](legal/LICENSE.CHROMIUM) and [Electron](legal/LICENSE.ELECTRON) components
