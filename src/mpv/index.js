@@ -6,7 +6,7 @@
 import React from "react";
 import {useSheet} from "../jss";
 if (BORAM_WIN_BUILD) {
-  require("file?name=mpv.dll!../../bin/64/mpv-1.dll");
+  require("file!../../bin/64/mpv-1.dll");
 }
 
 @useSheet({
