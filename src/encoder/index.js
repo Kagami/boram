@@ -4,8 +4,8 @@
  */
 
 import assert from "assert";
-import React from "react";
 import cx from "classnames";
+import React from "react";
 import FFmpeg from "../ffmpeg";
 import {useSheet} from "../jss";
 import {Pane, Tabs, Tab} from "../theme";

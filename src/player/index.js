@@ -7,53 +7,28 @@ import React from "react";
 import cx from "classnames";
 import {useSheet} from "../jss";
 import {Icon} from "../theme";
-import {parseTime, showTime, parseTimeBase, tryRun} from "../util";
-
-const KEY_SPACE = 32;
-const KEY_ESC = 27;
-const KEY_COMMA = 188;
-const KEY_DOT = 190;
-const KEY_F = 70;
-const KEY_T = 84;
-const KEY_ENTER = 13;
+import MPV from "../mpv";
+import {parseTime, showTime, tryRun} from "../util";
 
 @useSheet({
   player: {
-    position: "relative",
+    display: "flex",
     height: "100%",
+    flexDirection: "column",
   },
 })
 export default class extends React.PureComponent {
-  constructor(props) {
-    super(props);
-    this.duration = parseFloat(this.props.format.duration);
-    // XXX(Kagami): This won't work with VFR or wrong FPS value.
-    this.framed = parseTimeBase(this.props.vtrack.codec_time_base);
-  }
-  state = {time: 0}
+  state = {pause: true, time: 0, volume: 100, mute: false, fullscreen: false}
   componentWillMount() {
     this.setTime(this.state.time);
   }
   componentDidMount() {
     document.addEventListener("keydown", this.handleGlobaKey, false);
-    // Not supported by React.
-    this.getVideoNode().addEventListener(
-      "webkitfullscreenchange", this.handleFullscreenEvent, false
-    );
-    this.handleVolumeEvent();
   }
   componentWillUnmount() {
-    this.getVideoNode().removeEventListener(
-      "webkitfullscreenchange", this.handleFullscreenEvent, false
-    );
     document.removeEventListener("keydown", this.handleGlobaKey, false);
   }
-  getVideoURL() {
-    return "file://" + this.props.source.path;
-  }
-  getVideoNode() {
-    return this.refs.video.getNode();
-  }
+  duration = parseFloat(this.props.format.duration)
   // NOTE(Kagami): currentTime/mstart/mend are floats so need
   // small adjustements in order to keep them in sync.
   isAlmostEqual(a, b) {
@@ -75,16 +50,17 @@ export default class extends React.PureComponent {
   }
   // "Stupid" play/pause actions.
   play() {
-    this.getVideoNode().play();
+    this.refs.mpv.play();
   }
   pause() {
-    this.getVideoNode().pause();
+    this.refs.mpv.pause();
   }
   seek(time) {
-    // Improve experience by changing slider pos immediately.
+    this.refs.mpv.seek(time);
+    // We improve UX by changing slider pos immediately.
     this.setState({time});
-    this.getVideoNode().currentTime = time;
   }
+  // Displayed time info.
   setTime(time) {
     const prettyTime = showTime(time);
     const validTime = true;
@@ -92,15 +68,15 @@ export default class extends React.PureComponent {
   }
   // "Smart" play/pause action.
   togglePlay = () => {
-    const time = this.getVideoNode().currentTime;
+    const {time} = this.state;
     const mend = this.props.mend || this.duration;
-    const action = this.state.playing ? "pause" : "play";
+    const action = this.state.pause ? "play" : "pause";
     if (action === "play" &&
         this.state.loopCut &&
         (time < this.props.mstart + 0.001 || time > mend - 0.001)) {
-      // We can start playing right away and `handleTimeUpdateEvent`
-      // will handle `loopCut` anyway but that will play out-of-loop
-      // video for some period of time.
+      // We can start playing right away and `handleTime` will handle
+      // `loopCut` anyway but that will play out-of-loop video for some
+      // period of time.
       this.seek(this.props.mstart);
     // } else if (action === "play" && time >= Math.floor(this.duration)) {
     //   // If we have e.g. video with duration = 3s which consists of
@@ -111,49 +87,39 @@ export default class extends React.PureComponent {
     }
     this[action]();
   };
+  toggleLoopCut = () => {
+    this.setState({loopCut: !this.state.loopCut});
+  };
   toggleFullscreen = () => {
     if (this.state.fullscreen) {
       document.webkitExitFullscreen();
     } else {
-      this.getVideoNode().webkitRequestFullscreen();
+      this.refs.mpv.getNode().webkitRequestFullscreen();
     }
-  };
-  toggleLoopCut = () => {
-    this.setState({loopCut: !this.state.loopCut});
+    this.setState({fullscreen: !this.state.fullscreen});
   };
   handleGlobaKey = (e) => {
     if (!this.props.active) return;
-    switch (e.keyCode) {
-    case KEY_SPACE:
-      this.togglePlay();
-      break;
-    case KEY_ESC:
-      if (this.state.fullscreen) this.toggleFullscreen();
-      break;
-    case KEY_COMMA:
-      if (this.state.time >= this.framed) {
-        this.seek(this.state.time - this.framed);
-      }
-      break;
-    case KEY_DOT:
-      if (this.state.time <= this.duration - this.framed) {
-        this.seek(this.state.time + this.framed);
-      }
-      break;
-    case KEY_F:
-      this.toggleFullscreen();
-      break;
-    case KEY_T:
+    switch (e.key) {
+    case "t":
       this.refs.time.focus();
       // Prevent replacing time with "t" on focus.
       e.preventDefault();
       break;
+    case "f":
+      this.toggleFullscreen();
+      break;
+    case "Escape":
+      if (this.state.fullscreen) this.toggleFullscreen();
+      break;
+    default:
+      this.refs.mpv.handleKey(e);
     }
   };
   handleTimeKey = (e) => {
     e.nativeEvent.stopImmediatePropagation();
-    switch (e.keyCode) {
-    case KEY_ENTER:
+    switch (e.key) {
+    case "Enter":
       if (this.state.validTime) {
         const time = parseTime(this.state.prettyTime);
         const prettyTime = showTime(time);
@@ -162,44 +128,42 @@ export default class extends React.PureComponent {
         this.refs.time.blur();
       }
       break;
-    case KEY_ESC:
+    case "Escape":
       this.refs.time.blur();
       break;
     }
   };
-  handlePlayEvent = () => {
-    this.setState({playing: true});
+  handlePlayPause = (pause) => {
+    this.setState({pause});
   };
-  handlePauseEvent = () => {
-    this.setState({playing: false});
-  };
-  handleTimeUpdateEvent = () => {
+  handleTime = (time) => {
     if (this.seekDrag) return;
-    const time = this.getVideoNode().currentTime;
     const mend = this.props.mend || this.duration;
-    if (this.state.playing &&
+    if (!this.state.pause &&
         this.state.loopCut &&
         (time < this.props.mstart + 0.001 || time > mend - 0.001)) {
       this.seek(this.props.mstart);
-      this.play();
       return;
     }
     this.setTime(time);
     this.setState({time});
   };
-  handleVolumeEvent = () => {
-    const {volume, muted} = this.getVideoNode();
-    // Pass-through to sub-component.
-    this.refs.volume.handleVolumeEvent({volume, muted});
+  handleVolume = (upd) => {
+    let {volume, mute} = Object.assign({}, this.state, upd);
+    volume = Math.min(volume, 100);
+    // TODO(Kagami): Ignore if volumeDrag?
+    this.setState({volume, mute});
+  };
+  handleVolumeControl = ({volume, mute}) => {
+    // TODO(Kagami): Change internal state right away?
+    this.refs.mpv.setVolume({volume, mute});
   };
   handleWheelEvent = (e) => {
-    const video = this.getVideoNode();
-    const delta = e.deltaY > 0 ? -0.05 : 0.05;
-    video.volume = Math.min(Math.max(0, video.volume + delta), 1);
-    video.muted = false;
-  };
-  handleFullscreenEvent = () => {
-    this.setState({fullscreen: !this.state.fullscreen});
+    const delta = e.deltaY > 0 ? -5 : 5;
+    const volume = Math.min(Math.max(0, this.state.volume + delta), 100);
+    const mute = false;
+    // TODO(Kagami): Change internal state right away?
+    this.refs.mpv.setVolume({volume, mute});
   };
   handleMarkStart = () => {
     this.props.onMarkStart(this.state.time);
@@ -207,7 +171,7 @@ export default class extends React.PureComponent {
   handleMarkEnd = () => {
     this.props.onMarkEnd(this.state.time);
   };
-  handleTimeChange = (e) => {
+  handleTimeControl = (e) => {
     const prettyTime = e.target.value;
     const time = tryRun(parseTime, prettyTime);
     const validTime = time != null && time <= this.duration;
@@ -216,7 +180,7 @@ export default class extends React.PureComponent {
   handleSeekMouseDown = () => {
     this.seekDrag = true;
   };
-  handleSeekChange = (e) => {
+  handleSeekControl = (e) => {
     const time = parseInt(e.target.value, 10);
     this.setTime(time);
     this.seek(time);
@@ -224,28 +188,21 @@ export default class extends React.PureComponent {
   handleSeekMouseUp = () => {
     this.seekDrag = false;
   };
-  handleControlVolumeChange = ({volume, muted}) => {
-    const video = this.getVideoNode();
-    video.volume = volume;
-    video.muted = muted;
-  };
   render() {
     const {classes} = this.sheet;
     return (
       <div className={classes.player} onWheel={this.handleWheelEvent}>
-        <Video
-          ref="video"
-          src={this.getVideoURL()}
-          onClick={this.togglePlay}
-          onPlaying={this.handlePlayEvent}
-          onPause={this.handlePauseEvent}
-          onTimeUpdate={this.handleTimeUpdateEvent}
-          onVolumeChange={this.handleVolumeEvent}
-          onDoubleClick={this.toggleFullscreen}
+        <MPV
+          ref="mpv"
+          src={this.props.source.path}
+          onMouseDown={this.togglePlay}
+          onPlayPause={this.handlePlayPause}
+          onTime={this.handleTime}
+          onVolume={this.handleVolume}
         />
         <Controls>
           <Control
-            icon={this.state.playing ? "pause" : "play"}
+            icon={this.state.pause ? "play" : "pause"}
             title="Play/pause"
             onClick={this.togglePlay}
           />
@@ -259,7 +216,7 @@ export default class extends React.PureComponent {
           <Time
             ref="time"
             value={this.state.prettyTime}
-            onChange={this.handleTimeChange}
+            onChange={this.handleTimeControl}
             onKeyDown={this.handleTimeKey}
             invalid={!this.state.validTime}
           />
@@ -283,7 +240,9 @@ export default class extends React.PureComponent {
           />
           <Volume
             ref="volume"
-            onChange={this.handleControlVolumeChange}
+            volume={this.state.volume}
+            mute={this.state.mute}
+            onChange={this.handleVolumeControl}
           />
           <Seek
             value={Math.floor(this.state.time)}
@@ -291,7 +250,7 @@ export default class extends React.PureComponent {
             mstart={Math.floor(this.props.mstart)}
             mend={Math.floor(this.props.mend)}
             onMouseDown={this.handleSeekMouseDown}
-            onChange={this.handleSeekChange}
+            onChange={this.handleSeekControl}
             onMouseUp={this.handleSeekMouseUp}
           />
         </Controls>
@@ -302,40 +261,8 @@ export default class extends React.PureComponent {
 
 // Player sub-components.
 
-@useSheet({
-  video: {
-    position: "absolute",
-    width: "100%",
-    top: 0,
-    bottom: 40,
-    background: "#000",
-  },
-  videoInner: {
-    display: "block",
-    width: "100%",
-    height: "100%",
-  },
-})
-class Video extends React.PureComponent {
-  getNode() {
-    return this.refs.video;
-  }
-  render() {
-    const {classes} = this.sheet;
-    return (
-      <div className={classes.video}>
-        <video {...this.props} ref="video" className={classes.videoInner} />
-      </div>
-    );
-  }
-}
-
 const Controls = useSheet({
   controls: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
     padding: "5px 0 5px 5px",
     backgroundColor: "#eee",
     border: "solid #ccc",
@@ -442,22 +369,17 @@ class Control extends React.PureComponent {
   },
 }, {link: true})
 class Volume extends React.PureComponent {
-  constructor() {
-    super();
-    const sel = `.${this.sheet.classes.slider}::-webkit-slider-runnable-track`;
+  constructor(props) {
+    super(props);
+    const {classes} = this.sheet;
+    const sel = `.${classes.slider}::-webkit-slider-runnable-track`;
     this.progressRule = this.sheet.addRule(
       sel, {background: ""}, {named: false}
     );
   }
-  state = {}
-  toggleMuted = () => {
-    const opts = {volume: this.state.volume, muted: !this.state.muted};
-    this.setState(opts);
-    this.props.onChange(opts);
-  }
-  handleVolumeEvent = ({volume, muted}) => {
-    if (this.volumeDrag) return;
-    this.setState({volume, muted});
+  state = {shown: false}
+  toggleMute = () => {
+    this.props.onChange({volume: this.props.volume, mute: !this.props.mute});
   }
   handleMouseOver = () => {
     this.setState({shown: true});
@@ -469,18 +391,16 @@ class Volume extends React.PureComponent {
     this.volumeDrag = true;
   }
   handleVolumeChange = (e) => {
-    const opts = {volume: e.target.value / 100, muted: false};
-    this.setState(opts);
-    this.props.onChange(opts);
+    this.props.onChange({volume: e.target.value, mute: false});
   }
   handleVolumeMouseUp = () => {
     this.volumeDrag = false;
   }
   render() {
     const {classes} = this.sheet;
-    let volPercent = this.state.volume * 100;
+    let volPercent = this.props.volume;
     // Fix for different scale resolutions.
-    volPercent = this.state.muted
+    volPercent = this.props.mute
       ? 0
       : volPercent < 15
         ? volPercent * 2
@@ -495,7 +415,7 @@ class Volume extends React.PureComponent {
         #fff ${volPercent}%
       )
     `);
-    const icon = (this.state.muted || this.state.volume < 0.01)
+    const icon = (this.props.mute || this.props.volume < 1)
       ? "volume-off"
       : "volume-up";
     return (
@@ -508,7 +428,7 @@ class Volume extends React.PureComponent {
           type="range"
           title="Change volume"
           className={cx(classes.slider, {[classes.hidden]: !this.state.shown})}
-          value={this.state.muted ? 0 : this.state.volume * 100}
+          value={this.props.mute ? 0 : this.props.volume}
           onMouseDown={this.handleVolumeMouseDown}
           onChange={this.handleVolumeChange}
           onMouseUp={this.handleVolumeMouseUp}
@@ -516,7 +436,7 @@ class Volume extends React.PureComponent {
         <Control
           icon={icon}
           title="Toggle mute"
-          onClick={this.toggleMuted}
+          onClick={this.toggleMute}
         />
       </div>
     );
@@ -611,9 +531,10 @@ class Time extends React.PureComponent {
   },
 }, {link: true})
 class Seek extends React.PureComponent {
-  constructor() {
-    super();
-    const sel = `.${this.sheet.classes.range}::-webkit-slider-runnable-track`;
+  constructor(props) {
+    super(props);
+    const {classes} = this.sheet;
+    const sel = `.${classes.range}::-webkit-slider-runnable-track`;
     this.progressRule = this.sheet.addRule(
       sel, {background: ""}, {named: false}
     );

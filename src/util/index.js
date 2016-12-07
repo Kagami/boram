@@ -84,12 +84,6 @@ export function showFrameRate(rate) {
   return (rate % 1 ? rate.toFixed(3) : rate) + " fps";
 }
 
-export function parseTimeBase(tb) {
-  const [num, den] = tb.split("/", 2).map(n => parseInt(n, 10));
-  return num / den;
-}
-
-/** Simple helper since JavaScript lacks coffee's "?." */
 export function showErr(err) {
   return err ? err.message : null;
 }

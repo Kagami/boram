@@ -20,6 +20,10 @@ if (BORAM_DEBUG) {
   require("electron-debug")({enabled: true});
 }
 
+app.commandLine.appendSwitch(
+  "register-pepper-plugins", `${__dirname}/mpvinterop.node;application/x-mpv`
+);
+
 app.on("ready", () => {
   if (!BORAM_WIN_BUILD) {
     if (!checkLinuxDeps()) {
@@ -41,6 +45,9 @@ app.on("ready", () => {
     useContentSize: BORAM_WIN_BUILD,
     title: `${name} v${version} by T-ara Industries`,
     icon: `${__dirname}/icon-big.png`,
+    webPreferences: {
+      plugins: true,
+    },
   });
   win.setMenu(null);
   win.loadURL(`file://${__dirname}/index.html`);

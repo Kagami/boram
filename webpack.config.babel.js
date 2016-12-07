@@ -20,8 +20,6 @@ const COMMON_PLUGINS = [
 ];
 const PLUGINS = BORAM_DEBUG ? COMMON_PLUGINS : COMMON_PLUGINS.concat([
   // This will help minificator to delete debug code.
-  // TODO(Kagami): Fix `process.platform` too because we surely know on
-  // which platform the particular build will be run?
   new webpack.DefinePlugin({"process.env.NODE_ENV": '"production"'}),
   new webpack.optimize.OccurenceOrderPlugin(),
   new webpack.optimize.UglifyJsPlugin({
