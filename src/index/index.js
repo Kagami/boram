@@ -3,6 +3,8 @@
  * @module boram/index
  */
 
+import url from "url";
+import path from "path";
 import {BrowserWindow, app} from "electron";
 import {name, version} from "json!../../package.json";
 import {checkLinuxDeps} from "./deps";
@@ -20,8 +22,10 @@ if (BORAM_DEBUG) {
   require("electron-debug")({enabled: true});
 }
 
+const PLUGIN_NAME = BORAM_WIN_BUILD ? "mpvinterop.dll" : "libmpvinterop.so";
+const PLUGIN_PATH = path.join(__dirname, PLUGIN_NAME);
 app.commandLine.appendSwitch(
-  "register-pepper-plugins", `${__dirname}/mpvinterop.node;application/x-mpv`
+  "register-pepper-plugins", `${PLUGIN_PATH};application/x-mpv`
 );
 
 app.on("ready", () => {
@@ -44,13 +48,17 @@ app.on("ready", () => {
     // issue?
     useContentSize: BORAM_WIN_BUILD,
     title: `${name} v${version} by T-ara Industries`,
-    icon: `${__dirname}/icon-big.png`,
+    icon: path.join(__dirname, "icon-big.png"),
     webPreferences: {
       plugins: true,
     },
   });
   win.setMenu(null);
-  win.loadURL(`file://${__dirname}/index.html`);
+  win.loadURL(url.format({
+    pathname: path.join(__dirname, "index.html"),
+    protocol: "file:",
+    slashes: true,
+  }));
 });
 
 app.on("window-all-closed", () => {
