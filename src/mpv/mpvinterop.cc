@@ -5,13 +5,13 @@
 #include <GLES2/gl2ext.h>
 #include <mpv/client.h>
 #include <mpv/opengl_cb.h>
-#include "ppapi/cpp/module.h"
-#include "ppapi/cpp/instance.h"
-#include "ppapi/cpp/var.h"
-#include "ppapi/cpp/var_dictionary.h"
-#include "ppapi/cpp/graphics_3d.h"
-#include "ppapi/lib/gl/gles2/gl2ext_ppapi.h"
-#include "ppapi/utility/completion_callback_factory.h"
+#include <ppapi/cpp/module.h>
+#include <ppapi/cpp/instance.h>
+#include <ppapi/cpp/var.h>
+#include <ppapi/cpp/var_dictionary.h>
+#include <ppapi/cpp/graphics_3d.h>
+#include <ppapi/lib/gl/gles2/gl2ext_ppapi.h>
+#include <ppapi/utility/completion_callback_factory.h>
 
 #define DIE(msg) { fprintf(stderr, "%s\n", msg); return false; }
 
