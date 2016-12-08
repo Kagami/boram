@@ -195,7 +195,7 @@ export default class extends React.PureComponent {
         <MPV
           ref="mpv"
           src={this.props.source.path}
-          onMouseDown={this.togglePlay}
+          onClick={this.togglePlay}
           onPlayPause={this.handlePlayPause}
           onTime={this.handleTime}
           onVolume={this.handleVolume}

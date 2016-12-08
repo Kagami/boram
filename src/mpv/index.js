@@ -94,14 +94,14 @@ export default class extends React.PureComponent {
   }
   render() {
     const {classes} = this.sheet;
-    const {src, onMouseDown} = this.props;
+    const {src, onClick} = this.props;
     return (
       <embed
         ref="plugin"
         className={classes.plugin}
         type="application/x-mpv"
         src={src}
-        onMouseDown={onMouseDown}
+        onTouchTap={onClick}
       />
     );
   }
