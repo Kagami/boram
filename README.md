@@ -9,7 +9,7 @@
 * VP9/VP8/Opus/Vorbis/2pass/limit/CRF/CQ/raw-args support
 * Industry-grade codec settings, considered defaults
 * Can download source from almost any streaming site, thanks to [youtube-dl](https://rg3.github.io/youtube-dl/)
-* Can show almost any source with internal player, thanks to [mpv](https://mpv.io/)
+* Displays almost any video with embedded player, thanks to [mpv](https://mpv.io/)
 * Simple yet powerful interface, source video centric design
 * Multiple encodes at once in single window
 * Most popular effects are built-in and possible to use [any available ffmpeg filter](https://ffmpeg.org/ffmpeg-filters.html)
@@ -25,7 +25,7 @@ Download [latest release](https://github.com/Kagami/boram/releases), unpack and 
 ### Linux
 
 Download [latest release](https://github.com/Kagami/boram/releases), unpack and run `./boram`.  
-**NOTE:** You need Python (2 or 3) and FFmpeg (2+, with libvpx 1.5.0+) installed.
+**NOTE:** You need Python (2 or 3), FFmpeg (2+, with libvpx 1.5.0+) and libmpv installed.
 
 ## License
 
