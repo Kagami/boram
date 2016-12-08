@@ -266,6 +266,7 @@ class MPVInstance : public pp::Instance {
 
     mpv_set_option_string(mpv_, "input-default-bindings", "yes");
     mpv_set_option_string(mpv_, "volume-max", "100");
+    mpv_set_option_string(mpv_, "keep-open", "yes");
     mpv_set_option_string(mpv_, "osd-bar", "no");
     mpv_set_option_string(mpv_, "pause", "yes");
     const char *cmd[] = {"loadfile", src_, NULL};
