@@ -207,7 +207,6 @@ export default class extends React.PureComponent {
             onClick={this.togglePlay}
           />
           <Control
-            flip
             icon="scissors"
             title="Mark fragment start"
             disabled={this.isMarkStartDisabled()}
@@ -221,6 +220,7 @@ export default class extends React.PureComponent {
             invalid={!this.state.validTime}
           />
           <Control
+            flip
             icon="scissors"
             title="Mark fragment end"
             disabled={this.isMarkEndDisabled()}
