@@ -112,7 +112,7 @@ class MPVInstance : public pp::Instance {
         src_(NULL),
         width_(0),
         height_(0),
-        run(false) {}
+        run_(false) {}
 
   virtual ~MPVInstance() {
     if (mpv_gl_)
@@ -163,8 +163,8 @@ class MPVInstance : public pp::Instance {
     width_ = new_width;
     height_ = new_height;
 
-    if (!run) {
-      run = true;
+    if (!run_) {
+      run_ = true;
       MainLoop(0);
     }
   }
@@ -315,7 +315,7 @@ class MPVInstance : public pp::Instance {
   char* src_;
   int32_t width_;
   int32_t height_;
-  bool run;
+  bool run_;
 };
 
 class MPVModule : public pp::Module {
