@@ -147,7 +147,7 @@ class MPVInstance : public pp::Instance {
       int32_t result = context_.ResizeBuffers(new_width, new_height);
       if (result < 0) {
         fprintf(stderr,
-                "Unable to resize buffers to %d x %d!\n",
+                "unable to resize buffers to %d x %d\n",
                 new_width,
                 new_height);
         return;
@@ -232,7 +232,7 @@ class MPVInstance : public pp::Instance {
 
   bool InitGL(int32_t new_width, int32_t new_height) {
     if (!glInitializePPAPI(pp::Module::Get()->get_browser_interface()))
-      DIE("Unable to initialize GL PPAPI!");
+      DIE("unable to initialize GL PPAPI");
 
     const int32_t attrib_list[] = {
       PP_GRAPHICS3DATTRIB_ALPHA_SIZE, 8,
@@ -246,7 +246,7 @@ class MPVInstance : public pp::Instance {
     if (!BindGraphics(context_)) {
       context_ = pp::Graphics3D();
       glSetCurrentContextPPAPI(0);
-      DIE("Unable to bind 3d context!");
+      DIE("unable to bind 3d context");
     }
 
     glSetCurrentContextPPAPI(context_.pp_resource());
@@ -260,7 +260,7 @@ class MPVInstance : public pp::Instance {
     if (!mpv_)
       DIE("context init failed");
 
-    // mpv_set_property_string(mpv_, "terminal", "yes");
+    // mpv_set_option_string(mpv_, "terminal", "yes");
 
     if (mpv_initialize(mpv_) < 0)
       DIE("mpv init failed");
