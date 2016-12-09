@@ -106,14 +106,19 @@ class MPVInstance : public pp::Instance {
  public:
   explicit MPVInstance(PP_Instance instance)
       : pp::Instance(instance),
+        init_failed_(false),
         callback_factory_(this),
         width_(0),
         height_(0),
+        mpv_(NULL),
+        mpv_gl_(NULL),
         src_(NULL) {}
 
   virtual ~MPVInstance() {
-    mpv_opengl_cb_uninit_gl(mpv_gl_);
-    mpv_terminate_destroy(mpv_);
+    if (mpv_gl_)
+      mpv_opengl_cb_uninit_gl(mpv_gl_);
+    if (mpv_)
+      mpv_terminate_destroy(mpv_);
     delete[] src_;
   }
 
@@ -129,6 +134,10 @@ class MPVInstance : public pp::Instance {
   }
 
   virtual void DidChangeView(const pp::View& view) {
+    // TODO(Kagami): Destroy plugin instead?
+    if (init_failed_)
+      return;
+
     // Pepper specifies dimensions in DIPs (device-independent pixels).
     // To generate a context that is at device-pixel resolution on HiDPI
     // devices, scale the dimensions by view.GetDeviceScale().
@@ -139,8 +148,12 @@ class MPVInstance : public pp::Instance {
     // printf("@@@ RESIZE %d %d\n", new_width, new_height);
 
     if (context_.is_null()) {
-      if (!InitGL(new_width, new_height)) return;
-      if (!InitMPV()) return;
+      if (!InitGL(new_width, new_height) ||
+          !InitMPV()) {
+        init_failed_ = true;
+        fprintf(stderr, "init failed\n");
+        return;
+      }
       PostData("init", Var::Null());
       MainLoop(0);
     } else {
@@ -159,7 +172,8 @@ class MPVInstance : public pp::Instance {
   }
 
   virtual void HandleMessage(const Var& message) {
-    if (!message.is_dictionary()) return;
+    if (!message.is_dictionary())
+      return;
     pp::VarDictionary dict(message);
     std::string type = dict.Get("type").AsString();
     pp::Var data = dict.Get("data");
@@ -298,6 +312,7 @@ class MPVInstance : public pp::Instance {
     context_.SwapBuffers(callback_factory_.NewCallback(&MPVInstance::MainLoop));
   }
 
+  bool init_failed_;
   pp::CompletionCallbackFactory<MPVInstance> callback_factory_;
   pp::Graphics3D context_;
   int32_t width_;
