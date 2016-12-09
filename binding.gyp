@@ -2,7 +2,7 @@
   "targets": [
     {
       "target_name": "mpvinterop",
-      "sources": ["src/mpv/mpvinterop.cc"],
+      "sources": ["src/mpv/interop.cc"],
       "libraries": ["ppapi", "ppapi_cpp", "ppapi_gles2"],
       "conditions": [
         ["OS=='linux'", {
