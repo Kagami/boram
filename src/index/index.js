@@ -22,10 +22,10 @@ if (BORAM_DEBUG) {
   require("electron-debug")({enabled: true});
 }
 
-const PLUGIN_NAME = BORAM_WIN_BUILD ? "mpvinterop.dll" : "libmpvinterop.so";
+const PLUGIN_NAME = BORAM_WIN_BUILD ? "boram.dll" : "libboram.so";
 const PLUGIN_PATH = path.join(__dirname, PLUGIN_NAME);
 app.commandLine.appendSwitch(
-  "register-pepper-plugins", `${PLUGIN_PATH};application/x-mpv`
+  "register-pepper-plugins", `${PLUGIN_PATH};application/x-boram`
 );
 
 app.on("ready", () => {

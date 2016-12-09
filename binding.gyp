@@ -1,7 +1,7 @@
 {
   "targets": [
     {
-      "target_name": "mpvinterop",
+      "target_name": "boram",
       "sources": ["src/mpv/interop.cc"],
       "libraries": ["ppapi", "ppapi_cpp", "ppapi_gles2"],
       "conditions": [
