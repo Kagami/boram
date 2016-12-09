@@ -47,7 +47,7 @@ app.on("ready", () => {
     // include borders and useContentSize=true enlarges even more. WM
     // issue?
     useContentSize: BORAM_WIN_BUILD,
-    title: `${name} v${version} by T-ara Industries`,
+    title: `${name} v${version} by t-ara.industries`,
     icon: path.join(__dirname, "icon-big.png"),
     webPreferences: {
       plugins: true,
