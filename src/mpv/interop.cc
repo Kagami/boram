@@ -106,13 +106,13 @@ class MPVInstance : public pp::Instance {
  public:
   explicit MPVInstance(PP_Instance instance)
       : pp::Instance(instance),
-        init_failed_(false),
         callback_factory_(this),
-        width_(0),
-        height_(0),
         mpv_(NULL),
         mpv_gl_(NULL),
-        src_(NULL) {}
+        src_(NULL),
+        width_(0),
+        height_(0),
+        run(false) {}
 
   virtual ~MPVInstance() {
     if (mpv_gl_)
@@ -127,17 +127,21 @@ class MPVInstance : public pp::Instance {
       if (strcmp(argn[i], "data-boramsrc") == 0) {
         src_ = new char[strlen(argv[i])];
         strcpy(src_, argv[i]);
-        return true;
+        break;
       }
     }
-    return false;
+    if (!src_)
+      return false;
+
+    if (!InitGL())
+      return false;
+    if (!InitMPV())
+      return false;
+
+    return true;
   }
 
   virtual void DidChangeView(const pp::View& view) {
-    // TODO(Kagami): Destroy plugin instead?
-    if (init_failed_)
-      return;
-
     // Pepper specifies dimensions in DIPs (device-independent pixels).
     // To generate a context that is at device-pixel resolution on HiDPI
     // devices, scale the dimensions by view.GetDeviceScale().
@@ -147,28 +151,22 @@ class MPVInstance : public pp::Instance {
       view.GetRect().height() * view.GetDeviceScale());
     // printf("@@@ RESIZE %d %d\n", new_width, new_height);
 
-    if (context_.is_null()) {
-      if (!InitGL(new_width, new_height) ||
-          !InitMPV()) {
-        init_failed_ = true;
-        fprintf(stderr, "init failed\n");
-        return;
-      }
-      PostData("init", Var::Null());
-      MainLoop(0);
-    } else {
-      int32_t result = context_.ResizeBuffers(new_width, new_height);
-      if (result < 0) {
-        fprintf(stderr,
-                "unable to resize buffers to %d x %d\n",
-                new_width,
-                new_height);
-        return;
-      }
+    int32_t result = context_.ResizeBuffers(new_width, new_height);
+    if (result < 0) {
+      fprintf(stderr,
+              "unable to resize buffers to %d x %d\n",
+              new_width,
+              new_height);
+      return;
     }
 
     width_ = new_width;
     height_ = new_height;
+
+    if (!run) {
+      run = true;
+      MainLoop(0);
+    }
   }
 
   virtual void HandleMessage(const Var& message) {
@@ -244,15 +242,13 @@ class MPVInstance : public pp::Instance {
     static_cast<MPVInstance*>(ctx)->PostData("wakemeup", Var::Null());
   }
 
-  bool InitGL(int32_t new_width, int32_t new_height) {
+  bool InitGL() {
     if (!glInitializePPAPI(pp::Module::Get()->get_browser_interface()))
       DIE("unable to initialize GL PPAPI");
 
     const int32_t attrib_list[] = {
       PP_GRAPHICS3DATTRIB_ALPHA_SIZE, 8,
       PP_GRAPHICS3DATTRIB_DEPTH_SIZE, 24,
-      PP_GRAPHICS3DATTRIB_WIDTH, new_width,
-      PP_GRAPHICS3DATTRIB_HEIGHT, new_height,
       PP_GRAPHICS3DATTRIB_NONE
     };
 
@@ -312,14 +308,14 @@ class MPVInstance : public pp::Instance {
     context_.SwapBuffers(callback_factory_.NewCallback(&MPVInstance::MainLoop));
   }
 
-  bool init_failed_;
   pp::CompletionCallbackFactory<MPVInstance> callback_factory_;
   pp::Graphics3D context_;
-  int32_t width_;
-  int32_t height_;
   mpv_handle* mpv_;
   mpv_opengl_cb_context* mpv_gl_;
   char* src_;
+  int32_t width_;
+  int32_t height_;
+  bool run;
 };
 
 class MPVModule : public pp::Module {

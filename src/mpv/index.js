@@ -19,6 +19,7 @@ if (BORAM_WIN_BUILD) {
 })
 export default class extends React.PureComponent {
   componentDidMount() {
+    // TODO(Kagami): Handle plugin init errors.
     this.refs.plugin.addEventListener("message", this.handleMessage, false);
   }
   componentWillUnmount() {
