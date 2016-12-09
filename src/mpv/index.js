@@ -91,6 +91,11 @@ export default class extends React.PureComponent {
     case "mute":
       this.props.onVolume({mute: msg.data});
       break;
+    case "eof-reached":
+      if (msg.data) {
+        this.props.onEOF();
+      }
+      break;
     }
   }
   render() {

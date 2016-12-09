@@ -78,12 +78,8 @@ export default class extends React.PureComponent {
       // `loopCut` anyway but that will play out-of-loop video for some
       // period of time.
       this.seek(this.props.mstart);
-    // } else if (action === "play" && time >= Math.floor(this.duration)) {
-    //   // If we have e.g. video with duration = 3s which consists of
-    //   // frames with timestamps [0s, 1s, 2s] then if currentTime is at
-    //   // 2s and playing is false, play() call will set currentTime to 3s
-    //   // and playing to false again. This is not what we probably want.
-    //   this.seek(0);
+    } else if (action === "play" && time >= Math.floor(this.duration)) {
+      this.seek(0);
     }
     this[action]();
   };
@@ -165,6 +161,11 @@ export default class extends React.PureComponent {
     // TODO(Kagami): Change internal state right away?
     this.refs.mpv.setVolume({volume, mute});
   };
+  handleEOF = () => {
+    const time = this.duration;
+    this.setTime(time);
+    this.setState({time});
+  };
   handleMarkStart = () => {
     this.props.onMarkStart(this.state.time);
   };
@@ -199,6 +200,7 @@ export default class extends React.PureComponent {
           onPlayPause={this.handlePlayPause}
           onTime={this.handleTime}
           onVolume={this.handleVolume}
+          onEOF={this.handleEOF}
         />
         <Controls>
           <Control

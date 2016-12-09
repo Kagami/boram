@@ -298,6 +298,7 @@ class MPVInstance : public pp::Instance {
     mpv_observe_property(mpv_, 0, "time-pos", MPV_FORMAT_DOUBLE);
     mpv_observe_property(mpv_, 0, "mute", MPV_FORMAT_FLAG);
     mpv_observe_property(mpv_, 0, "volume", MPV_FORMAT_DOUBLE);
+    mpv_observe_property(mpv_, 0, "eof-reached", MPV_FORMAT_FLAG);
     mpv_set_wakeup_callback(mpv_, HandleMPVWakeup, this);
 
     return true;
