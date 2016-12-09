@@ -3,8 +3,6 @@
 #define GL_GLEXT_PROTOTYPES
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
-#include <mpv/client.h>
-#include <mpv/opengl_cb.h>
 #include <ppapi/cpp/module.h>
 #include <ppapi/cpp/instance.h>
 #include <ppapi/cpp/var.h>
@@ -12,6 +10,18 @@
 #include <ppapi/cpp/graphics_3d.h>
 #include <ppapi/lib/gl/gles2/gl2ext_ppapi.h>
 #include <ppapi/utility/completion_callback_factory.h>
+#ifdef BORAM_WIN_BUILD
+#include "client.h"
+#include "opengl_cb.h"
+#else
+#include <mpv/client.h>
+#include <mpv/opengl_cb.h>
+#endif
+
+// Fix for MSVS.
+#ifdef PostMessage
+#undef PostMessage
+#endif
 
 #define QUOTE(arg) #arg
 #define DIE(msg) { fprintf(stderr, "%s\n", msg); return false; }
@@ -109,7 +119,7 @@ class MPVInstance : public pp::Instance {
 
   virtual bool Init(uint32_t argc, const char* argn[], const char* argv[]) {
     for (uint32_t i = 0; i < argc; i++) {
-      if (strcmp(argn[i], "src") == 0) {
+      if (strcmp(argn[i], "mpvsrc") == 0) {
         src_ = new char[strlen(argv[i])];
         strcpy(src_, argv[i]);
         return true;
@@ -122,8 +132,10 @@ class MPVInstance : public pp::Instance {
     // Pepper specifies dimensions in DIPs (device-independent pixels).
     // To generate a context that is at device-pixel resolution on HiDPI
     // devices, scale the dimensions by view.GetDeviceScale().
-    int32_t new_width = view.GetRect().width() * view.GetDeviceScale();
-    int32_t new_height = view.GetRect().height() * view.GetDeviceScale();
+    int32_t new_width = static_cast<int32_t>(
+      view.GetRect().width() * view.GetDeviceScale());
+    int32_t new_height = static_cast<int32_t>(
+      view.GetRect().height() * view.GetDeviceScale());
     // printf("@@@ RESIZE %d %d\n", new_width, new_height);
 
     if (context_.is_null()) {

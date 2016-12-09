@@ -100,7 +100,7 @@ export default class extends React.PureComponent {
         ref="plugin"
         className={classes.plugin}
         type="application/x-mpv"
-        src={src}
+        mpvsrc={src}
         onTouchTap={onClick}
       />
     );
