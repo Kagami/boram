@@ -125,7 +125,7 @@ class MPVInstance : public pp::Instance {
   virtual bool Init(uint32_t argc, const char* argn[], const char* argv[]) {
     for (uint32_t i = 0; i < argc; i++) {
       if (strcmp(argn[i], "data-boramsrc") == 0) {
-        src_ = new char[strlen(argv[i])];
+        src_ = new char[strlen(argv[i]) + 1];
         strcpy(src_, argv[i]);
         break;
       }
