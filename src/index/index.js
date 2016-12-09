@@ -22,6 +22,10 @@ if (BORAM_DEBUG) {
   require("electron-debug")({enabled: true});
 }
 
+if (process.env.BORAM_NO_HWACCEL) {
+  app.disableHardwareAcceleration();
+}
+
 const PLUGIN_NAME = BORAM_WIN_BUILD ? "boram.dll" : "libboram.so";
 const PLUGIN_PATH = path.join(__dirname, PLUGIN_NAME);
 app.commandLine.appendSwitch(
