@@ -250,7 +250,7 @@ class MPVInstance : public pp::Instance {
     if (mpv_get_property(mpv_, "track-list", MPV_FORMAT_NODE, &node) < 0)
       return;
     if (node.format != MPV_FORMAT_NODE_ARRAY)
-      return;
+      return mpv_free_node_contents(&node);
 
     mpv_node_list* tracks = node.u.list;
     std::vector<int64_t> ext_sub_ids;
