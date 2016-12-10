@@ -145,21 +145,14 @@ export default class extends React.PureComponent {
     this.setState({time});
   };
   handleVolume = (upd) => {
+    if (this.refs.volume.isDragging()) return;
     let {volume, mute} = Object.assign({}, this.state, upd);
     volume = Math.min(volume, 100);
-    // TODO(Kagami): Ignore if volumeDrag?
     this.setState({volume, mute});
   };
   handleVolumeControl = ({volume, mute}) => {
-    // TODO(Kagami): Change internal state right away?
     this.refs.mpv.setVolume({volume, mute});
-  };
-  handleWheelEvent = (e) => {
-    const delta = e.deltaY > 0 ? -5 : 5;
-    const volume = Math.min(Math.max(0, this.state.volume + delta), 100);
-    const mute = false;
-    // TODO(Kagami): Change internal state right away?
-    this.refs.mpv.setVolume({volume, mute});
+    this.setState({volume, mute});
   };
   handleEOF = () => {
     const time = this.duration;
@@ -192,7 +185,7 @@ export default class extends React.PureComponent {
   render() {
     const {classes} = this.sheet;
     return (
-      <div className={classes.player} onWheel={this.handleWheelEvent}>
+      <div className={classes.player}>
         <MPV
           ref="mpv"
           src={this.props.source.path}
@@ -380,6 +373,9 @@ class Volume extends React.PureComponent {
     );
   }
   state = {shown: false}
+  isDragging() {
+    return this.volumeDrag;
+  }
   toggleMute = () => {
     this.props.onChange({volume: this.props.volume, mute: !this.props.mute});
   }
@@ -393,7 +389,7 @@ class Volume extends React.PureComponent {
     this.volumeDrag = true;
   }
   handleVolumeChange = (e) => {
-    this.props.onChange({volume: e.target.value, mute: false});
+    this.props.onChange({volume: +e.target.value, mute: false});
   }
   handleVolumeMouseUp = () => {
     this.volumeDrag = false;
