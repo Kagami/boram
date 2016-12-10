@@ -83,10 +83,10 @@ export default class extends React.PureComponent {
       this.props.onPlayPause(msg.data);
       break;
     case "time-pos":
-      this.props.onTime(msg.data);
+      this.props.onTime(Math.max(0, msg.data));
       break;
     case "volume":
-      this.props.onVolume({volume: msg.data});
+      this.props.onVolume({volume: Math.floor(msg.data)});
       break;
     case "mute":
       this.props.onVolume({mute: msg.data});

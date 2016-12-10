@@ -93,6 +93,7 @@ static const std::unordered_map<std::string, void*> GL_FUNCTIONS = {
   GLCB(DeleteQueriesEXT),
   GLCB(BeginQueryEXT),
   GLCB(EndQueryEXT),
+  // Few functions are not available in PPAPI or doesn't work properly.
   {"glQueryCounterEXT", NULL},
   GLCB(IsQueryEXT),
   {"glGetQueryObjectivEXT", NULL},
