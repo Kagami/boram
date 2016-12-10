@@ -182,6 +182,7 @@ export default class extends React.PureComponent {
     const upd = {extSubPath, burnSubs: true, strackn: -1};
     this.setState(upd);
     this.handleAll(upd);
+    this.refs.player.loadExtSub(extSubPath);
   };
   handleAll = (upd, what = {}) => {
     const nextState = Object.assign({}, this.state, upd);

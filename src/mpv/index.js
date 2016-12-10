@@ -40,6 +40,9 @@ export default class extends React.PureComponent {
   setVolume({volume, mute}) {
     this.postData("volume", {volume, mute});
   }
+  loadExtSub(extSubPath) {
+    this.postData("load-ext-sub", extSubPath);
+  }
   sendKey = ({key, shiftKey, ctrlKey}) => {
     // Don't need modifier events.
     if ([

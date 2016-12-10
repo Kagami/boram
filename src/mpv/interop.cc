@@ -1,4 +1,7 @@
+#include <stdio.h>
 #include <string.h>
+#include <string>
+#include <vector>
 #include <unordered_map>
 #define GL_GLEXT_PROTOTYPES
 #include <GLES2/gl2.h>
@@ -193,7 +196,12 @@ class MPVInstance : public pp::Instance {
       mpv_set_property(mpv_, "mute", MPV_FORMAT_FLAG, &mute);
     } else if (type == "keypress") {
       std::string key = data.AsString();
-      const char *cmd[] = {"keypress", key.c_str(), NULL};
+      const char* cmd[] = {"keypress", key.c_str(), NULL};
+      mpv_command(mpv_, cmd);
+    } else if (type == "load-ext-sub") {
+      ClearExternalSubs();
+      std::string file = data.AsString();
+      const char* cmd[] = {"sub-add", file.c_str(), NULL};
       mpv_command(mpv_, cmd);
     }
   }
@@ -235,6 +243,59 @@ class MPVInstance : public pp::Instance {
       double value = *static_cast<double*>(prop->data);
       PostData(prop->name, Var(value));
     }
+  }
+
+  void ClearExternalSubs() {
+    mpv_node node;
+    if (mpv_get_property(mpv_, "track-list", MPV_FORMAT_NODE, &node) < 0)
+      return;
+    if (node.format != MPV_FORMAT_NODE_ARRAY)
+      return;
+
+    mpv_node_list* tracks = node.u.list;
+    std::vector<int64_t> ext_sub_ids;
+    for (int i = 0; i < tracks->num; i++) {
+      int64_t id = GetSubId(&tracks->values[i]);
+      if (id >= 0) {
+        ext_sub_ids.push_back(id);
+      }
+    }
+
+    for (int id : ext_sub_ids) {
+      std::string str_id = std::to_string(id);
+      const char* cmd[] = {"sub-remove", str_id.c_str(), NULL};
+      mpv_command(mpv_, cmd);
+    }
+
+    mpv_free_node_contents(&node);
+  }
+
+  int64_t GetSubId(mpv_node* track_node) {
+    if (track_node->format != MPV_FORMAT_NODE_MAP)
+      return -1;
+
+    mpv_node_list* track = track_node->u.list;
+    char* type = NULL;
+    int external = 0;
+    int64_t id = -1;
+
+    for (int i = 0; i < track->num; i++) {
+      char* key = track->keys[i];
+      mpv_node* value_node = &track->values[i];
+      mpv_format format = value_node->format;
+      if (strcmp(key, "type") == 0 && format == MPV_FORMAT_STRING) {
+        type = value_node->u.string;
+      } else if (strcmp(key, "external") == 0 && format == MPV_FORMAT_FLAG) {
+        external = value_node->u.flag;
+      } else if (strcmp(key, "id") == 0 && format == MPV_FORMAT_INT64) {
+        id = value_node->u.int64;
+      }
+    }
+
+    if (external && type && strcmp(type, "sub") == 0) {
+      return id;
+    }
+    return -1;
   }
 
   static void HandleMPVWakeup(void* ctx) {
@@ -294,7 +355,7 @@ class MPVInstance : public pp::Instance {
     mpv_set_option_string(mpv_, "keep-open", "yes");
     mpv_set_option_string(mpv_, "osd-bar", "no");
     mpv_set_option_string(mpv_, "pause", "yes");
-    const char *cmd[] = {"loadfile", src_, NULL};
+    const char* cmd[] = {"loadfile", src_, NULL};
     mpv_command(mpv_, cmd);
 
     mpv_observe_property(mpv_, 0, "pause", MPV_FORMAT_FLAG);

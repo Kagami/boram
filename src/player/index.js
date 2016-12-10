@@ -60,6 +60,9 @@ export default class extends React.PureComponent {
     // We improve UX by changing slider pos immediately.
     this.setState({time});
   }
+  loadExtSub(extSubPath) {
+    this.refs.mpv.loadExtSub(extSubPath);
+  }
   // Displayed time info.
   setTime(time) {
     const prettyTime = showTime(time);
