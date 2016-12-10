@@ -362,7 +362,7 @@ export const Tip = (function() {
     icon: {
       display: "inline-block",
       marginRight: 15,
-      color: "blue",
+      color: "#4078c0",
     },
   };
   return function(props) {

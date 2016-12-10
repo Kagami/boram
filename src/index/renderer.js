@@ -60,6 +60,7 @@ import "file!./roboto-medium.ttf";
     cursor: "not-allowed",
   },
   "a[href]": {
+    color: "#4078c0",
     textDecoration: "none",
   },
   "a[href]:hover": {
