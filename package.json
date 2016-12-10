@@ -1,6 +1,6 @@
 {
   "name": "boram",
-  "version": "0.1.0-dev",
+  "version": "0.1.0",
   "private": true,
   "description": "Cross-platform WebM encoder",
   "scripts": {
