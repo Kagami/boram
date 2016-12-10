@@ -96,11 +96,10 @@ export default class extends React.PureComponent {
   };
   handleGlobaKey = (e) => {
     if (!this.props.active) return;
+    e.preventDefault();
     switch (e.key) {
     case "t":
       this.refs.time.focus();
-      // Prevent replacing time with "t" on focus.
-      e.preventDefault();
       break;
     case "f":
       this.toggleFullscreen();
@@ -109,7 +108,7 @@ export default class extends React.PureComponent {
       if (this.state.fullscreen) this.toggleFullscreen();
       break;
     default:
-      this.refs.mpv.handleKey(e);
+      this.refs.mpv.sendKey(e);
     }
   };
   handleTimeKey = (e) => {
@@ -133,7 +132,7 @@ export default class extends React.PureComponent {
     this.setState({pause});
   };
   handleTime = (time) => {
-    if (this.seekDrag) return;
+    if (this.seekDragging) return;
     const mend = this.props.mend || this.duration;
     if (!this.state.pause &&
         this.state.loopCut &&
@@ -172,7 +171,7 @@ export default class extends React.PureComponent {
     this.setState({prettyTime, validTime});
   };
   handleSeekMouseDown = () => {
-    this.seekDrag = true;
+    this.seekDragging = true;
   };
   handleSeekControl = (e) => {
     const time = parseInt(e.target.value, 10);
@@ -180,7 +179,7 @@ export default class extends React.PureComponent {
     this.seek(time);
   };
   handleSeekMouseUp = () => {
-    this.seekDrag = false;
+    this.seekDragging = false;
   };
   render() {
     const {classes} = this.sheet;
@@ -374,7 +373,7 @@ class Volume extends React.PureComponent {
   }
   state = {shown: false}
   isDragging() {
-    return this.volumeDrag;
+    return this.dragging;
   }
   toggleMute = () => {
     this.props.onChange({volume: this.props.volume, mute: !this.props.mute});
@@ -386,13 +385,13 @@ class Volume extends React.PureComponent {
     this.setState({shown: false});
   }
   handleVolumeMouseDown = () => {
-    this.volumeDrag = true;
+    this.dragging = true;
   }
   handleVolumeChange = (e) => {
     this.props.onChange({volume: +e.target.value, mute: false});
   }
   handleVolumeMouseUp = () => {
-    this.volumeDrag = false;
+    this.dragging = false;
   }
   render() {
     const {classes} = this.sheet;

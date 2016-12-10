@@ -40,7 +40,7 @@ export default class extends React.PureComponent {
   setVolume({volume, mute}) {
     this.postData("volume", {volume, mute});
   }
-  handleKey = ({key, shiftKey, ctrlKey}) => {
+  sendKey = ({key, shiftKey, ctrlKey}) => {
     // Don't need modifier events.
     if ([
       "Shift", "Control", "Alt",
