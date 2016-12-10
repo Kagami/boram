@@ -154,9 +154,7 @@ export default class extends React.PureComponent {
     this.setState({volume, mute});
   };
   handleEOF = () => {
-    const time = this.duration;
-    this.setTime(time);
-    this.setState({time});
+    this.seek(0);
   };
   handleMarkStart = () => {
     this.props.onMarkStart(this.state.time);
