@@ -61,7 +61,7 @@ export default class extends React.PureComponent {
     // don't propose anything better.
     if ([
       "q", "Q", "ESC", "POWER", "STOP",
-      "CLOSE_WIN", "CLOSE_WIN", "ctrl+c",
+      "CLOSE_WIN", "CLOSE_WIN", "Ctrl+c",
       "AR_PLAY_HOLD", "AR_CENTER_HOLD",
     ].includes(key)) return;
 
