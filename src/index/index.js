@@ -8,11 +8,10 @@ import path from "path";
 import {BrowserWindow, app} from "electron";
 import {name, version} from "json!../../package.json";
 import {checkLinuxDeps} from "./deps";
+import "file!./package.json";
 import "file!./index.html";
 import "file!./icon.png";
 import "file!./icon-big.png";
-// Need to have some valid package.json, so provide empty stub.
-import "file!./package.json";
 
 // Used by renderer process.
 global.tmp = require("tmp");
