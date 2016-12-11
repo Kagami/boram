@@ -127,8 +127,8 @@ export default class extends React.PureComponent {
             onCheck={this.props.makeChecker("deinterlace")}
           />
           <SmallButton
-            icon={<Icon name="refresh" />}
-            title="Auto-detect interlaced video"
+            icon={<Icon name="eye" />}
+            title="Auto-detect interlacing"
             style={{marginLeft: 0}}
             disabled={this.props.encoding}
             onClick={this.handleInterlaceDetect}
@@ -168,7 +168,7 @@ export default class extends React.PureComponent {
           />
           <Sep/>
           <SmallButton
-            icon={<Icon name="refresh" />}
+            icon={<Icon name="eye" />}
             title="Auto-detect black borders"
             style={{marginLeft: 0}}
             disabled={this.props.encoding}

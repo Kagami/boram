@@ -101,6 +101,9 @@ export default class extends React.PureComponent {
     if (!this.props.active) return;
     e.preventDefault();
     switch (e.key) {
+    case "r":
+      // mpv uses r/t combination, block "r" too since we use "t".
+      break;
     case "t":
       this.refs.time.focus();
       break;
