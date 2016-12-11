@@ -10,7 +10,7 @@ function infa(...parts) {
   return intree("node_modules", "font-awesome", ...parts);
 }
 
-const DIST_DIR = path.join("dist", "app");
+const APP_PATH = path.join("dist", "app");
 const BORAM_DEBUG = process.env.NODE_ENV !== "production";
 const BORAM_WIN_BUILD = process.env.PLATFORM === "win32";
 const ExtractLoader = ExtractTextPlugin.extract("css");
@@ -46,7 +46,7 @@ export default {
     renderer: "./src/index/renderer",
   },
   output: {
-    path: path.join(__dirname, DIST_DIR),
+    path: path.join(__dirname, APP_PATH),
     filename: "[name].js",
   },
   module: {

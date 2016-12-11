@@ -197,8 +197,6 @@ export function getRunPath(exe) {
   } catch (e) {
     // We ship all required binaries with Windows version, on Linux few
     // deps should be installed separately.
-    // TODO(Kagami): Ship static ffmpeg build in Linux version too? Some
-    // distros have too old libvpx, making it impractical to use VP9.
     if (BORAM_WIN_BUILD) {
       return path.join(APP_PATH, exe);
     } else {

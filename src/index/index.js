@@ -5,7 +5,7 @@
 
 import url from "url";
 import path from "path";
-import {BrowserWindow, app} from "electron";
+import {BrowserWindow, app, dialog} from "electron";
 import {name, version} from "json!../../package.json";
 import {checkLinuxDeps} from "./deps";
 import "file!./package.json";
@@ -25,8 +25,31 @@ if (process.env.BORAM_NO_HWACCEL) {
   app.disableHardwareAcceleration();
 }
 
+function containsNonASCII(str) {
+  for (let i = 0; i < str.length; i++) {
+    if (str.charCodeAt(i) > 255) {
+      return true;
+    }
+  }
+  return false;
+}
+
+const APP_PATH = app.getAppPath();
 const PLUGIN_NAME = BORAM_WIN_BUILD ? "boram.dll" : "libboram.so";
-const PLUGIN_PATH = path.join(__dirname, PLUGIN_NAME);
+const FULL_PLUGIN_PATH = path.join(APP_PATH, PLUGIN_NAME);
+let PLUGIN_PATH = path.relative(process.cwd(), FULL_PLUGIN_PATH);
+// "plugin.so" doesn't work, "./plugin.so" is required.
+PLUGIN_PATH = `.${path.sep}${PLUGIN_PATH}`;
+
+if (containsNonASCII(PLUGIN_PATH)) {
+  dialog.showErrorBox(
+    "Unsupported location detected",
+    "Because of Chromium limitation, boram can't be run from path " +
+    "with non-ASCII characters. Please run boram as ASCII-only path."
+  );
+  return app.exit(1);
+}
+
 app.commandLine.appendSwitch(
   "register-pepper-plugins", `${PLUGIN_PATH};application/x-boram`
 );
@@ -51,14 +74,14 @@ app.on("ready", () => {
     // issue?
     useContentSize: BORAM_WIN_BUILD,
     title: `${name} v${version} by t-ara.industries`,
-    icon: path.join(__dirname, "icon-big.png"),
+    icon: path.join(APP_PATH, "icon-big.png"),
     webPreferences: {
       plugins: true,
     },
   });
   win.setMenu(null);
   win.loadURL(url.format({
-    pathname: path.join(__dirname, "index.html"),
+    pathname: path.join(APP_PATH, "index.html"),
     protocol: "file:",
     slashes: true,
   }));
