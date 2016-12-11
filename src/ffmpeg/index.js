@@ -193,8 +193,8 @@ export default makeRunner("ffmpeg", {
     // Both values must be set if any is specified.
     // TODO(Kagami): Clear SAR?
     if (opts.scalew != null || opts.scaleh != null) {
-      scale.push(opts.scalew == null ? -1 : opts.scalew);
-      scale.push(opts.scaleh == null ? -1 : opts.scaleh);
+      scale.push(opts.scalew == null ? -2 : opts.scalew);
+      scale.push(opts.scaleh == null ? -2 : opts.scaleh);
       vfilters.push(`scale=${scale.join(":")}`);
     }
     if (opts.burnSubs) {
