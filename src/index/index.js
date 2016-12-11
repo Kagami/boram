@@ -47,7 +47,7 @@ if (containsNonASCII(PLUGIN_PATH)) {
     "Because of Chromium limitation, boram can't be run from path " +
     "with non-ASCII characters. Please run boram as ASCII-only path."
   );
-  return app.exit(1);
+  app.exit(1);
 }
 
 app.commandLine.appendSwitch(
