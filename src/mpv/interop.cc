@@ -261,7 +261,7 @@ class MPVInstance : public pp::Instance {
       }
     }
 
-    for (int id : ext_sub_ids) {
+    for (int64_t id : ext_sub_ids) {
       std::string str_id = std::to_string(id);
       const char* cmd[] = {"sub-remove", str_id.c_str(), NULL};
       mpv_command(mpv_, cmd);
