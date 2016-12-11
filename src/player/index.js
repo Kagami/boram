@@ -240,6 +240,7 @@ export default class extends React.PureComponent {
             ref="volume"
             volume={this.state.volume}
             mute={this.state.mute}
+            disabled={!this.props.atracks.length}
             onChange={this.handleVolumeControl}
           />
           <Seek
@@ -383,6 +384,7 @@ class Volume extends React.PureComponent {
     this.props.onChange({volume: this.props.volume, mute: !this.props.mute});
   }
   handleMouseOver = () => {
+    if (this.props.disabled) return;
     this.setState({shown: true});
   }
   handleMouseOut = () => {
@@ -416,7 +418,9 @@ class Volume extends React.PureComponent {
         #fff ${volPercent}%
       )
     `);
-    const icon = (this.props.mute || this.props.volume < 1)
+    const icon = (this.props.mute ||
+                  this.props.volume < 1 ||
+                  this.props.disabled)
       ? "volume-off"
       : "volume-up";
     return (
@@ -437,6 +441,7 @@ class Volume extends React.PureComponent {
         <Control
           icon={icon}
           title="Toggle mute"
+          disabled={this.props.disabled}
           onClick={this.toggleMute}
         />
       </div>

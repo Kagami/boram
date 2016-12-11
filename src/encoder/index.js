@@ -513,6 +513,7 @@ export default class extends React.PureComponent {
           source={this.props.source}
           format={this.props.info.format}
           vtrack={this.getVideoTracks()[0]}
+          atracks={this.getAudioTracks()}
           mstart={this.state.mstart}
           mend={this.state.mend}
           onMarkStart={this.handleMarkStart}
