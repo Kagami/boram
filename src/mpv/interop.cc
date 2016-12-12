@@ -148,9 +148,9 @@ class MPVInstance : public pp::Instance {
     // To generate a context that is at device-pixel resolution on HiDPI
     // devices, scale the dimensions by view.GetDeviceScale().
     int32_t new_width = static_cast<int32_t>(
-      view.GetRect().width() * view.GetDeviceScale());
+        view.GetRect().width() * view.GetDeviceScale());
     int32_t new_height = static_cast<int32_t>(
-      view.GetRect().height() * view.GetDeviceScale());
+        view.GetRect().height() * view.GetDeviceScale());
     // printf("@@@ RESIZE %d %d\n", new_width, new_height);
 
     int32_t result = context_.ResizeBuffers(new_width, new_height);
@@ -256,7 +256,7 @@ class MPVInstance : public pp::Instance {
     mpv_node_list* tracks = node.u.list;
     std::vector<int64_t> ext_sub_ids;
     for (int i = 0; i < tracks->num; i++) {
-      int64_t id = GetExternalSubId(&tracks->values[i]);
+      int64_t id = GetExternalSubID(&tracks->values[i]);
       if (id >= 0) {
         ext_sub_ids.push_back(id);
       }
@@ -271,7 +271,7 @@ class MPVInstance : public pp::Instance {
     mpv_free_node_contents(&node);
   }
 
-  int64_t GetExternalSubId(mpv_node* track_node) {
+  int64_t GetExternalSubID(mpv_node* track_node) {
     if (track_node->format != MPV_FORMAT_NODE_MAP)
       return -1;
 
@@ -339,7 +339,7 @@ class MPVInstance : public pp::Instance {
       DIE("mpv init failed");
 
     mpv_gl_ = static_cast<mpv_opengl_cb_context*>(
-      mpv_get_sub_api(mpv_, MPV_SUB_API_OPENGL_CB));
+        mpv_get_sub_api(mpv_, MPV_SUB_API_OPENGL_CB));
     if (!mpv_gl_)
       DIE("failed to create mpv GL API handle");
 
