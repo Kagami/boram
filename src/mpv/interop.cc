@@ -256,7 +256,7 @@ class MPVInstance : public pp::Instance {
     mpv_node_list* tracks = node.u.list;
     std::vector<int64_t> ext_sub_ids;
     for (int i = 0; i < tracks->num; i++) {
-      int64_t id = GetSubId(&tracks->values[i]);
+      int64_t id = GetExternalSubId(&tracks->values[i]);
       if (id >= 0) {
         ext_sub_ids.push_back(id);
       }
@@ -271,7 +271,7 @@ class MPVInstance : public pp::Instance {
     mpv_free_node_contents(&node);
   }
 
-  int64_t GetSubId(mpv_node* track_node) {
+  int64_t GetExternalSubId(mpv_node* track_node) {
     if (track_node->format != MPV_FORMAT_NODE_MAP)
       return -1;
 
