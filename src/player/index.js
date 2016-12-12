@@ -178,7 +178,8 @@ export default class extends React.PureComponent {
     this.seekDragging = true;
   };
   handleSeekControl = (e) => {
-    const time = parseInt(e.target.value, 10);
+    let time = parseFloat(e.target.value);
+    time = Math.floor(time * 10) / 10;
     this.setTime(time);
     this.seek(time);
   };
@@ -244,8 +245,8 @@ export default class extends React.PureComponent {
             onChange={this.handleVolumeControl}
           />
           <Seek
-            value={Math.floor(this.state.time)}
-            max={Math.max(1, Math.floor(this.duration))}
+            value={this.state.time}
+            max={Math.max(1, Math.ceil(this.duration))}
             mstart={Math.floor(this.props.mstart)}
             mend={Math.floor(this.props.mend)}
             onMouseDown={this.handleSeekMouseDown}
@@ -566,6 +567,7 @@ class Seek extends React.PureComponent {
       <div className={classes.seek}>
         <input
           {...other}
+          step={0.1}
           type="range"
           className={classes.range}
           onKeyDown={this.handleKey}
