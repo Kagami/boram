@@ -114,8 +114,6 @@ class MPVInstance : public pp::Instance {
         mpv_(NULL),
         mpv_gl_(NULL),
         src_(NULL),
-        width_(0),
-        height_(0),
         run_(false) {}
 
   virtual ~MPVInstance() {
