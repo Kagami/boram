@@ -203,6 +203,9 @@ class MPVInstance : public pp::Instance {
       std::string file = data.AsString();
       const char* cmd[] = {"sub-add", file.c_str(), NULL};
       mpv_command(mpv_, cmd);
+    } else if (type == "frame-step" || type == "frame-back-step") {
+      const char* cmd[] = {type.c_str(), NULL};
+      mpv_command(mpv_, cmd);
     }
   }
 

@@ -186,10 +186,14 @@ export default class extends React.PureComponent {
   handleSeekMouseUp = () => {
     this.seekDragging = false;
   };
+  handleWheel = (e) => {
+    const action = e.deltaY > 0 ? "frameBackStep" : "frameStep";
+    this.refs.mpv[action]();
+  };
   render() {
     const {classes} = this.sheet;
     return (
-      <div className={classes.player}>
+      <div className={classes.player} onWheel={this.handleWheel}>
         <MPV
           ref="mpv"
           src={this.props.source.path}

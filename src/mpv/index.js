@@ -43,6 +43,12 @@ export default class extends React.PureComponent {
   loadExtSub(extSubPath) {
     this.postData("load-ext-sub", extSubPath);
   }
+  frameStep() {
+    this.postData("frame-step", null);
+  }
+  frameBackStep() {
+    this.postData("frame-back-step", null);
+  }
   sendKey = ({key, shiftKey, ctrlKey}) => {
     // Don't need modifier events.
     if ([
