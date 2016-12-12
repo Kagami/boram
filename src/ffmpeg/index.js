@@ -4,6 +4,7 @@
  */
 
 import assert from "assert";
+import os from "os";
 import {makeRunner, escapeArg, fixOpt, clearOpt} from "../util";
 if (BORAM_WIN_BUILD) {
   require.context(
@@ -141,7 +142,7 @@ export default makeRunner("ffmpeg", {
     }
 
     // Video.
-    args.push("-threads", "8");
+    args.push("-threads", os.cpus().length);
     if (opts.vcodec === "vp9") {
       args.push("-c:v", "libvpx-vp9", "-speed", "1");
       // tile-columns=6 by default but won't harm.
