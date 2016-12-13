@@ -14,7 +14,7 @@ if (BORAM_WIN_BUILD) {
     /\.dll$|[\/\\]ffmpeg\.exe$/);
 }
 
-if (BORAM_WIN_BUILD) {
+if (BORAM_WIN_BUILD && !process.env.FONTCONFIG_FILE) {
   process.env.FONTCONFIG_FILE = WIN_FONTCONFIG_PATH;
 }
 
