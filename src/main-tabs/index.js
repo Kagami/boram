@@ -7,10 +7,11 @@ import {basename} from "path";
 import {remote} from "electron";
 import React from "react";
 import cx from "classnames";
+import {ICON_BIG_PATH} from "../shared";
 import {useSheet} from "../jss";
 import ShowHide from "../show-hide";
 import {Tabs, Tab, Icon} from "../theme";
-import {ICON_BIG_PATH, showProgress} from "../util";
+import {showProgress} from "../util";
 import Instance from "./instance";
 
 const DEFAULT_LABEL = "untitled";
