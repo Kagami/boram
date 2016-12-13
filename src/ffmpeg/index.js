@@ -5,6 +5,7 @@
 
 import assert from "assert";
 import os from "os";
+import {WIN_FONTCONFIG_PATH} from "../shared";
 import {makeRunner, escapeArg, fixOpt, clearOpt} from "../util";
 if (BORAM_WIN_BUILD) {
   require.context(
@@ -12,6 +13,8 @@ if (BORAM_WIN_BUILD) {
     false,
     /\.dll$|[\/\\]ffmpeg\.exe$/);
 }
+
+process.env.FONTCONFIG_FILE = WIN_FONTCONFIG_PATH;
 
 export default makeRunner("ffmpeg", {
   setTitle({inpath, outpath, title}) {
