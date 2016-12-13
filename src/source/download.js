@@ -81,18 +81,17 @@ export default class extends React.PureComponent {
       this.props.onProgress(progress);
     }).then(this.cleanYT, this.cleanYT);
   };
-  abort = () => {
-    // ytdl should have a chance to remote its temporary files, so we
-    // don't SIGKILL it.
-    try { this.ytdl.kill("SIGTERM"); } catch (e) { /* skip */ }
-    try { this.ff.kill("SIGKILL"); } catch (e) { /* skip */ }
-  };
   cleanYT = () => {
     try { fs.unlinkSync(this.tmpYTName); } catch (e) { /* skip */ }
   };
+  abort = () => {
+    try { this.ytdl.kill("SIGTERM"); } catch (e) { /* skip */ }
+    try { this.ff.kill("SIGKILL"); } catch (e) { /* skip */ }
+    // TODO(Kagami): Clean all tmp ytdl files (subs, subformats, etc).
+    this.cleanYT();
+  };
   handleCancel = () => {
     this.abort();
-    this.cleanYT();
     try { this.tmpFF.removeCallback(); } catch (e) { /* skip */ }
     this.props.onCancel();
   };
