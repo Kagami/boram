@@ -35,11 +35,9 @@ export default class extends React.PureComponent {
   state = {progress: 0, status: "", error: null}
   componentDidMount() {
     this.props.events.addListener("abort", this.abort);
-    const {afid, ext} = this.props.format;
-    const postfix = afid ? ".mkv" : `.${ext}`;
     // ytdl complains if its destination file exists, so we can't use
     // `fileSync` helper.
-    this.tmpYTName = tmp.tmpNameSync({prefix: "boram-", postfix});
+    this.tmpYTName = tmp.tmpNameSync({prefix: "boram-", postfix: ".mkv"});
     this.tmpFF = tmp.fileSync({prefix: "boram-", postfix: ".mkv"});
     this.handleDownload();
   }

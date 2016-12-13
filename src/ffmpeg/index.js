@@ -20,7 +20,6 @@ export default makeRunner("ffmpeg", {
       "-i", inpath,
       "-map", "0",
       "-c", "copy",
-      "-c:s", "ass",
       "-metadata", `title=${title}`,
       "-f", "matroska", "--", outpath,
     ]);

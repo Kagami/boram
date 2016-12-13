@@ -23,9 +23,10 @@ export default makeRunner("youtube-dl", {
   download({url, format, outpath}, onUpdate) {
     const args = [
       "--no-playlist",
+      "--merge-output-format", "mkv",
       "--write-sub", "--embed-subs",
       "--sub-lang", "en,en_US",
-      "--merge-output-format", "mkv",
+      "--postprocessor-args", "-c:s ass -f matroska",
       "--no-part",
       "-f", format,
       "-o", outpath,
