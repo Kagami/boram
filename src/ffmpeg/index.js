@@ -14,7 +14,9 @@ if (BORAM_WIN_BUILD) {
     /\.dll$|[\/\\]ffmpeg\.exe$/);
 }
 
-process.env.FONTCONFIG_FILE = WIN_FONTCONFIG_PATH;
+if (BORAM_WIN_BUILD) {
+  process.env.FONTCONFIG_FILE = WIN_FONTCONFIG_PATH;
+}
 
 export default makeRunner("ffmpeg", {
   setTitle({inpath, outpath, title}) {
