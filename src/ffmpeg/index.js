@@ -19,8 +19,8 @@ export default makeRunner("ffmpeg", {
       "-v", "error", "-nostdin", "-y",
       "-i", inpath,
       "-map", "0",
-      "-c:v", "copy",
-      "-c:a", "copy",
+      "-c", "copy",
+      "-c:s", "ass",
       "-metadata", `title=${title}`,
       "-f", "matroska", "--", outpath,
     ]);
