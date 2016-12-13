@@ -72,8 +72,11 @@ export default class extends React.PureComponent {
       throw new Error("Unknown codec_type");
     }
   }
-  handlePathClick = () => {
+  handleOpen = () => {
     shell.openItem(this.props.source.path);
+  };
+  handleOpenFolder = () => {
+    shell.showItemInFolder(this.props.source.path);
   };
   render() {
     const {classes} = this.sheet;
@@ -83,9 +86,10 @@ export default class extends React.PureComponent {
         <div className={classes.general}>
           <Prop name="path">
             <span
-              title={source.path}
               style={{cursor: "pointer"}}
-              onClick={this.handlePathClick}
+              title="Click to open, right-click to open directory"
+              onClick={this.handleOpen}
+              onContextMenu={this.handleOpenFolder}
             >
               {source.path}
             </span>
