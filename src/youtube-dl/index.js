@@ -24,6 +24,7 @@ export default makeRunner("youtube-dl", {
     const args = [
       "--no-playlist",
       "--write-sub", "--embed-subs",
+      "--sub-lang", "en,en_US",
       "--merge-output-format", "mkv",
       "--no-part",
       "-f", format,
