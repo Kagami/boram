@@ -10,9 +10,7 @@ import {spawn} from "child_process";
 import which from "which";
 import {parse as _parseArgs} from "shell-quote";
 import {remote} from "electron";
-
-export const APP_PATH = remote.app.getAppPath();
-export const ICON_BIG_PATH = path.join(APP_PATH, "icon-big.png");
+import {APP_PATH} from "../shared";
 
 // Renderer process doesn't receive process exit events so need to setup
 // cleanup inside main process.

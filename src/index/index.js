@@ -4,16 +4,14 @@
  */
 
 import url from "url";
-import path from "path";
 import {BrowserWindow, app, dialog} from "electron";
 import {name, version} from "json!../../package.json";
+import {ICON_BIG_PATH, PAGE_PATH} from "../shared";
 import {getPluginPath} from "./plugin";
 import "file!./package.json";
 import "file!./index.html";
 import "file!./icon.png";
 import "file!./icon-big.png";
-
-const APP_PATH = app.getAppPath();
 
 // Used by renderer process.
 global.tmp = require("tmp");
@@ -63,14 +61,14 @@ app.on("ready", () => {
     // issue?
     useContentSize: BORAM_WIN_BUILD,
     title: `${name} v${version} by t-ara.industries`,
-    icon: path.join(APP_PATH, "icon-big.png"),
+    icon: ICON_BIG_PATH,
     webPreferences: {
       plugins: true,
     },
   });
   win.setMenu(null);
   win.loadURL(url.format({
-    pathname: path.join(APP_PATH, "index.html"),
+    pathname: PAGE_PATH,
     protocol: "file:",
     slashes: true,
   }));

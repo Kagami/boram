@@ -4,7 +4,7 @@
  */
 
 import path from "path";
-import {app} from "electron";
+import {APP_PATH} from "../shared";
 
 function containsNonASCII(str) {
   for (let i = 0; i < str.length; i++) {
@@ -16,9 +16,8 @@ function containsNonASCII(str) {
 }
 
 export function getPluginPath() {
-  const appPath = app.getAppPath();
   const pluginName = BORAM_WIN_BUILD ? "boram.dll" : "libboram.so";
-  const fullPluginPath = path.join(appPath, pluginName);
+  const fullPluginPath = path.join(APP_PATH, pluginName);
   let pluginPath = path.relative(process.cwd(), fullPluginPath);
   // "plugin.so" doesn't work, "./plugin.so" is required.
   pluginPath = `.${path.sep}${pluginPath}`;

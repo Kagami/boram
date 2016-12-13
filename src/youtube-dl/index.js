@@ -4,7 +4,8 @@
  */
 
 import path from "path";
-import {APP_PATH, makeRunner, getRunPath} from "../util";
+import {APP_PATH} from "../shared";
+import {makeRunner, getRunPath} from "../util";
 require("file!../../bin/youtube-dl." + (BORAM_WIN_BUILD ? "exe" : "zip"));
 
 export default makeRunner("youtube-dl", {
