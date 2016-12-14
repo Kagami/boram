@@ -183,8 +183,11 @@ export const SmallSelect = (function() {
       verticalAlign: "middle",
       overflow: "hidden",
     },
-    item: {
+    menu: {
       color: SECONDARY_COLOR,
+    },
+    label: {
+      paddingRight: 24,
     },
   };
   return function(props) {
@@ -196,7 +199,12 @@ export const SmallSelect = (function() {
       style,
     );
     return (
-      <SelectField {...other} style={mainStyle} menuStyle={styles.item}>
+      <SelectField
+        {...other}
+        style={mainStyle}
+        menuStyle={styles.menu}
+        labelStyle={styles.label}
+      >
         {props.children}
       </SelectField>
     );
