@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <string>
-#include <vector>
 #include <unordered_map>
 #define GL_GLEXT_PROTOTYPES
 #include <GLES2/gl2.h>
@@ -196,17 +195,25 @@ class MPVInstance : public pp::Instance {
       std::string key = data.AsString();
       const char* cmd[] = {"keypress", key.c_str(), NULL};
       mpv_command(mpv_, cmd);
-    } else if (type == "load-ext-sub") {
-      ClearExternalSubs();
-      std::string file = data.AsString();
-      const char* cmd[] = {"sub-add", file.c_str(), NULL};
-      mpv_command(mpv_, cmd);
-    } else if (type == "frame-step" || type == "frame-back-step") {
-      const char* cmd[] = {type.c_str(), NULL};
-      mpv_command(mpv_, cmd);
     } else if (type == "deinterlace") {
       int deinterlace = data.AsBool();
       mpv_set_property(mpv_, "deinterlace", MPV_FORMAT_FLAG, &deinterlace);
+    } else if (type == "sid") {
+      pp::VarDictionary data_dict(data);
+      int64_t id = data_dict.Get("id").AsInt();
+      Var path = data_dict.Get("path");
+      if (path.is_null()) {
+        mpv_set_property(mpv_, "sid", MPV_FORMAT_INT64, &id);
+      } else {
+        std::string str_id = std::to_string(id);
+        const char* cmd_add[] = {"sub-remove", str_id.c_str(), NULL};
+        mpv_command(mpv_, cmd_add);
+        const char* cmd_remove[] = {"sub-add", path.AsString().c_str(), NULL};
+        mpv_command(mpv_, cmd_remove);
+      }
+    } else if (type == "frame-step" || type == "frame-back-step") {
+      const char* cmd[] = {type.c_str(), NULL};
+      mpv_command(mpv_, cmd);
     }
   }
 
@@ -243,63 +250,13 @@ class MPVInstance : public pp::Instance {
     if (prop->format == MPV_FORMAT_FLAG) {
       bool value = *static_cast<int*>(prop->data);
       PostData(prop->name, Var(value));
+    } else if (prop->format == MPV_FORMAT_INT64) {
+      int32_t value = *static_cast<int64_t*>(prop->data);
+      PostData(prop->name, Var(value));
     } else if (prop->format == MPV_FORMAT_DOUBLE) {
       double value = *static_cast<double*>(prop->data);
       PostData(prop->name, Var(value));
     }
-  }
-
-  void ClearExternalSubs() {
-    mpv_node node;
-    if (mpv_get_property(mpv_, "track-list", MPV_FORMAT_NODE, &node) < 0)
-      return;
-    if (node.format != MPV_FORMAT_NODE_ARRAY)
-      return mpv_free_node_contents(&node);
-
-    mpv_node_list* tracks = node.u.list;
-    std::vector<int64_t> ext_sub_ids;
-    for (int i = 0; i < tracks->num; i++) {
-      int64_t id = GetExternalSubID(&tracks->values[i]);
-      if (id >= 0) {
-        ext_sub_ids.push_back(id);
-      }
-    }
-
-    for (int64_t id : ext_sub_ids) {
-      std::string str_id = std::to_string(id);
-      const char* cmd[] = {"sub-remove", str_id.c_str(), NULL};
-      mpv_command(mpv_, cmd);
-    }
-
-    mpv_free_node_contents(&node);
-  }
-
-  int64_t GetExternalSubID(mpv_node* track_node) {
-    if (track_node->format != MPV_FORMAT_NODE_MAP)
-      return -1;
-
-    mpv_node_list* track = track_node->u.list;
-    char* type = NULL;
-    int external = 0;
-    int64_t id = -1;
-
-    for (int i = 0; i < track->num; i++) {
-      char* key = track->keys[i];
-      mpv_node* value_node = &track->values[i];
-      mpv_format format = value_node->format;
-      if (strcmp(key, "type") == 0 && format == MPV_FORMAT_STRING) {
-        type = value_node->u.string;
-      } else if (strcmp(key, "external") == 0 && format == MPV_FORMAT_FLAG) {
-        external = value_node->u.flag;
-      } else if (strcmp(key, "id") == 0 && format == MPV_FORMAT_INT64) {
-        id = value_node->u.int64;
-      }
-    }
-
-    if (external && type && strcmp(type, "sub") == 0) {
-      return id;
-    }
-    return -1;
   }
 
   static void HandleMPVWakeup(void* ctx) {
@@ -364,6 +321,7 @@ class MPVInstance : public pp::Instance {
     const char* cmd[] = {"loadfile", src_, NULL};
     mpv_command(mpv_, cmd);
 
+    mpv_observe_property(mpv_, 0, "sid", MPV_FORMAT_INT64);
     mpv_observe_property(mpv_, 0, "pause", MPV_FORMAT_FLAG);
     mpv_observe_property(mpv_, 0, "time-pos", MPV_FORMAT_DOUBLE);
     mpv_observe_property(mpv_, 0, "mute", MPV_FORMAT_FLAG);

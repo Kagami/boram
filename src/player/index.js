@@ -48,30 +48,17 @@ export default class extends React.PureComponent {
       (!this.props.mend && this.state.time > this.duration - 0.001)
     );
   }
+  // Just pass further to mpv module.
+  bindMPV(action) {
+    return (...args) => {
+      return this.refs.mpv[action](...args);
+    };
+  }
+  setDeinterlace = this.bindMPV("setDeinterlace")
+  setSub = this.bindMPV("setSub")
   // "Stupid" play/pause actions.
-  play() {
-    this.refs.mpv.play();
-  }
-  pause() {
-    this.refs.mpv.pause();
-  }
-  seek(time) {
-    this.refs.mpv.seek(time);
-    // We improve UX by changing slider pos immediately.
-    this.setState({time});
-  }
-  loadExtSub(extSubPath) {
-    this.refs.mpv.loadExtSub(extSubPath);
-  }
-  setDeinterlace(deinterlace) {
-    this.refs.mpv.setDeinterlace(deinterlace);
-  }
-  // Displayed time info.
-  setTime(time) {
-    const prettyTime = showTime(time);
-    const validTime = true;
-    this.setState({prettyTime, validTime});
-  }
+  play = this.bindMPV("play")
+  pause = this.bindMPV("pause")
   // "Smart" play/pause action.
   togglePlay = () => {
     const {time} = this.state;
@@ -89,6 +76,17 @@ export default class extends React.PureComponent {
     }
     this[action]();
   };
+  seek(time) {
+    this.refs.mpv.seek(time);
+    // We improve UX by changing slider pos immediately.
+    this.setState({time});
+  }
+  // Displayed time info.
+  setTime(time) {
+    const prettyTime = showTime(time);
+    const validTime = true;
+    this.setState({prettyTime, validTime});
+  }
   toggleLoopCut = () => {
     this.setState({loopCut: !this.state.loopCut});
   };
@@ -206,6 +204,7 @@ export default class extends React.PureComponent {
           onVolume={this.handleVolume}
           onEOF={this.handleEOF}
           onDeinterlace={this.props.onDeinterlace}
+          onSubTrack={this.props.onSubTrack}
         />
         <Controls>
           <Control

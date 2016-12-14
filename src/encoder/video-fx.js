@@ -16,7 +16,9 @@ import {
   SmallButton, Icon,
 } from "../theme";
 
-const COMMON_SUB_EXTENSIONS = ["ass", "srt", "webvtt", "vtt"];
+const COMMON_SUB_EXTENSIONS = [
+  "ass", "ssa", "srt", "webvtt", "vtt", "sub",
+];
 
 const HELP = {
   cropw: [
@@ -91,6 +93,7 @@ export default class extends React.PureComponent {
     const selected = remote.dialog.showOpenDialog({
       filters: [
         {name: "Subtitles", extensions: COMMON_SUB_EXTENSIONS},
+        {name: "All files", extensions: ["*"]},
       ],
     });
     if (!selected) return;
@@ -230,7 +233,7 @@ export default class extends React.PureComponent {
           {this.props.extSubPath ?
             /* ShowHide doesn't work inside SelectField. */
             <MenuItem
-              value={-1}
+              value={this.props.stracks.length}
               primaryText={basename(this.props.extSubPath)}
             />
           : null}

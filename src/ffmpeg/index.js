@@ -208,10 +208,9 @@ export default makeRunner("ffmpeg", {
       if (opts._start) {
         vfilters.push(`setpts=PTS+${opts._start}/TB`);
       }
-      const useExtSub = opts.strackn < 0;
-      const subpath = useExtSub ? opts.extSubPath : opts.inpath;
+      const subpath = opts.extSubPath || opts.inpath;
       subtitles.push(this._escapeFilterArg(subpath));
-      if (!useExtSub) {
+      if (!opts.extSubPath) {
         subtitles.push(`si=${opts.strackn}`);
       }
       vfilters.push(`subtitles=${subtitles.join(":")}`);

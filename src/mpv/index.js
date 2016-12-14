@@ -40,17 +40,19 @@ export default class extends React.PureComponent {
   setVolume({volume, mute}) {
     this.postData("volume", {volume, mute});
   }
-  loadExtSub(extSubPath) {
-    this.postData("load-ext-sub", extSubPath);
+  setDeinterlace(deinterlace) {
+    this.postData("deinterlace", deinterlace);
+  }
+  setSub({strackn, extSubPath}) {
+    const id = strackn + 1;
+    const path = extSubPath || null;
+    this.postData("sid", {id, path});
   }
   frameStep() {
     this.postData("frame-step", null);
   }
   frameBackStep() {
     this.postData("frame-back-step", null);
-  }
-  setDeinterlace(deinterlace) {
-    this.postData("deinterlace", deinterlace);
   }
   sendKey = ({key, shiftKey, ctrlKey}) => {
     // Don't need modifier events.
@@ -113,6 +115,12 @@ export default class extends React.PureComponent {
       break;
     case "deinterlace":
       this.props.onDeinterlace(data);
+      break;
+    case "sid":
+      // mpv actually doesn't send sid=0 ever, check just in case.
+      if (data > 0) {
+        this.props.onSubTrack(data - 1);
+      }
       break;
     }
   }

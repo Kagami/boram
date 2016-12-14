@@ -182,11 +182,15 @@ export default class extends React.PureComponent {
     // Not a user interaction.
     this.setState({deinterlace}, this.handleAll);
   };
+  handleMPVSubTrack = (strackn) => {
+    this.setState({strackn}, this.handleAll);
+  };
   handleSubLoad = (extSubPath) => {
-    const upd = {extSubPath, burnSubs: true, strackn: -1};
+    const strackn = this.getSubTracks().length;
+    const upd = {strackn, extSubPath, burnSubs: true};
     this.setState(upd);
     this.handleAll(upd);
-    this.refs.player.loadExtSub(extSubPath);
+    this.refs.player.setSub({strackn, extSubPath});
   };
   handleAll = (upd, what = {}) => {
     const nextState = Object.assign({}, this.state, upd);
@@ -257,7 +261,7 @@ export default class extends React.PureComponent {
     let fps = ""; //getText("videoFX", "fps");
     const burnSubs = get("burnSubs");
     const strackn = get("strackn");
-    const extSubPath = get("extSubPath");
+    let extSubPath = get("extSubPath");
     // afx.
     const hasAudio = get("hasAudio");
     const atrackn = get("atrackn");
@@ -282,6 +286,7 @@ export default class extends React.PureComponent {
     const mstart = get("mstart");
     const mend = get("mend");
     const induration = this.getFullDuration();
+    const useExtSub = strackn === this.getSubTracks().length;
     // Will contain exact values.
     let _start = null;
     let _duration = null;
@@ -321,6 +326,7 @@ export default class extends React.PureComponent {
       v = requireInt(v);
       return requireRange(v, 1);
     });
+    extSubPath = useExtSub ? extSubPath : null;
     speed = validate("videoFX", "speed", speed, v => {
       if (!v) return null;
       v = requireFloat(v);
@@ -416,6 +422,9 @@ export default class extends React.PureComponent {
     });
     if (what.checked === "deinterlace") {
       this.refs.player.setDeinterlace(deinterlace);
+    }
+    if (what.selected === "strackn") {
+      this.refs.player.setSub({strackn});
     }
     // This assumes we were called from `onBlur` handler.
     // This clears warnings if errors are present.
@@ -526,6 +535,7 @@ export default class extends React.PureComponent {
           onMarkStart={this.handleMarkStart}
           onMarkEnd={this.handleMarkEnd}
           onDeinterlace={this.handleMPVDeinterlace}
+          onSubTrack={this.handleMPVSubTrack}
         />
         <Tabs
           value={this.state.tabIndex}
