@@ -251,8 +251,8 @@ class MPVInstance : public pp::Instance {
       bool value = *static_cast<int*>(prop->data);
       PostData(prop->name, Var(value));
     } else if (prop->format == MPV_FORMAT_INT64) {
-      int32_t value = *static_cast<int64_t*>(prop->data);
-      PostData(prop->name, Var(value));
+      int64_t value = *static_cast<int64_t*>(prop->data);
+      PostData(prop->name, Var(static_cast<int32_t>(value)));
     } else if (prop->format == MPV_FORMAT_DOUBLE) {
       double value = *static_cast<double*>(prop->data);
       PostData(prop->name, Var(value));
