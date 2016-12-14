@@ -19,14 +19,33 @@ if (BORAM_WIN_BUILD && !process.env.FONTCONFIG_FILE) {
 }
 
 export default makeRunner("ffmpeg", {
+  /**
+   * Escape FFmpeg filename argument.
+   * In particular paths like ":" and "-" are processed differently.
+   * Note that you should not use this function if you really need
+   * stdin/non-file protocol.
+   */
+  _escapeFilename(fpath) {
+    return `file:${fpath}`;
+  },
+  /**
+   * Escape FFmpeg filter argument
+   * See ffmpeg-filters(1), "Notes on filtergraph escaping".
+   */
+  _escapeFilterArg(arg) {
+    arg = arg.replace(/\\/g, "\\\\");      // \ -> \\
+    arg = arg.replace(/'/g, "'\\\\\\''");  // ' -> '\\\''
+    arg = arg.replace(/:/g, "\\:");        // : -> \:
+    return `'${arg}'`;
+  },
   setTitle({inpath, outpath, title}) {
     return this._run([
       "-v", "error", "-nostdin", "-y",
-      "-i", inpath,
+      "-i", this._escapeFilename(inpath),
       "-map", "0",
       "-c", "copy",
       "-metadata", `title=${title}`,
-      "-f", "matroska", "--", outpath,
+      "-f", "matroska", this._escapeFilename(outpath),
     ]);
   },
   hasInterlace({inpath, vtrackn, start}) {
@@ -34,7 +53,7 @@ export default makeRunner("ffmpeg", {
     start = (start + 5).toString();
     return this._run([
       "-v", "error", "-nostdin", "-y",
-      "-ss", start, "-i", inpath,
+      "-ss", start, "-i", this._escapeFilename(inpath),
       "-map", `0:v:${vtrackn}`,
       "-vf", "idet,metadata=print:lavfi.idet.multiple.tff:file=-",
       "-frames:v", "10", "-f", "null", "-",
@@ -55,7 +74,7 @@ export default makeRunner("ffmpeg", {
     start = (start + 5).toString();
     return this._run([
       "-v", "error", "-nostdin", "-y",
-      "-ss", start, "-i", inpath,
+      "-ss", start, "-i", this._escapeFilename(inpath),
       "-map", `0:v:${vtrackn}`,
       "-vf", "cropdetect=round=2,metadata=print:file=-",
       "-frames:v", "2", "-f", "null", "-",
@@ -102,19 +121,6 @@ export default makeRunner("ffmpeg", {
     const vb = Math.floor(limitKbits / _duration - ab);
     return Math.max(1, vb);
   },
-  /**
-   * Escape FFmpeg filter argument (see ffmpeg-filters(1), "Notes on
-   * filtergraph escaping").
-   *
-   * Known issues: names like :.ass, 1:.ass still don't work. Seems like
-   * a bug in FFmpeg because _:.ass works ok.
-   */
-  _escapeFilterArg(arg) {
-    arg = arg.replace(/\\/g, "\\\\");      // \ -> \\
-    arg = arg.replace(/'/g, "'\\\\\\''");  // ' -> '\\\''
-    arg = arg.replace(/:/g, "\\:");        // : -> \:
-    return `'${arg}'`;
-  },
   getRawArgs(opts) {
     const args = [];
     const scale = [];
@@ -131,7 +137,7 @@ export default makeRunner("ffmpeg", {
 
     // Input.
     maybeSet("-ss", opts.start);
-    args.push("-i", escapeArg(opts.inpath));
+    args.push("-i", escapeArg(this._escapeFilename(opts.inpath)));
     if (opts.end != null) {
       // We always use `-t` in resulting command because `-ss` before
       // `-i` resets timestamps, see:
@@ -209,7 +215,7 @@ export default makeRunner("ffmpeg", {
         vfilters.push(`setpts=PTS+${opts._start}/TB`);
       }
       const subpath = opts.extSubPath || opts.inpath;
-      subtitles.push(this._escapeFilterArg(subpath));
+      subtitles.push(this._escapeFilterArg(this._escapeFilename(subpath)));
       if (!opts.extSubPath) {
         subtitles.push(`si=${opts.strackn}`);
       }
@@ -280,7 +286,7 @@ export default makeRunner("ffmpeg", {
       "-g",
     ]);
     args.push("-preset", "ultrafast");
-    args.push("-f", "matroska", "--", outpath);
+    args.push("-f", "matroska", this._escapeFilename(outpath));
     return args;
   },
   getEncodeArgs({baseArgs, passn, passlog, outpath}) {
@@ -288,16 +294,21 @@ export default makeRunner("ffmpeg", {
     if (passn === 1) {
       // <http://wiki.webmproject.org/ffmpeg/vp9-encoding-guide>.
       fixOpt(args, "-speed", "4");
-      // Should be without suffix.
+      // Path passed to ffmpeg should be without suffix.
+      // We always have single output stream so caller should reserve
+      // only path with suffix "-0.log".
       passlog = passlog.slice(0, -6);
+      // Passlog shouldn't be escaped as filename:
+      // "-passlogfile file:test" will create "file:test-0.log".
+      // Seems to be ffmpeg's inconsistency.
       args.push("-an", "-pass", "1", "-passlogfile", passlog);
       args.push("-f", "null", "-");
     } else if (passn === 2) {
       passlog = passlog.slice(0, -6);
       args.push("-pass", "2", "-passlogfile", passlog);
-      args.push("-f", "webm", "--", outpath);
+      args.push("-f", "webm", this._escapeFilename(outpath));
     } else if (passn === 0) {
-      args.push("-f", "webm", "--", outpath);
+      args.push("-f", "webm", this._escapeFilename(outpath));
     } else {
       assert(false);
     }

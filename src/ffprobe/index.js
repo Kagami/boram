@@ -17,7 +17,7 @@ export default makeRunner("ffprobe", {
       "-v", "error",
       "-of", "json",
       "-show_format", "-show_streams",
-      "-i", inpath,
+      "-i", `file:${inpath}`,
     ]).then(JSON.parse);
   },
 });
