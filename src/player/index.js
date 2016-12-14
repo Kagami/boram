@@ -63,6 +63,9 @@ export default class extends React.PureComponent {
   loadExtSub(extSubPath) {
     this.refs.mpv.loadExtSub(extSubPath);
   }
+  setDeinterlace(deinterlace) {
+    this.refs.mpv.setDeinterlace(deinterlace);
+  }
   // Displayed time info.
   setTime(time) {
     const prettyTime = showTime(time);
@@ -202,6 +205,7 @@ export default class extends React.PureComponent {
           onTime={this.handleTime}
           onVolume={this.handleVolume}
           onEOF={this.handleEOF}
+          onDeinterlace={this.props.onDeinterlace}
         />
         <Controls>
           <Control

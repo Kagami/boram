@@ -49,6 +49,9 @@ export default class extends React.PureComponent {
   frameBackStep() {
     this.postData("frame-back-step", null);
   }
+  setDeinterlace(deinterlace) {
+    this.postData("deinterlace", deinterlace);
+  }
   sendKey = ({key, shiftKey, ctrlKey}) => {
     // Don't need modifier events.
     if ([
@@ -78,32 +81,38 @@ export default class extends React.PureComponent {
   }
   postData(type, data) {
     const msg = {type, data};
-    // console.log("@@@ SEND", JSON.stringify(msg));
+    // if (type !== "wakeup")
+    //   console.log("@@@ SEND", JSON.stringify(msg));
     this.refs.plugin.postMessage(msg);
   }
   handleMessage = (e) => {
     const msg = e.data;
-    // console.log("@@@ RECV", JSON.stringify(msg));
-    switch (msg.type) {
+    const {type, data} = msg;
+    // if (type !== "wakemeup")
+    //   console.log("@@@ RECV", JSON.stringify(msg));
+    switch (type) {
     case "wakemeup":
       this.postData("wakeup", null);
       break;
     case "pause":
-      this.props.onPlayPause(msg.data);
+      this.props.onPlayPause(data);
       break;
     case "time-pos":
-      this.props.onTime(Math.max(0, msg.data));
+      this.props.onTime(Math.max(0, data));
       break;
     case "volume":
-      this.props.onVolume({volume: Math.floor(msg.data)});
+      this.props.onVolume({volume: Math.floor(data)});
       break;
     case "mute":
-      this.props.onVolume({mute: msg.data});
+      this.props.onVolume({mute: data});
       break;
     case "eof-reached":
-      if (msg.data) {
+      if (data) {
         this.props.onEOF();
       }
+      break;
+    case "deinterlace":
+      this.props.onDeinterlace(data);
       break;
     }
   }

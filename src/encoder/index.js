@@ -178,6 +178,10 @@ export default class extends React.PureComponent {
     this.setState(upd);
     this.handleAll(upd, {marked: "mend"});
   };
+  handleMPVDeinterlace = (deinterlace) => {
+    // Not a user interaction.
+    this.setState({deinterlace}, this.handleAll);
+  };
   handleSubLoad = (extSubPath) => {
     const upd = {extSubPath, burnSubs: true, strackn: -1};
     this.setState(upd);
@@ -410,6 +414,9 @@ export default class extends React.PureComponent {
         assert(false);
       }
     });
+    if (what.checked === "deinterlace") {
+      this.refs.player.setDeinterlace(deinterlace);
+    }
     // This assumes we were called from `onBlur` handler.
     // This clears warnings if errors are present.
     this.setState({allValid, warnings, errors, rawArgs, focused: null});
@@ -518,6 +525,7 @@ export default class extends React.PureComponent {
           mend={this.state.mend}
           onMarkStart={this.handleMarkStart}
           onMarkEnd={this.handleMarkEnd}
+          onDeinterlace={this.handleMPVDeinterlace}
         />
         <Tabs
           value={this.state.tabIndex}

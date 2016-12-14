@@ -204,6 +204,9 @@ class MPVInstance : public pp::Instance {
     } else if (type == "frame-step" || type == "frame-back-step") {
       const char* cmd[] = {type.c_str(), NULL};
       mpv_command(mpv_, cmd);
+    } else if (type == "deinterlace") {
+      int deinterlace = data.AsBool();
+      mpv_set_property(mpv_, "deinterlace", MPV_FORMAT_FLAG, &deinterlace);
     }
   }
 
@@ -366,6 +369,7 @@ class MPVInstance : public pp::Instance {
     mpv_observe_property(mpv_, 0, "mute", MPV_FORMAT_FLAG);
     mpv_observe_property(mpv_, 0, "volume", MPV_FORMAT_DOUBLE);
     mpv_observe_property(mpv_, 0, "eof-reached", MPV_FORMAT_FLAG);
+    mpv_observe_property(mpv_, 0, "deinterlace", MPV_FORMAT_FLAG);
     mpv_set_wakeup_callback(mpv_, HandleMPVWakeup, this);
 
     return true;
