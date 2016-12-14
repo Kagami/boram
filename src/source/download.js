@@ -4,7 +4,6 @@
  */
 
 import fs from "fs";
-import path from "path";
 import React from "react";
 import cx from "classnames";
 import YouTubeDL from "../youtube-dl";
@@ -70,8 +69,7 @@ export default class extends React.PureComponent {
       return this.ff;
     }).then(() => {
       // We hope ytdl already made all correct escapings.
-      const saveAs = `${path.parse(info._filename).name}.webm`;
-      const source = {saveAs, path: this.tmpFF.name};
+      const source = {path: this.tmpFF.name, saveAs: info._filename};
       this.props.onLoad(source);
     }, (error) => {
       const progress = 0;

@@ -87,7 +87,7 @@ export default class extends React.PureComponent {
           <Prop name="path">
             <span
               style={{cursor: "pointer"}}
-              title="Click to open, right-click to open directory"
+              title="Click to play, right-click to open directory"
               onClick={this.handleOpen}
               onContextMenu={this.handleOpenFolder}
             >

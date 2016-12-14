@@ -4,7 +4,6 @@
  */
 
 import assert from "assert";
-import fs from "fs";
 import path from "path";
 import {spawn} from "child_process";
 import which from "which";
@@ -260,32 +259,3 @@ export function makeRunner(exe, obj) {
     },
   };
 }
-
-export const moveSync = (function() {
-  const BUF_LENGTH = 64 * 1024;
-  const buf = Buffer.alloc(BUF_LENGTH);
-  return function _moveSync(src, dst) {
-    try {
-      fs.renameSync(src, dst);
-    } catch (e) {
-      if (e.code === "EXDEV") {
-        const fdr = fs.openSync(src, "r");
-        const fdw = fs.openSync(dst, "w");
-        let bytesRead = 0;
-        let pos = 0;
-
-        do {
-          bytesRead = fs.readSync(fdr, buf, 0, BUF_LENGTH, pos);
-          fs.writeSync(fdw, buf, 0, bytesRead);
-          pos += bytesRead;
-        } while (bytesRead);
-
-        fs.closeSync(fdr);
-        fs.closeSync(fdw);
-        fs.unlinkSync(src);
-      } else {
-        throw e;
-      }
-    }
-  };
-})();

@@ -9,11 +9,10 @@ import {shell, remote} from "electron";
 import React from "react";
 import FFmpeg from "../ffmpeg";
 import {useSheet} from "../jss";
-import {Icon, BigProgress, BigButton, Pane, Sep} from "../theme";
+import {BigProgress, BigButton, Pane, Sep} from "../theme";
 import {
-  tmp, moveSync,
-  parseFrameRate, parseArgs,
-  getOpt, showErr, showTime, showSize, quoteArgs,
+  tmp, parseFrameRate, parseArgs,
+  getOpt, showTime, showSize, quoteArgs,
 } from "../util";
 
 @useSheet({
@@ -64,11 +63,10 @@ export default class extends React.PureComponent {
       overflow: "hidden",
     },
   }
-  state = {progress: 0, log: ""}
+  state = {progress: 0, log: "", output: null, target: this.getDefaultTarget()}
   componentDidMount() {
     this.props.events.addListener("abort", this.abort);
     this.tmpLogName = tmp.tmpNameSync({prefix: "boram-", postfix: "-0.log"});
-    this.tmpEncodeName = tmp.tmpNameSync({prefix: "boram-", postfix: ".webm"});
     this.tmpPreviewName = tmp.tmpNameSync({prefix: "boram-", postfix: ".mkv"});
   }
   componentWillUnmount() {
@@ -77,7 +75,6 @@ export default class extends React.PureComponent {
   }
   cleanup() {
     try { fs.unlinkSync(this.tmpLogName); } catch (e) { /* skip */ }
-    try { fs.unlinkSync(this.tmpEncodeName); } catch (e) { /* skip */ }
     try { fs.unlinkSync(this.tmpPreviewName); } catch (e) { /* skip */ }
   }
   abort = () => {
@@ -170,7 +167,7 @@ export default class extends React.PureComponent {
     const fps = parseFrameRate(this.props.vtrack.avg_frame_rate);
     const totalFrames = Math.ceil(this.props._duration * fps);
     const passlog = this.tmpLogName;
-    const outpath = preview ? this.tmpPreviewName : this.tmpEncodeName;
+    const outpath = preview ? this.tmpPreviewName : this.state.target;
     const output = {preview, path: outpath};
     const baseArgs = parseArgs(this.props.rawArgs);
     const frameParser = this.createFrameParser();
@@ -202,7 +199,7 @@ export default class extends React.PureComponent {
       this.props.onProgress(progress);
       this.props.onEncoding(encoding);
       if (preview) {
-        this.handlePlay();
+        this.handleOpen();
       } else {
         handleLog(this.showStats(startTime));
       }
@@ -242,6 +239,7 @@ export default class extends React.PureComponent {
     const runTime = this.now() - startTime;
     return [
       this.sep(),
+      `Output path: ${this.state.output.path}`,
       `Output duration: ${showTime(this.props._duration)}`,
       `Output video bitrate: ${getOpt(args, "-b:v", "0")}`,
       `Output audio bitrate: ${getOpt(args, "-b:a", "0")}`,
@@ -250,16 +248,36 @@ export default class extends React.PureComponent {
       "",
     ].join("\n");
   }
+  clearState() {
+    this.setState({progress: 0, log: "", output: null});
+  }
   isPreviewEncoding() {
     return this.props.encoding && this.state.preview;
   }
   isNormalEncoding() {
     return this.props.encoding && !this.state.preview;
   }
+  getDefaultTarget() {
+    const dir = remote.app.getPath("desktop");
+    const bareName = path
+      .parse(this.props.source.saveAs || this.props.source.path)
+      .name;
+
+    let index = 0;
+    let target = null;
+    do {
+      const suffix = `-${index}`;
+      const name = `${bareName}${index ? suffix : ""}.webm`;
+      target = path.join(dir, name);
+      index += 1;
+    } while (fs.existsSync(target));
+    return target;
+  }
   toggleEncode({preview}) {
     const encoding = !this.props.encoding;
     if (encoding) {
-      this.setState({preview, output: null});
+      this.clearState();
+      this.setState({preview});
       this.props.onEncoding(encoding);
       this.start({preview});
     } else {
@@ -272,34 +290,23 @@ export default class extends React.PureComponent {
   handleNormalToggle = () => {
     this.toggleEncode({preview: false});
   };
-  handlePlay = () => {
+  handleOpen = () => {
     shell.openItem(this.state.output.path);
   };
-  handleSave = () => {
-    let defaultPath = this.props.source.saveAs ||
-                      `${path.parse(this.props.source.path).name}.webm`;
-    const tmppath = this.state.output.path;
-    const outpath = remote.dialog.showSaveDialog({
-      defaultPath,
+  handleOpenFolder = () => {
+    // <button disabled> doesn't block contextmenu.
+    if (!this.state.output) return;
+    shell.showItemInFolder(this.state.output.path);
+  };
+  handleSelectTarget = () => {
+    const target = remote.dialog.showSaveDialog({
+      defaultPath: this.state.target,
       filters: [
         {name: "WebM", extensions: ["webm"]},
       ],
     });
-    if (!outpath) return;
-    const output = {path: outpath, moved: true};
-    try {
-      // rename(2) returns success on Linux for the same path so no need
-      // to bother with additional checkings. The worse thing is that
-      // user may overwrite current source but we can't prevent this on
-      // OS level.
-      moveSync(tmppath, outpath);
-      // Encoded file is moved.
-      this.setState({output});
-    } catch (err) {
-      const msg = `Failed to save (${showErr(err)})`;
-      const log = `${this.state.log}\n${msg}\n`;
-      this.setState({log});
-    }
+    if (!target) return;
+    this.setState({target});
   };
   render() {
     const {styles} = this.constructor;
@@ -307,6 +314,14 @@ export default class extends React.PureComponent {
       <Pane vertical space={5} style2={styles.output}>
         <Pane space={5}>
           <div>
+            <BigButton
+              width={85}
+              label="target"
+              title="Select target path"
+              disabled={this.props.encoding}
+              onClick={this.handleSelectTarget}
+            />
+            <Sep margin={2.5} />
             <BigButton
               width={85}
               label={this.isPreviewEncoding() ? "cancel" : "preview"}
@@ -324,19 +339,12 @@ export default class extends React.PureComponent {
             />
             <Sep margin={2.5} />
             <BigButton
-              icon={<Icon name="tv" />}
-              title="Play result"
+              width={85}
+              label="open"
+              title="Click to play, right-click to open directory"
               disabled={!this.state.output}
-              onClick={this.handlePlay}
-            />
-            <Sep margin={2.5} />
-            <BigButton
-              icon={<Icon name="save" />}
-              title="Save result"
-              disabled={!this.state.output ||
-                        this.state.output.preview ||
-                        this.state.output.moved}
-              onClick={this.handleSave}
+              onClick={this.handleOpen}
+              onContextMenu={this.handleOpenFolder}
             />
           </div>
           <BigProgress value={this.state.progress} />
@@ -344,7 +352,7 @@ export default class extends React.PureComponent {
         <Output
           value={this.state.log ||
                  (this.props.allValid
-                   ? "Ready to start."
+                   ? `Ready to start.\nSaving to ${this.state.target}`
                    : "Fix invalid settings.")}
         />
       </Pane>

@@ -498,6 +498,7 @@ export default class extends React.PureComponent {
   handleSelect = (tabIndex) => {
     if (this.state.encoding) return;
     this.setState({tabIndex});
+    this.refs.encode.clearState();
   };
   getTabNode(label, index, children) {
     const {classes} = this.sheet;
