@@ -24,7 +24,7 @@ const HELP = {
     "Limit/video bitrate",
     `In limit mode specifies the target file size in megabytes.
      Video bitrate in kbits otherwise.
-     Set to 8/1000 by default respectfully.`,
+     Set to 19/5000 by default respectfully.`,
   ], quality: [
     "Video quality",
     `Generally useful for CRF mode and short clips.

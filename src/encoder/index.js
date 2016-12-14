@@ -17,8 +17,8 @@ import Codecs from "./codecs";
 import Encode from "./encode";
 import {parseTime, showTime} from "../util";
 
-const DEFAULT_LIMIT = 8;
-const DEFAULT_BITRATE = 1000;
+const DEFAULT_LIMIT = 19;
+const DEFAULT_BITRATE = 5000;
 const DEFAULT_Q = 25;
 const DEFAULT_OPUS_BITRATE = 128;
 const DEFAULT_VORBIS_Q = 4;
