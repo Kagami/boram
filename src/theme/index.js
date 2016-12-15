@@ -346,6 +346,7 @@ export function Sep(props) {
   const margin = props.vertical ? `${props.margin || 5}px 0`
                                 : `0 ${props.margin || 5}px`;
   const style = {
+    ...props.style,
     display,
     margin,
     textAlign: "center",

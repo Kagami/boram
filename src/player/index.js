@@ -35,18 +35,22 @@ export default class extends React.PureComponent {
     return Math.abs(a - b) < 0.001;
   }
   isMarkStartDisabled() {
-    const mend = this.props.mend || this.duration;
     return (
-      this.isAlmostEqual(this.state.time, this.props.mstart) ||
-      this.state.time > mend - 0.001
+      this.isAlmostEqual(this.state.time, this.duration) ||
+      this.isAlmostEqual(this.state.time, this.props.mstart)
     );
   }
   isMarkEndDisabled() {
     return (
-      this.isAlmostEqual(this.state.time, this.props.mend) ||
-      this.state.time < this.props.mstart + 0.001 ||
-      (!this.props.mend && this.state.time > this.duration - 0.001)
+      this.isAlmostEqual(this.state.time, 0) ||
+      this.isAlmostEqual(this.state.time, this.props.mend)
     );
+  }
+  getSliderMarkEnd() {
+    return (!this.props.mstart &&
+            this.isAlmostEqual(this.props.mend, this.duration))
+      ? 0
+      : this.props.mend;
   }
   // Just pass further to mpv module.
   bindMPV(action) {
@@ -254,8 +258,8 @@ export default class extends React.PureComponent {
           <Seek
             value={this.state.time}
             max={this.duration}
-            mstart={Math.floor(this.props.mstart)}
-            mend={Math.floor(this.props.mend)}
+            mstart={this.props.mstart}
+            mend={this.getSliderMarkEnd()}
             onMouseDown={this.handleSeekMouseDown}
             onChange={this.handleSeekControl}
             onMouseUp={this.handleSeekMouseUp}

@@ -76,7 +76,7 @@ export default class extends React.PureComponent {
               onFocus={this.props.makeFocuser("start")}
               onBlur={this.props.onUpdate}
             />
-            <Sep>÷</Sep>
+            <Sep style={{position: "relative", top: 2}}>÷</Sep>
             <SmallInput
               ref="end"
               hintText="end"

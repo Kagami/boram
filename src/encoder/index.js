@@ -83,7 +83,7 @@ export default class extends React.PureComponent {
     warnings: {},
     errors: {},
     mstart: 0,
-    mend: 0,
+    mend: this.getFullDuration(),
     vtrackn: 0,
     deinterlace: false,
     burnSubs: false,
@@ -102,6 +102,9 @@ export default class extends React.PureComponent {
     this.handleAll();
   }
 
+  getFullDuration() {
+    return parseFloat(this.props.info.format.duration);
+  }
   getVideoTracks() {
     return this.props.info.streams.filter(t =>
       t.codec_type === "video" && !t.disposition.attached_pic
@@ -112,9 +115,6 @@ export default class extends React.PureComponent {
   }
   getSubTracks() {
     return this.props.info.streams.filter(t => t.codec_type === "subtitle");
-  }
-  getFullDuration() {
-    return parseFloat(this.props.info.format.duration);
   }
   getFinalWidth({vtrackn, scalew, scaleh, cropw}) {
     const {width, height} = this.getVideoTracks()[vtrackn];
@@ -189,21 +189,29 @@ export default class extends React.PureComponent {
     };
   };
   handleMarkStart = (mstart) => {
-    const upd = {mstart};
+    let {mend} = this.state;
+    if (mstart >= mend) {
+      mend = this.getFullDuration();
+    }
+    const upd = {mstart, mend};
     this.setState(upd);
-    this.handleAll(upd, {marked: "mstart"});
+    this.handleAll(upd, {marked: "both"});
   };
   handleMarkEnd = (mend) => {
-    const upd = {mend};
+    let {mstart} = this.state;
+    if (mstart >= mend) {
+      mstart = 0;
+    }
+    const upd = {mstart, mend};
     this.setState(upd);
-    this.handleAll(upd, {marked: "mend"});
+    this.handleAll(upd, {marked: "both"});
   };
   handleResetFragment = () => {
     const mstart = 0;
-    const mend = 0;
+    const mend = this.getFullDuration();
     const upd = {mstart, mend};
     this.setState(upd);
-    this.handleAll(upd, {marked: "reset"});
+    this.handleAll(upd, {marked: "both"});
   };
   handleMPVDeinterlace = (deinterlace) => {
     // Not a user interaction.
@@ -382,7 +390,7 @@ export default class extends React.PureComponent {
       v = requireInt(v);
       return requireRange(v, 1, 64);
     });
-    if (what.marked === "mstart" || what.marked === "reset") {
+    if (what.marked === "mstart" || what.marked === "both") {
       start = mstart ? showTime(mstart) : "";
       setText("codecs", "start", start);
     }
@@ -392,8 +400,8 @@ export default class extends React.PureComponent {
       v = parseTime(v);
       return requireRange(v, 0, induration - 0.001);
     });
-    if (what.marked === "mend" || what.marked === "reset") {
-      end = (!mend || mend > induration - 0.001) ? "" : showTime(mend);
+    if (what.marked === "mend" || what.marked === "both") {
+      end = mend > induration - 0.001 ? "" : showTime(mend);
       setText("codecs", "end", end);
     }
     end = end || null;
@@ -509,7 +517,7 @@ export default class extends React.PureComponent {
       warnings,
       rawArgs,
       mstart: _start,
-      mend: _duration < induration ? _start + _duration : 0,
+      mend: _start + _duration,
     });
   };
   handleRawArgs = (e) => {
