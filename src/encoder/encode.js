@@ -316,8 +316,8 @@ export default class extends React.PureComponent {
           <div>
             <BigButton
               width={85}
-              label="target"
-              title="Select target path"
+              label="path"
+              title="Select destination path"
               disabled={this.props.encoding}
               onClick={this.handleSelectTarget}
             />
