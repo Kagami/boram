@@ -25,7 +25,7 @@ import {
     overflowY: "scroll",
     fontSize: "14px",
     whiteSpace: "pre-wrap",
-    wordWrap: "break-word",
+    wordBreak: "break-all",
     color: "#333",
     backgroundColor: "#f8f8f8",
   },
