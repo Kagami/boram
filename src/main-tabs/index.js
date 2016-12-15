@@ -101,7 +101,7 @@ export default class extends React.Component {
     this.setState({tabs});
   }
   handleGlobalClose = (e) => {
-    if (!BORAM_WIN_BUILD && !this.closing) {
+    if (!BORAM_DEBUG && !this.closing) {
       e.returnValue = false;
       setTimeout(() => {
         const choice = remote.dialog.showMessageBox({
