@@ -198,6 +198,13 @@ export default class extends React.PureComponent {
     this.setState(upd);
     this.handleAll(upd, {marked: "mend"});
   };
+  handleResetFragment = () => {
+    const mstart = 0;
+    const mend = 0;
+    const upd = {mstart, mend};
+    this.setState(upd);
+    this.handleAll(upd, {marked: "reset"});
+  };
   handleMPVDeinterlace = (deinterlace) => {
     // Not a user interaction.
     this.setState({deinterlace}, this.handleAll);
@@ -375,7 +382,7 @@ export default class extends React.PureComponent {
       v = requireInt(v);
       return requireRange(v, 1, 64);
     });
-    if (what.marked === "mstart") {
+    if (what.marked === "mstart" || what.marked === "reset") {
       start = mstart ? showTime(mstart) : "";
       setText("codecs", "start", start);
     }
@@ -385,8 +392,8 @@ export default class extends React.PureComponent {
       v = parseTime(v);
       return requireRange(v, 0, induration - 0.001);
     });
-    if (what.marked === "mend") {
-      end = mend > induration - 0.001 ? "" : showTime(mend);
+    if (what.marked === "mend" || what.marked === "reset") {
+      end = (!mend || mend > induration - 0.001) ? "" : showTime(mend);
       setText("codecs", "end", end);
     }
     end = end || null;
@@ -476,6 +483,9 @@ export default class extends React.PureComponent {
       _start, _duration,
     };
     if (!modeCRF) {
+      if (this.isShortClip(opts)) {
+        warn("codecs", `Consider CRF mode for such short fragment`);
+      }
       if (this.isSmallBitrate(opts)) {
         warn("codecs", `Video bitrate seems too small,
                         consider fixing limit`);
@@ -490,9 +500,6 @@ export default class extends React.PureComponent {
                         ${SMALL_FHD_BITRATE}÷${BIG_FHD_BITRATE} (fhd),
                         ${SMALL_OTHER_BITRATE}÷${BIG_OTHER_BITRATE} (other);
                         current: ${vb} kbps`);
-      }
-      if (this.isShortClip(opts)) {
-        warn("codecs", `Consider CRF mode for such short fragment`);
       }
     }
     rawArgs = FFmpeg.getRawArgs(opts).join(" ");
@@ -631,6 +638,7 @@ export default class extends React.PureComponent {
               focused={this.state.focused}
               warnings={this.state.warnings.codecs}
               errors={this.state.errors.codecs}
+              _duration={this.state._duration}
               vcodec={this.state.vcodec}
               hasAudio={this.state.hasAudio}
               acodec={this.state.acodec}
@@ -639,6 +647,7 @@ export default class extends React.PureComponent {
               modeCRF={this.state.modeCRF}
               onUpdate={this.handleAll}
               onRawArgs={this.handleRawArgs}
+              onResetFragment={this.handleResetFragment}
             />
           )}
           {this.getTabNode("encode", 5,

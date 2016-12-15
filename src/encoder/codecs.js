@@ -5,6 +5,7 @@
 
 import React from "react";
 import {useSheet} from "../jss";
+import ShowHide from "../show-hide";
 import {
   HelpPane,
   Prop, SmallInput,
@@ -12,6 +13,7 @@ import {
   InlineCheckbox, Sep,
   ArgsInput,
 } from "../theme";
+import {showTime} from "../util";
 
 const HELP = {
   start: [
@@ -42,6 +44,11 @@ const HELP = {
     display: "flex",
     height: "100%",
     flexDirection: "column",
+  },
+  duration: {
+    fontSize: "16px",
+    cursor: "pointer",
+    WebkitUserSelect: "none",
   },
   valueCheck: {
     lineHeight: "48px",
@@ -77,6 +84,16 @@ export default class extends React.PureComponent {
               onFocus={this.props.makeFocuser("end")}
               onBlur={this.props.onUpdate}
             />
+            <Sep/>
+            <ShowHide show={!this.props.errors || !this.props.errors.length}>
+              <span
+                className={classes.duration}
+                title="Resulting duration, click to reset"
+                onClick={this.props.onResetFragment}
+              >
+                ({showTime(this.props._duration)})
+              </span>
+            </ShowHide>
           </Prop>
           <Prop name="video codec">
             <SmallSelect
