@@ -90,6 +90,14 @@ export function showProgress(progress) {
   return `${space}${progress.toFixed(1)}%`;
 }
 
+export function showLang(track) {
+  if (track.tags && track.tags.language && track.tags.language !== "und") {
+    return track.tags.language;
+  } else {
+    return null;
+  }
+}
+
 /**
  * Escape shell argument.
  */

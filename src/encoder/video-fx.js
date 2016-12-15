@@ -15,6 +15,7 @@ import {
   InlineCheckbox, Sep,
   SmallButton, Icon,
 } from "../theme";
+import {showLang} from "../util";
 
 const COMMON_SUB_EXTENSIONS = [
   "ass", "ssa", "srt", "webvtt", "vtt", "sub",
@@ -56,6 +57,10 @@ const HELP = {
   },
 })
 export default class extends React.PureComponent {
+  getSubText(track, i) {
+    const lang = showLang(track);
+    return `#${i} (${track.codec_name}${lang ? ", " + lang : ""})`;
+  }
   handleInterlaceDetect = () => {
     const inpath = this.props.source.path;
     const {vtrackn} = this.props;
@@ -227,7 +232,7 @@ export default class extends React.PureComponent {
             <MenuItem
               key={i}
               value={i}
-              primaryText={`#${i} (${t.codec_name})`}
+              primaryText={this.getSubText(t, i)}
             />
           )}
           {this.props.extSubPath ?

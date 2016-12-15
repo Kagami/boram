@@ -8,7 +8,7 @@ import React from "react";
 import {useSheet} from "../jss";
 import {CompactProp as Prop} from "../theme";
 import {
-  showTime, showBitrate, showSize,
+  showTime, showBitrate, showSize, showLang,
   parseFrameRate, showFrameRate,
 } from "../util";
 
@@ -35,6 +35,10 @@ import {
   },
 })
 export default class extends React.PureComponent {
+  getLangNode(track) {
+    const lang = showLang(track);
+    return lang ? <Prop name="language">{lang}</Prop> : null;
+  }
   getTrackNode(track, i) {
     const {classes} = this.sheet;
     switch (track.codec_type) {
@@ -58,6 +62,7 @@ export default class extends React.PureComponent {
           <Prop name="codec">{track.codec_name}</Prop>
           <Prop name="stream index">{track.index}</Prop>
           <Prop name="channels">{track.channels} ({track.channel_layout})</Prop>
+          {this.getLangNode(track)}
         </div>
       );
     case "subtitle":
@@ -66,6 +71,7 @@ export default class extends React.PureComponent {
           <div className={classes.header}>Subtitle #{i}</div>
           <Prop name="codec">{track.codec_name}</Prop>
           <Prop name="stream index">{track.index}</Prop>
+          {this.getLangNode(track)}
         </div>
       );
     default:

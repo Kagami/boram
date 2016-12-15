@@ -10,6 +10,7 @@ import {
   SmallSelect, MenuItem,
   InlineCheckbox, Sep,
 } from "../theme";
+import {showLang} from "../util";
 
 const HELP = {
   fadeIn: [
@@ -26,6 +27,10 @@ const HELP = {
 };
 
 export default class extends React.PureComponent {
+  getAudioText(track, i) {
+    const lang = showLang(track);
+    return `#${i} (${track.codec_name}${lang ? ", " + lang : ""})`;
+  }
   render() {
     return (
       <HelpPane
@@ -49,7 +54,7 @@ export default class extends React.PureComponent {
             <MenuItem
               key={i}
               value={i}
-              primaryText={`#${i} (${t.codec_name})`}
+              primaryText={this.getAudioText(t, i)}
             />
           )}
           </SmallSelect>
