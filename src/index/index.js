@@ -25,12 +25,17 @@ if (process.env.BORAM_NO_HWACCEL) {
   app.disableHardwareAcceleration();
 }
 
-if (BORAM_WIN_BUILD && BORAM_X64_BUILD && process.arch !== "x64") {
-  dialog.showErrorBox(
-    "Wrond build",
-    "You're trying to run x64 build on x86 system."
-  );
-  app.exit(1);
+if (BORAM_WIN_BUILD) {
+  const wrongBuildMsg = (BORAM_X64_BUILD && process.arch !== "x64")
+    ? "You're trying to run x64 build on x86 system."
+    : (!BORAM_X64_BUILD && process.arch !== "x86")
+      // Strictly not an error but x64 build will be faster.
+      ? "You're trying to run x86 build on x64 system."
+      : null;
+  if (wrongBuildMsg) {
+    dialog.showErrorBox("Wrong build", wrongBuildMsg);
+    app.exit(1);
+  }
 }
 
 if (!BORAM_WIN_BUILD && !require("./deps").checkLinuxDeps()) {
