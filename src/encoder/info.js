@@ -101,7 +101,6 @@ export default class extends React.PureComponent {
           <Prop name="duration">{showTime(+format.duration)}</Prop>
           <Prop name="bitrate">{showBitrate(+format.bit_rate)}</Prop>
           <Prop name="container">{format.format_long_name}</Prop>
-          <Prop name="tracks">{format.nb_streams}</Prop>
         </div>
         <div className={classes.tracks}>
           {this.props.vtracks.map(this.getTrackNode.bind(this))}
