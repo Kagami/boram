@@ -82,8 +82,9 @@ export default class extends React.Component {
   }
   componentWillUnmount() {
     window.removeEventListener("beforeunload", this.handleGlobalClose, false);
-    this.handleGlobalClose();
+    this.abort();
   }
+  closing = false
   tabKey = 0
   getInstance(i) {
     return this.refs[`instance${i}`];
@@ -99,25 +100,32 @@ export default class extends React.Component {
     });
     this.setState({tabs});
   }
-  handleGlobalClose = (e = null) => {
-    if (e && !BORAM_DEBUG) {
-    //   const choice = remote.dialog.showMessageBox({
-    //     icon: ICON_BIG_PATH,
-    //     title: "Confirm",
-    //     message: "Close all tabs and quit?",
-    //     buttons: ["OK", "Cancel"],
-    //   });
-    //   // TODO(Kagami): Doesn't work reliable right now, see
-    //   // <https://github.com/electron/electron/issues/7977>.
-    //   if (choice !== 0) {
-    //     e.returnValue = false;
-    //     return;
-    //   }
+  handleGlobalClose = (e) => {
+    if (!BORAM_WIN_BUILD && !this.closing) {
+      e.returnValue = false;
+      setTimeout(() => {
+        const choice = remote.dialog.showMessageBox({
+          icon: ICON_BIG_PATH,
+          title: "Confirm",
+          message: "Close all tabs and quit?",
+          buttons: ["OK", "Cancel"],
+        });
+        if (choice === 0) {
+          // Workaround for:
+          // <https://github.com/electron/electron/issues/7977>.
+          this.closing = true;
+          remote.getCurrentWindow().close();
+        }
+      });
+    } else {
+      this.abort();
     }
+  };
+  abort() {
     for (let i = 0; i < this.state.tabs.length; i++) {
       this.getInstance(i).abort();
     }
-  };
+  }
   handleTitleChange = (i, label = DEFAULT_LABEL) => {
     const tabs = this.state.tabs;
     tabs[i].label = label;
