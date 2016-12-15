@@ -69,6 +69,7 @@ export default class extends React.PureComponent {
               width={250}
               height={40}
               label="cancel"
+              labelStyle={{fontSize: "inherit"}}
               onClick={this.props.onCancel}
             />
           </ShowHide>
