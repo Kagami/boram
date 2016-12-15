@@ -30,6 +30,12 @@ const MIN_OPUS_BITRATE = 6;
 const MAX_OPUS_BITRATE = 510;
 const MIN_VORBIS_Q = -1;
 const MAX_VORBIS_Q = 10;
+const SMALL_HD_BITRATE = 2000;
+const BIG_HD_BITRATE = 5000;
+const SMALL_FHD_BITRATE = 4000;
+const BIG_FHD_BITRATE = 10000;
+const SMALL_OTHER_BITRATE = 1000;
+const BIG_OTHER_BITRATE = 20000;
 
 @useSheet({
   tabs: {
@@ -122,28 +128,42 @@ export default class extends React.PureComponent {
       return width;
     }
   }
-  // Heuristics below are up to further tuninig. Especially in relation
-  // to vertical videos and high fps. Also VP8 vs VP9.
+  getFinalHeight({vtrackn, scalew, scaleh, croph}) {
+    const {width, height} = this.getVideoTracks()[vtrackn];
+    if (scaleh) {
+      return scaleh;
+    } else if (scalew) {
+      return Math.floor(height * scalew / width);
+    } else if (croph) {
+      return croph;
+    } else {
+      return height;
+    }
+  }
+  getMaxSide(opts) {
+    return Math.max(this.getFinalWidth(opts), this.getFinalHeight(opts));
+  }
+  // Heuristics below are up to further tuninig.
   isShortClip(opts = null) {
     const duration = opts ? opts._duration : this.getFullDuration();
     return duration < 6;
   }
   isSmallBitrate(opts) {
     const vb = FFmpeg.getVideoBitrate(opts);
-    const width = this.getFinalWidth(opts);
+    const size = this.getMaxSide(opts);
     return (
-      (width >= 1920 && vb < 800) ||
-      (width >= 1280 && vb < 400) ||
-      vb < 200
+      (size >= 1920 && vb < SMALL_FHD_BITRATE) ||
+      (size >= 1280 && vb < SMALL_HD_BITRATE) ||
+      vb < SMALL_OTHER_BITRATE
     );
   }
   isBigBitrate(opts) {
     const vb = FFmpeg.getVideoBitrate(opts);
-    const width = this.getFinalWidth(opts);
+    const size = this.getMaxSide(opts);
     return (
-      (width <= 1280 && vb > 10000) ||
-      (width <= 1920 && vb > 20000) ||
-      vb > 30000
+      (size <= 1280 && vb > BIG_HD_BITRATE) ||
+      (size <= 1920 && vb > BIG_FHD_BITRATE) ||
+      vb > BIG_OTHER_BITRATE
     );
   }
 
@@ -462,6 +482,14 @@ export default class extends React.PureComponent {
       } else if (this.isBigBitrate(opts)) {
         warn("codecs", `Video bitrate seems too big,
                         consider CRF mode or fix limit`);
+      }
+      if (this.isSmallBitrate(opts) || this.isBigBitrate(opts)) {
+        const vb = FFmpeg.getVideoBitrate(opts);
+        warn("codecs", `Recommended bitrates:
+                        ${SMALL_HD_BITRATE}÷${BIG_HD_BITRATE} (hd),
+                        ${SMALL_FHD_BITRATE}÷${BIG_FHD_BITRATE} (fhd),
+                        ${SMALL_OTHER_BITRATE}÷${BIG_OTHER_BITRATE} (other);
+                        current: ${vb} kbps`);
       }
       if (this.isShortClip(opts)) {
         warn("codecs", `Consider CRF mode for such short fragment`);
