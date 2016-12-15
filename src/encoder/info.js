@@ -47,7 +47,6 @@ export default class extends React.PureComponent {
         <div key={track.index} className={classes.track}>
           <div className={classes.header}>Video #{i}</div>
           <Prop name="codec">{track.codec_name}</Prop>
-          <Prop name="stream index">{track.index}</Prop>
           <Prop name="resolution">{track.width}x{track.height}</Prop>
           <Prop name="frame rate">
             {showFrameRate(parseFrameRate(track.avg_frame_rate))}
@@ -60,7 +59,6 @@ export default class extends React.PureComponent {
         <div key={track.index} className={classes.track}>
           <div className={classes.header}>Audio #{i}</div>
           <Prop name="codec">{track.codec_name}</Prop>
-          <Prop name="stream index">{track.index}</Prop>
           <Prop name="channels">{track.channels} ({track.channel_layout})</Prop>
           {this.getLangNode(track)}
         </div>
@@ -70,7 +68,6 @@ export default class extends React.PureComponent {
         <div key={track.index} className={classes.track}>
           <div className={classes.header}>Subtitle #{i}</div>
           <Prop name="codec">{track.codec_name}</Prop>
-          <Prop name="stream index">{track.index}</Prop>
           {this.getLangNode(track)}
         </div>
       );
