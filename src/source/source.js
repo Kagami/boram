@@ -14,9 +14,13 @@ import {showErr} from "../util";
 const YTDL_SUPPORTED_URL =
   "https://rg3.github.io/youtube-dl/supportedsites.html";
 const COMMON_VIDEO_EXTENSIONS = [
-  "mkv", "webm", "mp4", "mov", "avi", "ts", "tp",
-  "wmv", "ogm", "ogv", "ogg", "m4v", "flv", "f4v",
-  "asf", "y4m", "vob", "mpg", "3gp",
+  "mkv", "webm",
+  "ogg", "ogv", "ogm",
+  "mp4", "mov", "m4v",
+  "flv", "f4v",
+  "ts", "tp", "m2ts", "vob", "mpg",
+  "avi", "wmv", "asf", "3gp",
+  "y4m",
 ];
 
 @useSheet({
