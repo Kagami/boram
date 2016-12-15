@@ -12,8 +12,9 @@ function infa(...parts) {
 
 const APP_PATH = path.join("dist", "app");
 const BORAM_DEBUG = process.env.NODE_ENV !== "production";
-const BORAM_WIN_BUILD = process.env.BORAM_PLATFORM.startsWith("win");
-const BORAM_X64_BUILD = process.env.BORAM_PLATFORM.endsWith("64");
+const BORAM_PLATFORM = process.env.BORAM_PLATFORM || "";
+const BORAM_WIN_BUILD = BORAM_PLATFORM.startsWith("win");
+const BORAM_X64_BUILD = BORAM_PLATFORM.endsWith("64");
 const ExtractLoader = ExtractTextPlugin.extract("css");
 const COMMON_PLUGINS = [
   new webpack.DefinePlugin({BORAM_DEBUG, BORAM_WIN_BUILD, BORAM_X64_BUILD}),
