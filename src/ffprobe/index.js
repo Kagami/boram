@@ -5,10 +5,19 @@
 
 import {makeRunner} from "../util";
 if (BORAM_WIN_BUILD) {
-  require.context(
-    "../../bin/ffmpeg-latest-win32-shared/bin",
-    false,
-    /\.dll$|[\/\\]ffprobe\.exe$/);
+  if (BORAM_X64_BUILD) {
+    require.context(
+      "../../bin/ffmpeg-latest-win64-shared/bin",
+      false,
+      /\.dll$|[\/\\]ffprobe\.exe$/
+    );
+  } else {
+    require.context(
+      "../../bin/ffmpeg-latest-win32-shared/bin",
+      false,
+      /\.dll$|[\/\\]ffprobe\.exe$/
+    );
+  }
 }
 
 export default makeRunner("ffprobe", {

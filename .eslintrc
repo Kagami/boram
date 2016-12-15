@@ -15,6 +15,7 @@
   globals: {
     "BORAM_DEBUG": false,
     "BORAM_WIN_BUILD": false,
+    "BORAM_X64_BUILD": false,
   },
   "plugins": ["react"],
   "extends": ["eslint:recommended", "plugin:react/recommended"],

@@ -25,6 +25,14 @@ if (process.env.BORAM_NO_HWACCEL) {
   app.disableHardwareAcceleration();
 }
 
+if (BORAM_WIN_BUILD && BORAM_X64_BUILD && process.arch !== "x64") {
+  dialog.showErrorBox(
+    "Wrond build",
+    "You're trying to run x64 build on x86 system."
+  );
+  app.exit(1);
+}
+
 if (!BORAM_WIN_BUILD && !require("./deps").checkLinuxDeps()) {
   dialog.showErrorBox(
     "Dependency missing",
