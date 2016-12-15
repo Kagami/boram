@@ -6,7 +6,7 @@
 import {makeRunner} from "../util";
 if (BORAM_WIN_BUILD) {
   require.context(
-    "../../bin/ffmpeg-latest-win64-shared/bin",
+    "../../bin/ffmpeg-latest-win32-shared/bin",
     false,
     /\.dll$|[\/\\]ffprobe\.exe$/);
 }

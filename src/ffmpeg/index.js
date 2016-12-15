@@ -9,7 +9,7 @@ import {WIN_FONTCONFIG_PATH} from "../shared";
 import {makeRunner, escapeArg, fixOpt, clearOpt} from "../util";
 if (BORAM_WIN_BUILD) {
   require.context(
-    "../../bin/ffmpeg-latest-win64-shared/bin",
+    "../../bin/ffmpeg-latest-win32-shared/bin",
     false,
     /\.dll$|[\/\\]ffmpeg\.exe$/);
 }

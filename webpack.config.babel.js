@@ -12,7 +12,7 @@ function infa(...parts) {
 
 const APP_PATH = path.join("dist", "app");
 const BORAM_DEBUG = process.env.NODE_ENV !== "production";
-const BORAM_WIN_BUILD = process.env.PLATFORM === "win32";
+const BORAM_WIN_BUILD = process.env.BORAM_PLATFORM === "win32";
 const ExtractLoader = ExtractTextPlugin.extract("css");
 const COMMON_PLUGINS = [
   new webpack.DefinePlugin({BORAM_DEBUG, BORAM_WIN_BUILD}),
@@ -29,6 +29,8 @@ const PLUGINS = BORAM_DEBUG ? COMMON_PLUGINS : COMMON_PLUGINS.concat([
 ]);
 
 export default {
+  // Exit with code on errors.
+  bail: true,
   // Make electron's virtual modules work.
   target: "electron",
   node: {
