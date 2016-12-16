@@ -26,9 +26,10 @@ if (process.env.BORAM_NO_HWACCEL) {
 }
 
 if (BORAM_WIN_BUILD) {
-  const wrongBuildMsg = (BORAM_X64_BUILD && process.arch !== "x64")
+  const arch = require("arch")();
+  const wrongBuildMsg = (BORAM_X64_BUILD && arch !== "x64")
     ? "You're trying to run x64 build on x86 system."
-    : (!BORAM_X64_BUILD && process.arch !== "x86")
+    : (!BORAM_X64_BUILD && arch !== "x86")
       // Strictly not an error but x64 build will be faster.
       ? "You're trying to run x86 build on x64 system."
       : null;

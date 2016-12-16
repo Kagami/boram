@@ -47,6 +47,7 @@
   },
   "homepage": "https://github.com/Kagami/boram#readme",
   "dependencies": {
+    "arch": "^2.0.0",
     "classnames": "^2.2.5",
     "electron-contextmenu-middleware": "^1.0.2",
     "electron-input-menu": "^2.0.3",
