@@ -4,8 +4,8 @@
   "private": true,
   "description": "Cross-platform WebM encoder",
   "scripts": {
-    "start": "rm -rf dist/app && webpack --watch",
-    "dev": "electron dist/app",
+    "start": "rm -rf dist && webpack --watch",
+    "dev": "rm -f \"${BORAM_PREBUILT_ROOT}/boram.node\" && electron dist/app",
     "test": "eslint .",
     "app": "rm -rf dist/app && NODE_ENV=production webpack",
     "mpv-dev": "node-gyp rebuild && cp build/Release/boram.node dist/app/libboram.so && cp build/Release/ffmpeg.node node_modules/electron-prebuilt/dist/libffmpeg.so",
@@ -18,7 +18,7 @@
     "release-win32": "rm -rf dist/*win-x86* && BORAM_PLATFORM=win32 npm run app && npm run mpv-win32 && npm run pack-win32",
     "release-win64": "rm -rf dist/*win-x64* && BORAM_PLATFORM=win64 npm run app && npm run mpv-win32 && npm run pack-win64",
     "release-lin64": "rm -rf dist/*linux-x64* && BORAM_PLATFORM=lin64 npm run app && npm run mpv-lin64 && npm run pack-lin64",
-    "release": "rm -rf dist && npm run release-win32 && npm run release-win64 && npm run release-lin64 && rm \"${BORAM_PREBUILT_ROOT}/boram.node\"",
+    "release": "rm -rf dist && npm run release-win32 && npm run release-win64 && npm run release-lin64",
     "binaries": "rm -rf bin && mkdir bin && cd bin && wget https://yt-dl.org/latest/youtube-dl -O youtube-dl.zip && wget https://yt-dl.org/latest/youtube-dl.exe && wget https://ffmpeg.zeranoe.com/builds/win32/shared/ffmpeg-latest-win32-shared.7z && 7z x ffmpeg-latest-win32-shared.7z && wget https://ffmpeg.zeranoe.com/builds/win64/shared/ffmpeg-latest-win64-shared.7z && 7z x ffmpeg-latest-win64-shared.7z && wget https://mpv.srsfckn.biz/mpv-dev-latest.7z && 7z x mpv-dev-latest.7z"
   },
   "babel": {
