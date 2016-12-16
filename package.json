@@ -9,7 +9,7 @@
     "test": "eslint .",
     "app": "rm -rf dist/app && NODE_ENV=production webpack",
     "mpv-dev": "node-gyp rebuild && cp build/Release/boram.node dist/app/libboram.so && cp build/Release/ffmpeg.node node_modules/electron-prebuilt/dist/libffmpeg.so",
-    "mpv-win32-prebuild": "node-gyp rebuild --arch=ia32 && copy build\\Release\\boram.node E:\\",
+    "mpv-win32-prebuild": "del E:\\boram.node && node-gyp rebuild --arch=ia32 && copy build\\Release\\boram.node E:\\",
     "mpv-win32": "cp \"${BORAM_PREBUILT_ROOT}/boram.node\" dist/app/boram.dll",
     "mpv-lin64": "node-gyp rebuild && strip build/Release/boram.node -o dist/app/libboram.so",
     "pack-win32": "electron-packager dist/app --platform=win32 --arch=ia32 --out=dist --icon=src/index/icon-big.ico --app-copyright='Copyright (c) 2016 T-ara Industries' --win32metadata.CompanyName='T-ara Industries' --win32metadata.FileDescription='Cross-platform WebM encoder' --win32metadata.OriginalFilename=boram.exe --win32metadata.ProductName=boram && cd dist && rm *win-x86/LICENSE* && cp -a ../legal *win-x86 && 7z a -m0=lzma2 -mx=9 $(echo *win-x86).7z *win-x86",
@@ -18,7 +18,7 @@
     "release-win32": "rm -rf dist/*win-x86* && BORAM_PLATFORM=win32 npm run app && npm run mpv-win32 && npm run pack-win32",
     "release-win64": "rm -rf dist/*win-x64* && BORAM_PLATFORM=win64 npm run app && npm run mpv-win32 && npm run pack-win64",
     "release-lin64": "rm -rf dist/*linux-x64* && BORAM_PLATFORM=lin64 npm run app && npm run mpv-lin64 && npm run pack-lin64",
-    "release": "rm -rf dist && npm run release-win32 && npm run release-win64 && npm run release-lin64",
+    "release": "rm -rf dist && npm run release-win32 && npm run release-win64 && npm run release-lin64 && rm \"${BORAM_PREBUILT_ROOT}/boram.node\"",
     "binaries": "rm -rf bin && mkdir bin && cd bin && wget https://yt-dl.org/latest/youtube-dl -O youtube-dl.zip && wget https://yt-dl.org/latest/youtube-dl.exe && wget https://ffmpeg.zeranoe.com/builds/win32/shared/ffmpeg-latest-win32-shared.7z && 7z x ffmpeg-latest-win32-shared.7z && wget https://ffmpeg.zeranoe.com/builds/win64/shared/ffmpeg-latest-win64-shared.7z && 7z x ffmpeg-latest-win64-shared.7z && wget https://mpv.srsfckn.biz/mpv-dev-latest.7z && 7z x mpv-dev-latest.7z"
   },
   "babel": {
