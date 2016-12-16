@@ -86,7 +86,7 @@ export default makeRunner("ffmpeg", {
       "-ss", start, "-i", this._escapeFilename(inpath),
       "-map", `0:v:${vtrackn}`,
       "-vf", "cropdetect=round=2,metadata=print:file=-",
-      "-frames:v", "2", "-f", "null", "-",
+      "-frames:v", "3", "-f", "null", "-",
     ]).then(log => {
       // OK to fail here, caller will just ignore us.
       const w = +log.match(/^lavfi.cropdetect.w=(\d+)/m)[1];
