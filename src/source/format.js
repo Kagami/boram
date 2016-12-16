@@ -3,7 +3,6 @@
  * @module boram/source/format
  */
 
-import assert from "assert";
 import React from "react";
 import {useSheet} from "../jss";
 import {Tip, BigButton, SmallSelect, MenuItem, Sep} from "../theme";
@@ -13,11 +12,17 @@ import {showSize} from "../util";
   format: {
     marginBottom: 100,
   },
+  header: {
+    margin: 0,
+    marginRight: 24,  // Compensate for SelectField icon
+    marginBottom: 20,
+  },
 })
 export default class extends React.PureComponent {
   state = {
     vfid: this.getVideoFormats()[0].key,
     afid: this.getAudioFormats()[0].key,
+    sfid: this.getDefaultSubID(),
   }
   componentDidMount() {
     if (BORAM_DEBUG) {
@@ -26,8 +31,9 @@ export default class extends React.PureComponent {
       }
     }
   }
+
   // Prefer high-quality.
-  compareVideo(a, b) {
+  compareVideoFormats(a, b) {
     // Higher resolution/FPS is always better.
     if (a.height !== b.height) return b.height - a.height;
     if (a.width !== b.width) return b.width - a.width;
@@ -61,15 +67,15 @@ export default class extends React.PureComponent {
   getVideoFormats() {
     const formats = this.props.info.formats
       .filter(f => !f.acodec || f.vcodec !== "none")
-      .sort(this.compareVideo)
+      .sort(this.compareVideoFormats)
       .map(f => ({
         key: f.format_id,
-        ext: f.ext,
         text: this.getVideoText(f),
       }));
     return formats.length ? formats : [{key: null, text: "none"}];
   }
-  compareAudio(a, b) {
+
+  compareAudioFormats(a, b) {
     return b.abr - a.abr;
   }
   getAudioText(format) {
@@ -81,13 +87,42 @@ export default class extends React.PureComponent {
   getAudioFormats() {
     return this.props.info.formats
       .filter(f => f.vcodec === "none")
-      .sort(this.compareAudio)
+      .sort(this.compareAudioFormats)
       .map(f => ({
         key: f.format_id,
         text: this.getAudioText(f),
       }))
       .concat({key: null, text: "none"});
   }
+
+  getDefaultSubID() {
+    const engIDs = ["en", "eng", "en_US", "en-US"];
+    const f = this.getSubFormats().find(f => engIDs.includes(f.key));
+    return f ? f.key : this.getSubFormats()[0].key;
+  }
+  getSubText(format, lang) {
+    return `${format.ext} (${lang})`;
+  }
+  getSubFormats() {
+    // ytdl automatically selects format across available subtitles
+    // (e.g. it selects vtt across ttml and vtt on youtube). We hope
+    // selected format is always appropriate because we can't
+    // distinguish multiple formats with same ID.
+    const requestedFormats = this.props.info.requested_subtitles || {};
+    return Object.keys(requestedFormats)
+      // Just lexical sorting, we prefer english only for initial select.
+      .sort()
+      .map(id => {
+        const f = requestedFormats[id];
+        return {
+          key: id,
+          ext: f.ext,
+          text: this.getSubText(f, id),
+        };
+      })
+      .concat({key: null, text: "none"});
+  }
+
   isNoVideo() {
     const formats = this.getVideoFormats();
     return formats.length === 1 && formats[0].key == null;
@@ -96,27 +131,32 @@ export default class extends React.PureComponent {
     const formats = this.getAudioFormats();
     return formats.length === 1 && formats[0].key == null;
   }
+  isNoSub() {
+    const formats = this.getSubFormats();
+    return formats.length === 1 && formats[0].key == null;
+  }
   handleVideoFormatChange = (e, _, vfid) => {
     this.setState({vfid});
   };
   handleAudioFormatChange = (e, _, afid) => {
     this.setState({afid});
   };
+  handleSubFormatChange = (e, _, sfid) => {
+    this.setState({sfid});
+  };
   handleDownload = () => {
-    const {vfid, afid} = this.state;
-    const ext = this.getVideoFormats().find(f => f.key === vfid).ext;
-    assert(ext);
-    this.props.onLoad({vfid, afid, ext});
+    const {vfid, afid, sfid} = this.state;
+    const sext = this.getSubFormats().find(f => f.key === sfid).ext;
+    this.props.onLoad({vfid, afid, sfid, sext});
   };
   render() {
     const {classes} = this.sheet;
     return (
       <div className={classes.format}>
-        <h2>Video format</h2>
+        <h2 className={classes.header}>Video format</h2>
         <SmallSelect
           width={300}
           style={{fontSize: "16px"}}
-          labelStyle={{paddingRight: 24}}
           value={this.state.vfid}
           disabled={this.isNoVideo()}
           onChange={this.handleVideoFormatChange}
@@ -131,16 +171,33 @@ export default class extends React.PureComponent {
         )}
         </SmallSelect>
         <Sep vertical size={20} />
-        <h2>Audio format (optional)</h2>
+        <h2 className={classes.header}>Audio format</h2>
         <SmallSelect
           width={300}
           style={{fontSize: "16px"}}
-          labelStyle={{paddingRight: 24}}
           value={this.state.afid}
           disabled={this.isNoAudio()}
           onChange={this.handleAudioFormatChange}
         >
         {this.getAudioFormats().map(f =>
+          <MenuItem
+            key={f.key}
+            value={f.key}
+            primaryText={f.text}
+            style={{fontSize: "16px"}}
+          />
+        )}
+        </SmallSelect>
+        <Sep vertical size={20} />
+        <h2 className={classes.header}>Subtitles</h2>
+        <SmallSelect
+          width={300}
+          style={{fontSize: "16px"}}
+          value={this.state.sfid}
+          disabled={this.isNoSub()}
+          onChange={this.handleSubFormatChange}
+        >
+        {this.getSubFormats().map(f =>
           <MenuItem
             key={f.key}
             value={f.key}

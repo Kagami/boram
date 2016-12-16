@@ -32,7 +32,7 @@ const PLUGINS = BORAM_DEBUG ? COMMON_PLUGINS : COMMON_PLUGINS.concat([
 
 export default {
   // Exit with code on errors.
-  bail: true,
+  bail: !BORAM_DEBUG,
   // Make electron's virtual modules work.
   target: "electron",
   node: {

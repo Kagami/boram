@@ -17,6 +17,7 @@ function hasBinary(exe) {
 }
 
 export function checkLinuxDeps() {
+  // TODO(Kagami): Check for libmpv.
   // TODO(Kagami): Check for version and required codecs?
   if (!hasBinary("ffmpeg")) {
     console.error("Please install ffmpeg.");

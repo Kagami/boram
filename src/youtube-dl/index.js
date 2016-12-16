@@ -19,21 +19,30 @@ export default makeRunner("youtube-dl", {
     }
   },
   getInfo(url) {
-    return this._run(["--no-playlist", "-j", "--", url]).then(JSON.parse);
-  },
-  download({url, format, outpath}, onUpdate) {
-    const args = [
+    return this._run([
       "--no-playlist",
-      "--merge-output-format", "mkv",
-      "--write-sub", "--embed-subs",
-      "--sub-lang", "en,en_US",
-      "--postprocessor-args", "-c:s ass -f matroska",
-      "--no-part",
-      "-f", format,
-      "-o", outpath,
+      "--dump-json",
+      "--all-subs",
       "--",
       url,
+    ]).then(JSON.parse);
+  },
+  download({url, format, outpath}, onUpdate) {
+    const {vfid, afid, sfid} = format;
+    const args = [
+      "--no-part",
+      "--no-playlist",
+      "--format", vfid + (afid ? `+${afid}` : ""),
+      "--merge-output-format", "mkv",
     ];
+    if (sfid) {
+      args.push(
+        "--sub-lang", sfid,
+        "--write-sub", "--embed-subs",
+        "--postprocessor-args", "-c:s ass -f matroska"
+      );
+    }
+    args.push("--output", outpath, "--", url);
 
     let log = "";
     let progress = 0;
