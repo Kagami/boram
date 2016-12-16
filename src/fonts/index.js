@@ -24,7 +24,8 @@ function escapeXML(unsafe) {
 }
 
 export function setupWindowsFontconfig() {
-  const systemFontsPath = path.join(process.env.WINDIR, "Fonts");
+  const winDir = process.env.SystemRoot || "C:\\Windows";
+  const systemFontsPath = path.join(winDir, "Fonts");
   const aliasesPath = path.join(APP_PATH, "aliases.conf");
   const cachePath = path.join(DATA_PATH, "fc-cache");
   const fontsConf = util.format(
