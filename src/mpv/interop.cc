@@ -309,6 +309,7 @@ class MPVInstance : public pp::Instance {
     if (mpv_set_option_string(mpv_, "vo", "opengl-cb") < 0)
       DIE("failed to set VO");
 
+    mpv_set_option_string(mpv_, "vf-defaults", "yadif=interlaced-only=no");
     mpv_set_option_string(mpv_, "stop-playback-on-init-failure", "no");
     mpv_set_option_string(mpv_, "input-default-bindings", "yes");
     mpv_set_option_string(mpv_, "audio-file-auto", "no");
