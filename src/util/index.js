@@ -66,7 +66,9 @@ function pad2(n) {
 }
 
 export function showTime(duration, sep = ":") {
-  let ts = pad2(duration / 60) + sep;
+  const h = Math.floor(duration / 3600);
+  let ts = h ? h + sep : "";
+  ts += pad2(duration % 3600 / 60) + sep;
   ts += pad2(duration % 60);
   ts += (duration % 1).toFixed(3).slice(1, 5);
   return ts;
