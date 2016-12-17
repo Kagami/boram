@@ -499,7 +499,6 @@ class Time extends React.PureComponent {
         {...other}
         ref="input"
         type="text"
-        maxLength={9}
         className={cx(classes.time, invalid && classes.invalid)}
       />
     );
