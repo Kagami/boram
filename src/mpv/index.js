@@ -14,7 +14,6 @@ if (BORAM_WIN_BUILD) {
     display: "block",
     width: "100%",
     height: "100%",
-    flex: 1,
   },
 })
 export default class extends React.PureComponent {
@@ -126,14 +125,12 @@ export default class extends React.PureComponent {
   }
   render() {
     const {classes} = this.sheet;
-    const {src, onClick} = this.props;
     return (
       <embed
         ref="plugin"
         className={classes.plugin}
         type="application/x-boram"
-        data-boramsrc={src}
-        onTouchTap={onClick}
+        data-boramsrc={this.props.src}
       />
     );
   }

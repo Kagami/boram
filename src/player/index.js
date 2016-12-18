@@ -16,6 +16,11 @@ import {parseTime, showTime, tryRun} from "../util";
     height: "100%",
     flexDirection: "column",
   },
+  pluginWrapper: {
+    position: "relative",
+    flex: 1,
+    minHeight: 0,
+  },
 })
 export default class extends React.PureComponent {
   state = {pause: true, time: 0, volume: 100, mute: false, fullscreen: false}
@@ -199,17 +204,22 @@ export default class extends React.PureComponent {
     const {classes} = this.sheet;
     return (
       <div className={classes.player} onWheel={this.handleWheel}>
-        <MPV
-          ref="mpv"
-          src={this.props.source.path}
-          onClick={this.togglePlay}
-          onPlayPause={this.handlePlayPause}
-          onTime={this.handleTime}
-          onVolume={this.handleVolume}
-          onEOF={this.handleEOF}
-          onDeinterlace={this.props.onDeinterlace}
-          onSubTrack={this.props.onSubTrack}
-        />
+        <div className={classes.pluginWrapper}>
+          <MPV
+            ref="mpv"
+            src={this.props.source.path}
+            onPlayPause={this.handlePlayPause}
+            onTime={this.handleTime}
+            onVolume={this.handleVolume}
+            onEOF={this.handleEOF}
+            onDeinterlace={this.props.onDeinterlace}
+            onSubTrack={this.props.onSubTrack}
+          />
+          <CropArea
+            crop={this.props.crop}
+            onClick={this.togglePlay}
+          />
+        </div>
         <Controls>
           <Control
             icon={this.state.pause ? "play" : "pause"}
@@ -271,6 +281,136 @@ export default class extends React.PureComponent {
 }
 
 // Player sub-components.
+
+@useSheet({
+  outer: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    cursor: "default",
+  },
+  inner: {
+    position: "absolute",
+    border: "3px solid orange",
+    boxSizing: "border-box",
+  },
+})
+class CropArea extends React.PureComponent {
+  state = {
+    x1: 0,
+    y1: 0,
+    x2: 0,
+    y2: 0,
+  }
+  offset = {left: 0, top: 0, width: 0, height: 0}
+  resizing = false
+  wasEmpty = false
+  moving = false
+  baseX = 0
+  baseY = 0
+  startX = 0
+  startY = 0
+
+  // FIXME(Kagami): SAR.
+  getVideoRanges() {
+  }
+  getCSSCrop() {
+    const offset = this.offset;
+    let {x1, x2, y1, y2} = this.state;
+    x1 -= offset.left;
+    x2 -= offset.left;
+    y1 -= offset.top;
+    y2 -= offset.top;
+    const width = Math.abs(x2 - x1);
+    const height = Math.abs(y2 - y1);
+    const left = Math.max(0, Math.min(x1, x2, offset.width - width));
+    const top = Math.max(0, Math.min(y1, y2, offset.height - height));
+    const display = (width && height) ? "block" : "none";
+    return {width, height, left, top, display};
+  }
+  getFFCrop() {
+  }
+  isEmpty() {
+    return (
+      (this.state.x1 - this.state.x2) === 0 &&
+      (this.state.y1 - this.state.y2) === 0
+    );
+  }
+
+  handleOuterMouseDown = (e) => {
+    this.resizing = true;
+    this.wasEmpty = this.isEmpty();
+    this.offset = this.refs.outer.getClientRects()[0];
+    this.setState({
+      x1: e.clientX,
+      x2: e.clientX,
+      y1: e.clientY,
+      y2: e.clientY,
+    });
+  }
+  handleOuterMouseMove = (e) => {
+    if (!this.resizing) return;
+    this.setState({x2: e.clientX, y2: e.clientY});
+  }
+  handleOuterMouseUp = () => {
+    this.resizing = false;
+    if (this.isEmpty() && this.wasEmpty) {
+      this.props.onClick();
+    }
+  }
+
+  handleInnerMouseDown = (e) => {
+    e.stopPropagation();
+    this.moving = true;
+    this.baseX = e.clientX;
+    this.baseY = e.clientY;
+    this.startX = this.state.x1;
+    this.startY = this.state.y1;
+  }
+  handleInnerMouseMove = (e) => {
+    if (!this.moving) return;
+    const deltaX = e.clientX - this.baseX;
+    const deltaY = e.clientY - this.baseY;
+    this.setState({
+      x1: this.startX + deltaX,
+      x2: this.startX + deltaX + this.state.x2 - this.state.x1,
+      y1: this.startY + deltaY,
+      y2: this.startY + deltaY + this.state.y2 - this.state.y1,
+    });
+  }
+  handleInnerMouseUp = (e) => {
+    if (!this.moving) return;
+    this.moving = false;
+    const deltaX = e.clientX - this.baseX;
+    const deltaY = e.clientY - this.baseY;
+    if (!deltaX && !deltaY) {
+      this.setState({x1: 0, x2: 0, y1: 0, y2: 0});
+    }
+  }
+
+  render() {
+    const {classes} = this.sheet;
+    return (
+      <div
+        ref="outer"
+        className={classes.outer}
+        onMouseDown={this.handleOuterMouseDown}
+        onMouseMove={this.handleOuterMouseMove}
+        onMouseUp={this.handleOuterMouseUp}
+      >
+        <div
+          style={this.getCSSCrop()}
+          className={classes.inner}
+          onMouseDown={this.handleInnerMouseDown}
+          onMouseMove={this.handleInnerMouseMove}
+          onMouseUp={this.handleInnerMouseUp}
+        />
+      </div>
+    );
+  }
+}
 
 const Controls = useSheet({
   controls: {
@@ -568,8 +708,8 @@ class Seek extends React.PureComponent {
       -webkit-linear-gradient(
         left,
         #bdbdbd ${mstartPercent}%,
-        #00bcd4 ${mstartPercent}%,
-        #00bcd4 ${mendPercent}%,
+        orange ${mstartPercent}%,
+        orange ${mendPercent}%,
         #bdbdbd ${mendPercent}%
       )
     `);

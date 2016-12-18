@@ -86,6 +86,7 @@ export default class extends React.PureComponent {
     mend: this.getFullDuration(),
     vtrackn: 0,
     deinterlace: false,
+    crop: null,
     burnSubs: false,
     strackn: this.getSubTracks().length ? 0 : null,
     extSubPath: null,
@@ -576,6 +577,7 @@ export default class extends React.PureComponent {
           atracks={this.getAudioTracks()}
           mstart={this.state.mstart}
           mend={this.state.mend}
+          crop={this.state.crop}
           onMarkStart={this.handleMarkStart}
           onMarkEnd={this.handleMarkEnd}
           onDeinterlace={this.handleMPVDeinterlace}
