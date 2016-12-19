@@ -128,6 +128,13 @@ export class SmallInput extends React.PureComponent {
   }
   handleKeyDown = (e) => {
     e.nativeEvent.stopImmediatePropagation();
+    if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+      e.preventDefault();
+      const v = this.getValue() || "0";
+      if (v.match(/^\d+$/)) {
+        this.setValue(parseInt(v, 10) + (e.key === "ArrowUp" ? 1 : -1));
+      }
+    }
   };
   render() {
     const {styles} = this.constructor;
