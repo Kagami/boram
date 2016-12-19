@@ -312,6 +312,7 @@ class MPVInstance : public pp::Instance {
     mpv_set_option_string(mpv_, "vf-defaults", "yadif=interlaced-only=no");
     mpv_set_option_string(mpv_, "stop-playback-on-init-failure", "no");
     mpv_set_option_string(mpv_, "input-default-bindings", "yes");
+    mpv_set_option_string(mpv_, "hr-seek-demuxer-offset", "1.5");
     mpv_set_option_string(mpv_, "audio-file-auto", "no");
     mpv_set_option_string(mpv_, "sub-auto", "no");
     mpv_set_option_string(mpv_, "slang", "eng,en,en_US,en-US");
