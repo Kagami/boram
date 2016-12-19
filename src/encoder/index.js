@@ -86,7 +86,7 @@ export default class extends React.PureComponent {
     mend: this.getFullDuration(),
     vtrackn: 0,
     deinterlace: false,
-    crop: null,
+    crop: {},
     burnSubs: false,
     strackn: this.getSubTracks().length ? 0 : null,
     extSubPath: null,
@@ -530,6 +530,8 @@ export default class extends React.PureComponent {
       rawArgs,
       mstart: _start,
       mend: _start + _duration,
+      // For CropArea.
+      crop: {cropw, croph, cropx, cropy},
     });
   };
   handleRawArgs = (e) => {

@@ -312,7 +312,20 @@ class CropArea extends React.PureComponent {
     // We don't get "mouseup" for <div> if button was released outside
     // of its area so need a global one.
     window.addEventListener("mouseup", this.handleGlobalMouseUp, false);
-    this.handleResize();
+    this.setRects();
+  }
+  componentWillReceiveProps(nextProps) {
+    const acrop = this.props.crop;
+    const bcrop = nextProps.crop;
+    /* eslint-disable eqeqeq */
+    // Check for nulls/undefined.
+    if (acrop.cropw != bcrop.cropw ||
+        acrop.croph != bcrop.croph ||
+        acrop.cropx != bcrop.cropx ||
+        acrop.cropy != bcrop.cropy) {
+      this.setFFCrop(bcrop);
+    }
+    /* eslint-enable eqeqeq */
   }
   componentWillUnmount() {
     window.removeEventListener("mouseup", this.handleGlobalMouseUp, false);
@@ -329,6 +342,10 @@ class CropArea extends React.PureComponent {
   startX = 0
   startY = 0
 
+  setRects() {
+    this.domRect = this.refs.outer.getClientRects()[0];
+    this.vidRect = this.getVideoRect();
+  }
   getTrackDims() {
     const {width, height} = this.props.vtrack;
     const sar = parseSAR(this.props.vtrack.sample_aspect_ratio);
@@ -360,10 +377,10 @@ class CropArea extends React.PureComponent {
       outHeight = dheight * domWidth / dwidth;
     }
     return {
-      width: Math.floor(outWidth),
-      height: Math.floor(outHeight),
-      left: Math.floor((domWidth - outWidth) / 2),
-      top: Math.floor((domHeight - outHeight) / 2),
+      width: Math.round(outWidth),
+      height: Math.round(outHeight),
+      left: Math.round((domWidth - outWidth) / 2),
+      top: Math.round((domHeight - outHeight) / 2),
     };
   }
   getCrop() {
@@ -396,24 +413,45 @@ class CropArea extends React.PureComponent {
     let {width: cropw, height: croph, left: cropx, top: cropy} = this.getCrop();
     if (this.isEmpty()) {
       // Will clear UI inputs.
-      cropw = croph = cropx = cropy = "";
+      cropw = croph = cropx = cropy = null;
       return {cropw, croph, cropx, cropy};
     }
     const {dwidth, sar} = this.getTrackDims();
     const scalef = dwidth / this.vidRect.width;
-    cropw = Math.floor(cropw * scalef / sar);
-    croph = Math.floor(croph * scalef / sar);
-    cropx = Math.floor(cropx * scalef / sar);
-    cropy = Math.floor(cropy * scalef / sar);
+    cropw = Math.round(cropw * scalef / sar);
+    croph = Math.round(croph * scalef / sar);
+    cropx = Math.round(cropx * scalef / sar);
+    cropy = Math.round(cropy * scalef / sar);
     return {cropw, croph, cropx, cropy};
   }
-  setCrop(upd, cb = null) {
+  setFFCrop(crop) {
+    const {width, height, dwidth, sar} = this.getTrackDims();
+    const scalef = dwidth / this.vidRect.width;
+
+    let {cropw, croph, cropx, cropy} = crop;
+    if (cropw == null && croph == null) return this.clearCrop();
+    // We allow to skip some values in UI, so need to emulate lavfi's
+    // crop behavior.
+    cropw = cropw == null ? width : cropw;
+    croph = croph == null ? height : croph;
+    cropx = cropx == null ? (width - cropw) / 2 : cropx;
+    cropy = cropy == null ? (height - croph) / 2 : cropy;
+
+    cropw = Math.round(cropw / scalef * sar);
+    croph = Math.round(croph / scalef * sar);
+    cropx = Math.round(cropx / scalef * sar);
+    cropy = Math.round(cropy / scalef * sar);
+
+    this.setCrop({width: cropw, height: croph, left: cropx, top: cropy},
+                 null, {resizing: true});
+  }
+  setCrop(upd, cb = null, opts = {}) {
     let {width, height, left, top} = {...this.state, ...upd};
 
     left = Math.max(0, left);
     top = Math.max(0, top);
 
-    if (this.resizing) {
+    if (this.resizing || opts.resizing) {
       width = width > 0 ? Math.min(width, this.vidRect.width - left)
                         : Math.max(-left, width);
       height = height > 0 ? Math.min(height, this.vidRect.height - top)
@@ -425,15 +463,17 @@ class CropArea extends React.PureComponent {
 
     this.setState({width, height, left, top}, cb);
   }
+  clearCrop(cb = null) {
+    this.setCrop({width: 0, height: 0}, cb);
+  }
   sendCrop = () => {
     this.props.onCrop(this.getFFCrop());
   };
 
   handleResize = () => {
-    this.domRect = this.refs.outer.getClientRects()[0];
-    this.vidRect = this.getVideoRect();
+    this.setRects();
     // Need to either recalculate current crop area or just discard it.
-    this.setCrop({width: 0, height: 0}, this.sendCrop);
+    this.clearCrop(this.sendCrop);
   };
   handleOuterMouseDown = (e) => {
     this.resizing = true;
@@ -473,7 +513,7 @@ class CropArea extends React.PureComponent {
       const deltaX = e.clientX - this.baseX;
       const deltaY = e.clientY - this.baseY;
       if (!deltaX && !deltaY) {
-        this.setCrop({width: 0, height: 0}, this.sendCrop);
+        this.clearCrop(this.sendCrop);
       } else {
         this.sendCrop();
       }
