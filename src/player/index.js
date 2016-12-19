@@ -8,7 +8,7 @@ import cx from "classnames";
 import {useSheet} from "../jss";
 import {Icon} from "../theme";
 import MPV from "../mpv";
-import {parseTime, showTime, tryRun} from "../util";
+import {parseTime, showTime, parseSAR, tryRun} from "../util";
 
 @useSheet({
   player: {
@@ -216,6 +216,7 @@ export default class extends React.PureComponent {
             onSubTrack={this.props.onSubTrack}
           />
           <CropArea
+            vtrack={this.props.vtrack}
             crop={this.props.crop}
             onClick={this.togglePlay}
           />
@@ -299,12 +300,25 @@ export default class extends React.PureComponent {
 })
 class CropArea extends React.PureComponent {
   state = {
-    x1: 0,
-    y1: 0,
-    x2: 0,
-    y2: 0,
+    width: 0,
+    height: 0,
+    left: 0,
+    top: 0,
   }
-  offset = {left: 0, top: 0, width: 0, height: 0}
+  componentDidMount() {
+    window.addEventListener("resize", this.handleResize, false);
+    // We don't get "mouseup" for <div> if button was released outside
+    // of its area so need a global one.
+    window.addEventListener("mouseup", this.handleGlobalMouseUp, false);
+    this.handleResize();
+  }
+  componentWillUnmount() {
+    window.removeEventListener("mouseup", this.handleGlobalMouseUp, false);
+    window.removeEventListener("resize", this.handleResize, false);
+  }
+
+  domRect = null
+  vidRect = null
   resizing = false
   wasEmpty = false
   moving = false
@@ -313,83 +327,141 @@ class CropArea extends React.PureComponent {
   startX = 0
   startY = 0
 
-  // FIXME(Kagami): SAR.
-  getVideoRanges() {
+  handleResize = () => {
+    this.domRect = this.refs.outer.getClientRects()[0];
+    this.vidRect = this.getVideoRect();
+    // Need to either recalculate current crop area or just discard it.
+    this.setState({width: 0, height: 0});
+  };
+  getVideoRect() {
+    const {width, height} = this.props.vtrack;
+    const sar = parseSAR(this.props.vtrack.sample_aspect_ratio);
+    // Displayable video dimensions without taking window size into
+    // account. Should be equal to mpv's dwidth/dheight properties.
+    let dwidth = width;
+    let dheight = height;
+    if (sar > 1) {
+      dwidth *= sar;
+    } else {
+      dheight *= sar;
+    }
+
+    const {width: domWidth, height: domHeight} = this.domRect;
+    const domSAR = domWidth / domHeight;
+    let outWidth = 0;
+    let outHeight = 0;
+    // No way to get this from mpv. Assume video is inscribed into
+    // provided area at center, no pan/scan enabled etc.
+    if (domSAR > sar) {
+      outWidth = dwidth * domHeight / dheight;
+      outHeight = domHeight;
+    } else {
+      outWidth = domWidth;
+      outHeight = dheight * domWidth / dwidth;
+    }
+    return {
+      width: Math.floor(outWidth),
+      height: Math.floor(outHeight),
+      // "+1" is just a temporary hack.
+      left: Math.floor((domWidth - outWidth) / 2) + 1,
+      top: Math.floor((domHeight - outHeight) / 2),
+    };
+  }
+  isEmpty() {
+    return !this.state.width && !this.state.height;
   }
   getCSSCrop() {
-    const offset = this.offset;
-    let {x1, x2, y1, y2} = this.state;
-    x1 -= offset.left;
-    x2 -= offset.left;
-    y1 -= offset.top;
-    y2 -= offset.top;
-    const width = Math.abs(x2 - x1);
-    const height = Math.abs(y2 - y1);
-    const left = Math.max(0, Math.min(x1, x2, offset.width - width));
-    const top = Math.max(0, Math.min(y1, y2, offset.height - height));
-    const display = (width && height) ? "block" : "none";
+    let {width, height, left, top} = this.state;
+    // Format of size in state is not the same as in CSS, we allow width
+    // to be negative (grow in opposite dimension), so need to fix
+    // before displaying.
+    if (width < 0) {
+      width = Math.abs(width);
+      left -= width;
+    }
+    if (height < 0) {
+      height = Math.abs(height);
+      top -= height;
+    }
+    const display = this.isEmpty() ? "none" : "block";
     return {width, height, left, top, display};
   }
   getFFCrop() {
   }
-  isEmpty() {
-    return (
-      (this.state.x1 - this.state.x2) === 0 &&
-      (this.state.y1 - this.state.y2) === 0
-    );
+  setCrop(upd) {
+    let {width, height, left, top} = {...this.state, ...upd};
+
+    const {left: vidLeft, top: vidTop} = this.vidRect;
+    const vidRight = vidLeft + this.vidRect.width;
+    const vidBottom = vidTop + this.vidRect.height;
+
+    left = Math.max(vidLeft, left);
+    top = Math.max(vidTop, top);
+
+    if (this.resizing) {
+      width = width > 0 ? Math.min(width, vidRight - left)
+                        : Math.max(-(left - vidLeft), width);
+      height = height > 0 ? Math.min(height, vidBottom - top)
+                          : Math.max(-(top - vidTop), height);
+    } else if (this.moving) {
+      left = Math.min(left, vidRight - width);
+      top = Math.min(top, vidBottom - height);
+    }
+
+    this.setState({width, height, left, top});
   }
 
   handleOuterMouseDown = (e) => {
     this.resizing = true;
     this.wasEmpty = this.isEmpty();
-    this.offset = this.refs.outer.getClientRects()[0];
-    this.setState({
-      x1: e.clientX,
-      x2: e.clientX,
-      y1: e.clientY,
-      y2: e.clientY,
+    this.baseX = e.clientX;
+    this.baseY = e.clientY;
+    this.setCrop({
+      left: e.clientX - this.domRect.left,
+      top: e.clientY - this.domRect.top,
+      width: 0,
+      height: 0,
     });
-  }
+  };
   handleOuterMouseMove = (e) => {
-    if (!this.resizing) return;
-    this.setState({x2: e.clientX, y2: e.clientY});
-  }
-  handleOuterMouseUp = () => {
-    this.resizing = false;
-    if (this.isEmpty() && this.wasEmpty) {
-      this.props.onClick();
+    e.preventDefault();
+    if (this.resizing) {
+      this.setCrop({
+        width: e.clientX - this.baseX,
+        height: e.clientY - this.baseY,
+      });
+    } else if (this.moving) {
+      this.setCrop({
+        left: this.startX + e.clientX - this.baseX,
+        top: this.startY + e.clientY - this.baseY,
+      });
     }
-  }
-
+  };
+  handleGlobalMouseUp = (e) => {
+    if (this.resizing) {
+      this.resizing = false;
+      if (this.isEmpty() && this.wasEmpty) {
+        this.props.onClick();
+      }
+    }
+    if (this.moving) {
+      this.moving = false;
+      const deltaX = e.clientX - this.baseX;
+      const deltaY = e.clientY - this.baseY;
+      if (!deltaX && !deltaY) {
+        this.setCrop({width: 0, height: 0});
+      }
+    }
+  };
   handleInnerMouseDown = (e) => {
+    e.preventDefault();
     e.stopPropagation();
     this.moving = true;
     this.baseX = e.clientX;
     this.baseY = e.clientY;
-    this.startX = this.state.x1;
-    this.startY = this.state.y1;
-  }
-  handleInnerMouseMove = (e) => {
-    if (!this.moving) return;
-    const deltaX = e.clientX - this.baseX;
-    const deltaY = e.clientY - this.baseY;
-    this.setState({
-      x1: this.startX + deltaX,
-      x2: this.startX + deltaX + this.state.x2 - this.state.x1,
-      y1: this.startY + deltaY,
-      y2: this.startY + deltaY + this.state.y2 - this.state.y1,
-    });
-  }
-  handleInnerMouseUp = (e) => {
-    if (!this.moving) return;
-    this.moving = false;
-    const deltaX = e.clientX - this.baseX;
-    const deltaY = e.clientY - this.baseY;
-    if (!deltaX && !deltaY) {
-      this.setState({x1: 0, x2: 0, y1: 0, y2: 0});
-    }
-  }
-
+    this.startX = this.state.left;
+    this.startY = this.state.top;
+  };
   render() {
     const {classes} = this.sheet;
     return (
@@ -398,14 +470,11 @@ class CropArea extends React.PureComponent {
         className={classes.outer}
         onMouseDown={this.handleOuterMouseDown}
         onMouseMove={this.handleOuterMouseMove}
-        onMouseUp={this.handleOuterMouseUp}
       >
         <div
           style={this.getCSSCrop()}
           className={classes.inner}
           onMouseDown={this.handleInnerMouseDown}
-          onMouseMove={this.handleInnerMouseMove}
-          onMouseUp={this.handleInnerMouseUp}
         />
       </div>
     );
