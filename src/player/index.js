@@ -297,6 +297,7 @@ export default class extends React.PureComponent {
     position: "absolute",
     border: "3px solid orange",
     boxSizing: "border-box",
+    display: "none",
   },
 })
 class CropArea extends React.PureComponent {
@@ -328,12 +329,6 @@ class CropArea extends React.PureComponent {
   startX = 0
   startY = 0
 
-  handleResize = () => {
-    this.domRect = this.refs.outer.getClientRects()[0];
-    this.vidRect = this.getVideoRect();
-    // Need to either recalculate current crop area or just discard it.
-    this.setCrop({width: 0, height: 0}, this.sendCrop);
-  };
   getTrackDims() {
     const {width, height} = this.props.vtrack;
     const sar = parseSAR(this.props.vtrack.sample_aspect_ratio);
@@ -385,15 +380,25 @@ class CropArea extends React.PureComponent {
     }
     return {width, height, left, top};
   }
+  isEmpty() {
+    return !this.state.width || !this.state.height;
+  }
+  getCSSCrop() {
+    // Not available until DOM is rendered.
+    if (!this.vidRect) return null;
+    let {width, height, left, top} = this.getCrop();
+    left += this.vidRect.left;
+    top += this.vidRect.top;
+    const display = this.isEmpty() ? "none" : "block";
+    return {width, height, left, top, display};
+  }
   getFFCrop() {
     let {width: cropw, height: croph, left: cropx, top: cropy} = this.getCrop();
-    if (!cropw || !croph) {
+    if (this.isEmpty()) {
       // Will clear UI inputs.
       cropw = croph = cropx = cropy = "";
       return {cropw, croph, cropx, cropy};
     }
-    cropx -= this.vidRect.left;
-    cropy -= this.vidRect.top;
     const {dwidth, sar} = this.getTrackDims();
     const scalef = dwidth / this.vidRect.width;
     cropw = Math.floor(cropw * scalef / sar);
@@ -402,34 +407,33 @@ class CropArea extends React.PureComponent {
     cropy = Math.floor(cropy * scalef / sar);
     return {cropw, croph, cropx, cropy};
   }
-  isEmpty() {
-    return !this.state.width && !this.state.height;
-  }
   setCrop(upd, cb = null) {
     let {width, height, left, top} = {...this.state, ...upd};
 
-    const {left: vidLeft, top: vidTop} = this.vidRect;
-    const vidRight = vidLeft + this.vidRect.width;
-    const vidBottom = vidTop + this.vidRect.height;
-
-    left = Math.max(vidLeft, left);
-    top = Math.max(vidTop, top);
+    left = Math.max(0, left);
+    top = Math.max(0, top);
 
     if (this.resizing) {
-      width = width > 0 ? Math.min(width, vidRight - left)
-                        : Math.max(-(left - vidLeft), width);
-      height = height > 0 ? Math.min(height, vidBottom - top)
-                          : Math.max(-(top - vidTop), height);
+      width = width > 0 ? Math.min(width, this.vidRect.width - left)
+                        : Math.max(-left, width);
+      height = height > 0 ? Math.min(height, this.vidRect.height - top)
+                          : Math.max(-top, height);
     } else if (this.moving) {
-      left = Math.min(left, vidRight - width);
-      top = Math.min(top, vidBottom - height);
+      left = Math.min(left, this.vidRect.width - width);
+      top = Math.min(top, this.vidRect.height - height);
     }
 
     this.setState({width, height, left, top}, cb);
   }
-
   sendCrop = () => {
     this.props.onCrop(this.getFFCrop());
+  };
+
+  handleResize = () => {
+    this.domRect = this.refs.outer.getClientRects()[0];
+    this.vidRect = this.getVideoRect();
+    // Need to either recalculate current crop area or just discard it.
+    this.setCrop({width: 0, height: 0}, this.sendCrop);
   };
   handleOuterMouseDown = (e) => {
     this.resizing = true;
@@ -437,8 +441,8 @@ class CropArea extends React.PureComponent {
     this.baseX = e.clientX;
     this.baseY = e.clientY;
     this.setCrop({
-      left: e.clientX - this.domRect.left,
-      top: e.clientY - this.domRect.top,
+      left: e.clientX - this.domRect.left - this.vidRect.left,
+      top: e.clientY - this.domRect.top - this.vidRect.top,
       width: 0,
       height: 0,
     });
@@ -486,9 +490,6 @@ class CropArea extends React.PureComponent {
   };
   render() {
     const {classes} = this.sheet;
-    const {width, height, left, top} = this.getCrop();
-    const display = this.isEmpty() ? "none" : "block";
-    const cropStyle = {width, height, left, top, display};
     return (
       <div
         ref="outer"
@@ -497,7 +498,7 @@ class CropArea extends React.PureComponent {
         onMouseMove={this.handleOuterMouseMove}
       >
         <div
-          style={cropStyle}
+          style={this.getCSSCrop()}
           className={classes.inner}
           onMouseDown={this.handleInnerMouseDown}
         />
