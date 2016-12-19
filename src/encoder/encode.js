@@ -300,6 +300,7 @@ export default class extends React.PureComponent {
   };
   handleSelectTarget = () => {
     const target = remote.dialog.showSaveDialog({
+      title: "Select destination path",
       defaultPath: this.state.target,
       filters: [
         {name: "WebM", extensions: ["webm"]},
