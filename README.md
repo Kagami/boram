@@ -28,12 +28,12 @@ Download [latest release](https://github.com/Kagami/boram/releases), unpack and 
 
 ## License
 
-boram's own code is licensed under [CC0](legal/LICENSE.BORAM) but releases also include:
+boram's own code is licensed under [CC0](licenses/LICENSE.BORAM) but releases also include:
 
 * Libraries from dependencies section of [package.json](package.json)
-* [Roboto font](legal/LICENSE.ROBOTO)
-* [Font Awesome font](legal/LICENSE.FONTAWESOME)
-* [youtube-dl binaries](legal/LICENSE.PYTHON)
-* [Zeranoe FFmpeg binaries](legal/LICENSE.FFMPEG)
-* [lachs0r mpv binaries](legal/LICENSE.MPV)
-* [Chromium](legal/LICENSE.CHROMIUM) and [Electron](legal/LICENSE.ELECTRON) components
+* [Roboto font](licenses/LICENSE.ROBOTO)
+* [Font Awesome font](licenses/LICENSE.FONTAWESOME)
+* [youtube-dl binaries](licenses/LICENSE.PYTHON)
+* [Zeranoe FFmpeg binaries](licenses/LICENSE.FFMPEG)
+* [lachs0r mpv binaries](licenses/LICENSE.MPV)
+* [Chromium](licenses/LICENSE.CHROMIUM) and [Electron](licenses/LICENSE.ELECTRON) components
