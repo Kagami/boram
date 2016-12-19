@@ -16,7 +16,7 @@ import {parseTime, showTime, parseSAR, tryRun} from "../util";
     height: "100%",
     flexDirection: "column",
   },
-  pluginWrapper: {
+  playerInner: {
     position: "relative",
     flex: 1,
     minHeight: 0,
@@ -204,7 +204,7 @@ export default class extends React.PureComponent {
     const {classes} = this.sheet;
     return (
       <div className={classes.player} onWheel={this.handleWheel}>
-        <div className={classes.pluginWrapper}>
+        <div className={classes.playerInner}>
           <MPV
             ref="mpv"
             src={this.props.source.path}
@@ -219,6 +219,7 @@ export default class extends React.PureComponent {
             vtrack={this.props.vtrack}
             crop={this.props.crop}
             onClick={this.togglePlay}
+            onCrop={this.props.onCrop}
           />
         </div>
         <Controls>
@@ -331,9 +332,9 @@ class CropArea extends React.PureComponent {
     this.domRect = this.refs.outer.getClientRects()[0];
     this.vidRect = this.getVideoRect();
     // Need to either recalculate current crop area or just discard it.
-    this.setState({width: 0, height: 0});
+    this.setCrop({width: 0, height: 0}, this.sendCrop);
   };
-  getVideoRect() {
+  getTrackDims() {
     const {width, height} = this.props.vtrack;
     const sar = parseSAR(this.props.vtrack.sample_aspect_ratio);
     // Displayable video dimensions without taking window size into
@@ -345,14 +346,18 @@ class CropArea extends React.PureComponent {
     } else {
       dheight *= sar;
     }
-
+    const dar = dwidth / dheight;
+    return {width, height, dwidth, dheight, sar, dar};
+  }
+  getVideoRect() {
+    const {dwidth, dheight, dar} = this.getTrackDims();
     const {width: domWidth, height: domHeight} = this.domRect;
     const domSAR = domWidth / domHeight;
     let outWidth = 0;
     let outHeight = 0;
     // No way to get this from mpv. Assume video is inscribed into
     // provided area at center, no pan/scan enabled etc.
-    if (domSAR > sar) {
+    if (domSAR > dar) {
       outWidth = dwidth * domHeight / dheight;
       outHeight = domHeight;
     } else {
@@ -362,19 +367,14 @@ class CropArea extends React.PureComponent {
     return {
       width: Math.floor(outWidth),
       height: Math.floor(outHeight),
-      // "+1" is just a temporary hack.
-      left: Math.floor((domWidth - outWidth) / 2) + 1,
+      left: Math.floor((domWidth - outWidth) / 2),
       top: Math.floor((domHeight - outHeight) / 2),
     };
   }
-  isEmpty() {
-    return !this.state.width && !this.state.height;
-  }
-  getCSSCrop() {
+  getCrop() {
     let {width, height, left, top} = this.state;
-    // Format of size in state is not the same as in CSS, we allow width
-    // to be negative (grow in opposite dimension), so need to fix
-    // before displaying.
+    // We allow width to be negative (grow in opposite dimension), so
+    // need to fix before displaying.
     if (width < 0) {
       width = Math.abs(width);
       left -= width;
@@ -383,12 +383,29 @@ class CropArea extends React.PureComponent {
       height = Math.abs(height);
       top -= height;
     }
-    const display = this.isEmpty() ? "none" : "block";
-    return {width, height, left, top, display};
+    return {width, height, left, top};
   }
   getFFCrop() {
+    let {width: cropw, height: croph, left: cropx, top: cropy} = this.getCrop();
+    if (!cropw || !croph) {
+      // Will clear UI inputs.
+      cropw = croph = cropx = cropy = "";
+      return {cropw, croph, cropx, cropy};
+    }
+    cropx -= this.vidRect.left;
+    cropy -= this.vidRect.top;
+    const {dwidth, sar} = this.getTrackDims();
+    const scalef = dwidth / this.vidRect.width;
+    cropw = Math.floor(cropw * scalef / sar);
+    croph = Math.floor(croph * scalef / sar);
+    cropx = Math.floor(cropx * scalef / sar);
+    cropy = Math.floor(cropy * scalef / sar);
+    return {cropw, croph, cropx, cropy};
   }
-  setCrop(upd) {
+  isEmpty() {
+    return !this.state.width && !this.state.height;
+  }
+  setCrop(upd, cb = null) {
     let {width, height, left, top} = {...this.state, ...upd};
 
     const {left: vidLeft, top: vidTop} = this.vidRect;
@@ -408,9 +425,12 @@ class CropArea extends React.PureComponent {
       top = Math.min(top, vidBottom - height);
     }
 
-    this.setState({width, height, left, top});
+    this.setState({width, height, left, top}, cb);
   }
 
+  sendCrop = () => {
+    this.props.onCrop(this.getFFCrop());
+  };
   handleOuterMouseDown = (e) => {
     this.resizing = true;
     this.wasEmpty = this.isEmpty();
@@ -443,13 +463,15 @@ class CropArea extends React.PureComponent {
       if (this.isEmpty() && this.wasEmpty) {
         this.props.onClick();
       }
-    }
-    if (this.moving) {
+      this.sendCrop();
+    } if (this.moving) {
       this.moving = false;
       const deltaX = e.clientX - this.baseX;
       const deltaY = e.clientY - this.baseY;
       if (!deltaX && !deltaY) {
-        this.setCrop({width: 0, height: 0});
+        this.setCrop({width: 0, height: 0}, this.sendCrop);
+      } else {
+        this.sendCrop();
       }
     }
   };
@@ -464,6 +486,9 @@ class CropArea extends React.PureComponent {
   };
   render() {
     const {classes} = this.sheet;
+    const {width, height, left, top} = this.getCrop();
+    const display = this.isEmpty() ? "none" : "block";
+    const cropStyle = {width, height, left, top, display};
     return (
       <div
         ref="outer"
@@ -472,7 +497,7 @@ class CropArea extends React.PureComponent {
         onMouseMove={this.handleOuterMouseMove}
       >
         <div
-          style={this.getCSSCrop()}
+          style={cropStyle}
           className={classes.inner}
           onMouseDown={this.handleInnerMouseDown}
         />

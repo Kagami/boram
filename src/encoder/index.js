@@ -218,6 +218,9 @@ export default class extends React.PureComponent {
     // Not a user interaction.
     this.setState({deinterlace}, this.handleAll);
   };
+  handleCrop = (crop) => {
+    this.handleAll(null, {crop});
+  };
   handleMPVSubTrack = (strackn) => {
     this.setState({strackn}, this.handleAll);
   };
@@ -278,6 +281,14 @@ export default class extends React.PureComponent {
         return null;
       }
     };
+
+    if (what.crop) {
+      // Always receive all 4 values.
+      setText("videoFX", "cropw", what.crop.cropw);
+      setText("videoFX", "croph", what.crop.croph);
+      setText("videoFX", "cropx", what.crop.cropx);
+      setText("videoFX", "cropy", what.crop.cropy);
+    }
 
     // NOTE(Kagami): We use getValue/setValue instead of value/setState
     // in inputs fields because we should avoid any slowdowns at all
@@ -581,6 +592,7 @@ export default class extends React.PureComponent {
           onMarkStart={this.handleMarkStart}
           onMarkEnd={this.handleMarkEnd}
           onDeinterlace={this.handleMPVDeinterlace}
+          onCrop={this.handleCrop}
           onSubTrack={this.handleMPVSubTrack}
         />
         <Tabs
