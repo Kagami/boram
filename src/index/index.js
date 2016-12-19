@@ -6,12 +6,17 @@
 import url from "url";
 import {BrowserWindow, app, dialog} from "electron";
 import {name, version} from "json!../../package.json";
-import {ICON_BIG_PATH, PAGE_PATH} from "../shared";
+import {WIN_ICON_PATH, PAGE_PATH} from "../shared";
 import {getPluginPath} from "./plugin";
 import "file!./package.json";
 import "file!./index.html";
-import "file!./icon.png";
+// TODO(Kagami): Normally dialogs in win build should use .ico icon too,
+// but for some reason it looks much worse than png, even with multiple
+// dimensions included.
 import "file!./icon-big.png";
+if (BORAM_WIN_BUILD) {
+  require("file!./icon.ico");
+}
 
 // Used by renderer process.
 global.tmp = require("tmp");
@@ -75,7 +80,7 @@ app.on("ready", () => {
     // issue?
     useContentSize: BORAM_WIN_BUILD,
     title: `${name} v${version} by t-ara.industries`,
-    icon: ICON_BIG_PATH,
+    icon: WIN_ICON_PATH,
     webPreferences: {
       plugins: true,
     },
