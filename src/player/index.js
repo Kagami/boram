@@ -308,6 +308,7 @@ class CropArea extends React.PureComponent {
     top: 0,
   }
   componentDidMount() {
+    window.addEventListener("webkitfullscreenchange", this.handleResize, false);
     window.addEventListener("resize", this.handleResize, false);
     // We don't get "mouseup" for <div> if button was released outside
     // of its area so need a global one.
@@ -330,6 +331,8 @@ class CropArea extends React.PureComponent {
   componentWillUnmount() {
     window.removeEventListener("mouseup", this.handleGlobalMouseUp, false);
     window.removeEventListener("resize", this.handleResize, false);
+    window.removeEventListener("webkitfullscreenchange",
+                               this.handleResize, false);
   }
 
   domRect = null
