@@ -8,7 +8,7 @@
     "dev": "rm -f \"${BORAM_PREBUILT_ROOT}/boram.node\" && electron dist/app",
     "test": "eslint .",
     "app": "rm -rf dist/app && NODE_ENV=production webpack",
-    "mpv-dev": "node-gyp rebuild && cp build/Release/boram.node dist/app/libboram.so && cp build/Release/ffmpeg.node node_modules/electron-prebuilt/dist/libffmpeg.so",
+    "mpv-dev": "node-gyp rebuild && cp build/Release/boram.node dist/app/libboram.so && cp build/Release/ffmpeg.node node_modules/electron/dist/libffmpeg.so",
     "mpv-win32-prebuild": "del E:\\boram.node && node-gyp rebuild --arch=ia32 && copy build\\Release\\boram.node E:\\",
     "mpv-win32": "cp \"${BORAM_PREBUILT_ROOT}/boram.node\" dist/app/boram.dll",
     "mpv-lin64": "node-gyp rebuild && strip build/Release/boram.node -o dist/app/libboram.so",
