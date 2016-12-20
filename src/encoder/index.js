@@ -516,10 +516,10 @@ export default class extends React.PureComponent {
       if (this.isSmallBitrate(opts) || this.isBigBitrate(opts)) {
         const vb = FFmpeg.getVideoBitrate(opts);
         warn("codecs", `Recommended bitrates:
-                        ${SMALL_HD_BITRATE}÷${BIG_HD_BITRATE} (hd),
-                        ${SMALL_FHD_BITRATE}÷${BIG_FHD_BITRATE} (fhd),
+                        ${SMALL_HD_BITRATE}÷${BIG_HD_BITRATE} (HD),
+                        ${SMALL_FHD_BITRATE}÷${BIG_FHD_BITRATE} (FHD),
                         ${SMALL_OTHER_BITRATE}÷${BIG_OTHER_BITRATE} (other);
-                        current: ${vb} kbps`);
+                        current: ${vb} Kbps`);
       }
     }
     rawArgs = FFmpeg.getRawArgs(opts).join(" ");

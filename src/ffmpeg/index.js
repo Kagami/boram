@@ -96,6 +96,7 @@ export default makeRunner("ffmpeg", {
       return {w, h, x, y};
     });
   },
+  /** In Kbps. */
   _getVorbisBitrate(vorbisq) {
     /* eslint-disable indent */
     const bitrate = {
@@ -116,6 +117,7 @@ export default makeRunner("ffmpeg", {
     assert(bitrate);
     return bitrate;
   },
+  /** In Kbps. */
   getVideoBitrate({modeLimit, modeCRF, limit, _duration,
                    hasAudio, acodec, ab}) {
     if (!modeLimit || modeCRF) return limit;
