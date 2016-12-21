@@ -6,7 +6,7 @@
 import url from "url";
 import {BrowserWindow, app, dialog} from "electron";
 import {name, version} from "json!../../package.json";
-import {WIN_ICON_PATH, PAGE_PATH} from "../shared";
+import {ICON_BIG_PATH, WIN_ICON_PATH, PAGE_PATH} from "../shared";
 import {getPluginPath} from "./plugin";
 import "file!./package.json";
 import "file!./index.html";
@@ -76,11 +76,10 @@ app.on("ready", () => {
     minWidth: 640,
     minHeight: 780,
     // Works strangely on Linux. useContentSize=false enlarges window to
-    // include borders and useContentSize=true enlarges even more. WM
-    // issue?
+    // include borders and useContentSize=true enlarges even more.
     useContentSize: BORAM_WIN_BUILD,
     title: `${name} v${version} by t-ara.industries`,
-    icon: WIN_ICON_PATH,
+    icon: BORAM_WIN_BUILD ? WIN_ICON_PATH : ICON_BIG_PATH,
     webPreferences: {
       plugins: true,
     },
