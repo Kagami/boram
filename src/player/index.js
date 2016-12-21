@@ -506,6 +506,8 @@ class CropArea extends React.PureComponent {
     this.clearCrop(this.sendCrop);
   };
   handleOuterMouseDown = (e) => {
+    if (e.buttons === 2) return this.clearCrop(this.sendCrop);
+    if (e.buttons !== 1) return;
     this.movOuter = true;
     this.moved = false;
     this.baseX = e.clientX;
@@ -589,6 +591,7 @@ class CropArea extends React.PureComponent {
     }
   };
   handleInnerMouseDown = (e) => {
+    if (e.buttons !== 1) return;
     e.preventDefault();
     e.stopPropagation();
     this.movInner = true;
