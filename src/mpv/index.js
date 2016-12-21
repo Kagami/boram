@@ -53,7 +53,7 @@ export default class extends React.PureComponent {
   frameBackStep() {
     this.postData("frame-back-step", null);
   }
-  sendKey({key, shiftKey, ctrlKey}) {
+  sendKey({key, shiftKey, ctrlKey, altKey}) {
     // Don't need modifier events.
     if ([
       "Shift", "Control", "Alt",
@@ -68,6 +68,9 @@ export default class extends React.PureComponent {
     }
     if (ctrlKey) {
       key = `Ctrl+${key}`;
+    }
+    if (altKey) {
+      key = `Alt+${key}`;
     }
 
     // Ignore exit keys for default keybindings settings. Kludgy but mpv
