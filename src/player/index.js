@@ -752,12 +752,11 @@ class Volume extends React.PureComponent {
     backgroundColor: "#f8f8f8",
     "&:focus": {
       outline: "none",
-      borderColor: "#000",
     },
   },
   invalid: {
-    borderColor: "#f00 !important",
-    color: "#f00",
+    borderColor: "red !important",
+    color: "red",
   },
 })
 class Time extends React.PureComponent {
