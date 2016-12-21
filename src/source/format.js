@@ -59,7 +59,7 @@ export default class extends React.PureComponent {
     if (acodec && acodec !== "none") {
       text += `+${acodec.trim().replace(/\..+$/, "")}`;
     }
-    text += ` ${width}x${height}`;
+    if (width && height) text += ` ${width}x${height}`;
     if (fps > 1) text += ` ${fps}fps`;
     if (filesize) text += ` (${showSize(filesize, {tight: true})})`;
     return text;
