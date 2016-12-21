@@ -601,6 +601,7 @@ class CropArea extends React.PureComponent {
     this.startY = this.state.top;
   };
   handleInnerMouseMove = (e) => {
+    e.preventDefault();
     const w = this.state.width;
     const h = this.state.height;
     const ox = e.nativeEvent.offsetX;

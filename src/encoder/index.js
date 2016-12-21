@@ -153,8 +153,8 @@ export default class extends React.PureComponent {
     const {vb} = opts;
     const size = this.getMaxSide(opts);
     return (
-      (size >= 1920 && vb < SMALL_FHD_BITRATE) ||
-      (size >= 1280 && vb < SMALL_HD_BITRATE) ||
+      (size > 1280 && vb < SMALL_FHD_BITRATE) ||
+      (size === 1280 && vb < SMALL_HD_BITRATE) ||
       vb < SMALL_OTHER_BITRATE
     );
   }
@@ -334,6 +334,7 @@ export default class extends React.PureComponent {
     const mend = get("mend");
     const induration = this.getFullDuration();
     const useExtSub = strackn === this.getSubTracks().length;
+    const focused = null;
     // Will contain exact values.
     let _start = null;
     let _duration = null;
@@ -426,7 +427,7 @@ export default class extends React.PureComponent {
       if (v <= 0) throw new Error("less than start");
       return v;
     });
-    if (what.checked === "modeCRF") {
+    if (what.checked === "modeCRF" || what.checked === "modeLimit") {
       limit = modeCRF ? "0" : "";
       setText("codecs", "limit", limit);
     }
@@ -473,11 +474,9 @@ export default class extends React.PureComponent {
     if (what.selected === "strackn") {
       this.refs.player.setSub({strackn});
     }
-    // This assumes we were called from `onBlur` handler.
-    // This clears warnings if errors are present.
-    this.setState({allValid, warnings, errors, rawArgs, focused: null});
     if (!allValid) {
       setText("codecs", "rawArgs", rawArgs);
+      this.setState({allValid, warnings, errors, rawArgs, focused});
       return;
     }
 
@@ -507,6 +506,8 @@ export default class extends React.PureComponent {
       if (this.isShortClip(opts)) {
         warn("codecs", `Consider CRF mode for such short fragment`);
       }
+    }
+    if (!modeCRF && modeLimit) {
       if (this.isSmallBitrate(opts)) {
         warn("codecs", `Video bitrate seems too small,
                         consider fixing limit`);
@@ -532,8 +533,11 @@ export default class extends React.PureComponent {
       // For Codecs.
       _vb,
 
+      allValid,
       warnings,
+      errors,
       rawArgs,
+      focused,
       mstart: _start,
       mend: _start + _duration,
     });
