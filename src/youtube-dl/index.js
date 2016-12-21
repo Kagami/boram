@@ -4,16 +4,29 @@
  */
 
 import path from "path";
+import which from "which";
 import {APP_PATH} from "../shared";
 import {makeRunner, getRunPath} from "../util";
 require("file!../../bin/youtube-dl." + (BORAM_WIN_BUILD ? "exe" : "zip"));
 
 export default makeRunner("youtube-dl", {
   _fixPathArgs(runpath, args) {
-    // youtube-dl must always be in PATH on Windows.
-    if (runpath || BORAM_WIN_BUILD) {
+    if (BORAM_WIN_BUILD) {
+      try {
+        // youtube-dl lacks functionality without ffmpeg in PATH (can't
+        // merge formats, embed subtitles, etc).
+        which.sync("ffmpeg");
+      } catch (e) {
+        // "ffmpeg.exe" is in the same directory and "." is in PATH.
+        runpath = path.join(APP_PATH, "youtube-dl");
+      }
+      return [runpath, args];
+    } else if (runpath) {
       return [runpath, args];
     } else {
+      // We might require youtube-dl package on Linux but it's often
+      // outdated, so provide our own. On the other hand, Python should
+      // be installed almost anywhere out of the box.
       const zippath = path.join(APP_PATH, "youtube-dl.zip");
       return [getRunPath("python"), [zippath].concat(args)];
     }
