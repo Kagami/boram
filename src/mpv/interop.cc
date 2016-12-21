@@ -32,7 +32,7 @@
 using pp::Var;
 
 // PPAPI GLES implementation doesn't provide getProcAddress.
-static const std::unordered_map<std::string, void*> GL_FUNCTIONS = {
+static const std::unordered_map<std::string, void*> GL_CALLBACKS = {
   GLCB(GetString),
   GLCB(ActiveTexture),
   GLCB(AttachShader),
@@ -105,17 +105,19 @@ static const std::unordered_map<std::string, void*> GL_FUNCTIONS = {
   {"glGetTranslatedShaderSourceANGLE", NULL}
 };
 
-class MPVInstance : public pp::Instance {
+class BoramInstance : public pp::Instance {
  public:
-  explicit MPVInstance(PP_Instance instance)
+  explicit BoramInstance(PP_Instance instance)
       : pp::Instance(instance),
         callback_factory_(this),
         mpv_(NULL),
         mpv_gl_(NULL),
         src_(NULL),
+        width_(0),
+        height_(0),
         run_(false) {}
 
-  virtual ~MPVInstance() {
+  virtual ~BoramInstance() {
     if (mpv_gl_)
       mpv_opengl_cb_uninit_gl(mpv_gl_);
     if (mpv_)
@@ -219,8 +221,8 @@ class MPVInstance : public pp::Instance {
 
  private:
   static void* GetProcAddressMPV(void* fn_ctx, const char* name) {
-    auto search = GL_FUNCTIONS.find(name);
-    if (search == GL_FUNCTIONS.end()) {
+    auto search = GL_CALLBACKS.find(name);
+    if (search == GL_CALLBACKS.end()) {
       fprintf(stderr, "FIXME: missed GL function %s\n", name);
       return NULL;
     } else {
@@ -262,7 +264,7 @@ class MPVInstance : public pp::Instance {
   static void HandleMPVWakeup(void* ctx) {
     // XXX(Kagami): Do a round-trip in order to process mpv events
     // asynchronously. Use some better way?
-    static_cast<MPVInstance*>(ctx)->PostData("wakemeup", Var::Null());
+    static_cast<BoramInstance*>(ctx)->PostData("wakemeup", Var::Null());
   }
 
   bool InitGL() {
@@ -337,10 +339,11 @@ class MPVInstance : public pp::Instance {
 
   void MainLoop(int32_t) {
     mpv_opengl_cb_draw(mpv_gl_, 0, width_, -height_);
-    context_.SwapBuffers(callback_factory_.NewCallback(&MPVInstance::MainLoop));
+    context_.SwapBuffers(
+        callback_factory_.NewCallback(&BoramInstance::MainLoop));
   }
 
-  pp::CompletionCallbackFactory<MPVInstance> callback_factory_;
+  pp::CompletionCallbackFactory<BoramInstance> callback_factory_;
   pp::Graphics3D context_;
   mpv_handle* mpv_;
   mpv_opengl_cb_context* mpv_gl_;
@@ -350,18 +353,18 @@ class MPVInstance : public pp::Instance {
   bool run_;
 };
 
-class MPVModule : public pp::Module {
+class BoramModule : public pp::Module {
  public:
-  MPVModule() : pp::Module() {}
-  virtual ~MPVModule() {}
+  BoramModule() : pp::Module() {}
+  virtual ~BoramModule() {}
 
   virtual pp::Instance* CreateInstance(PP_Instance instance) {
-    return new MPVInstance(instance);
+    return new BoramInstance(instance);
   }
 };
 
 namespace pp {
 Module* CreateModule() {
-  return new MPVModule();
+  return new BoramModule();
 }
 }  // namespace pp
