@@ -61,8 +61,8 @@ class Output extends React.PureComponent {
     sel.addRange(range);
   };
   menu = remote.Menu.buildFromTemplate([
-    {label: "Copy", role: "copy"},
     {label: "Clear", click: this.handleClear},
+    {label: "Copy", role: "copy"},
     {type: "separator"},
     {label: "Select all", click: this.handleSelectAll},
   ]);
