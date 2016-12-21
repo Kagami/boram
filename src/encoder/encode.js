@@ -41,15 +41,42 @@ class Output extends React.PureComponent {
   componentDidUpdate() {
     this.scrollToEnd();
   }
-  atEnd = true;
+
+  atEnd = true
   scrollToEnd() {
     if (this.atEnd) {
       this.refs.out.scrollTop = this.refs.out.scrollHeight;
     }
   }
+
+  handleClear = () => {
+    this.props.onClear();
+  };
+  handleSelectAll = () => {
+    // https://stackoverflow.com/a/23255927
+    const range = document.createRange();
+    range.selectNodeContents(this.refs.out);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  };
+  menu = remote.Menu.buildFromTemplate([
+    {label: "Copy", role: "copy"},
+    {label: "Clear", click: this.handleClear},
+    {type: "separator"},
+    {label: "Select all", click: this.handleSelectAll},
+  ])
+  handleMenu = () => {
+    this.menu.popup();
+  };
+
   render() {
     const {classes} = this.sheet;
-    return <pre ref="out" className={classes.output}>{this.props.value}</pre>;
+    return (
+      <pre ref="out" className={classes.output} onContextMenu={this.handleMenu}>
+        {this.props.value}
+      </pre>
+    );
   }
 }
 
@@ -248,9 +275,6 @@ export default class extends React.PureComponent {
       "",
     ].join("\n");
   }
-  clearState() {
-    this.setState({progress: 0, log: "", output: null});
-  }
   isPreviewEncoding() {
     return this.props.encoding && this.state.preview;
   }
@@ -284,6 +308,9 @@ export default class extends React.PureComponent {
       this.cancel();
     }
   }
+  clearState = () => {
+    this.setState({progress: 0, log: "", output: null});
+  };
   handlePreviewToggle = () => {
     this.toggleEncode({preview: true});
   };
@@ -351,6 +378,7 @@ export default class extends React.PureComponent {
           <BigProgress value={this.state.progress} />
         </Pane>
         <Output
+          onClear={this.clearState}
           value={this.state.log ||
                  (this.props.allValid
                    ? `Ready to start.\nSaving to ${this.state.target}`
