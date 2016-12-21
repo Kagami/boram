@@ -34,9 +34,10 @@ class Output extends React.PureComponent {
   componentDidMount() {
     this.scrollToEnd();
   }
-  componentWillUpdate() {
+  componentWillUpdate(nextProps) {
     const {scrollHeight, scrollTop, clientHeight} = this.refs.out;
     this.atEnd = scrollHeight - scrollTop <= clientHeight;
+    this.menu.items[0].enabled = !nextProps.encoding;
   }
   componentDidUpdate() {
     this.scrollToEnd();
@@ -377,11 +378,12 @@ export default class extends React.PureComponent {
           <BigProgress value={this.state.progress} />
         </Pane>
         <Output
-          onClear={this.clearState}
           value={this.state.log ||
                  (this.props.allValid
                    ? `Ready to start.\nSaving to ${this.state.target}`
                    : "Fix invalid settings.")}
+          encoding={this.props.encoding}
+          onClear={this.clearState}
         />
       </Pane>
     );
