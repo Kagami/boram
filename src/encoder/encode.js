@@ -50,6 +50,7 @@ class Output extends React.PureComponent {
   }
 
   handleClear = () => {
+    window.getSelection().removeAllRanges();
     this.props.onClear();
   };
   handleSelectAll = () => {
