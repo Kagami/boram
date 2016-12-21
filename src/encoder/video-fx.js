@@ -94,6 +94,13 @@ export default class extends React.PureComponent {
       this.props.onEncoding(false);
     });
   };
+  handleCropClear = () => {
+    this.refs.cropw.setValue("");
+    this.refs.croph.setValue("");
+    this.refs.cropx.setValue("");
+    this.refs.cropy.setValue("");
+    this.props.onUpdate();
+  };
   handleSubLoad = () => {
     const selected = remote.dialog.showOpenDialog({
       filters: [
@@ -137,7 +144,6 @@ export default class extends React.PureComponent {
           <SmallButton
             icon={<Icon name="eye" />}
             title="Auto-detect interlacing"
-            style={{marginLeft: 0}}
             disabled={this.props.encoding}
             onClick={this.handleInterlaceDetect}
           />
@@ -146,6 +152,7 @@ export default class extends React.PureComponent {
           <SmallInput
             ref="cropw"
             hintText="width"
+            width={45}
             disabled={this.props.encoding}
             onFocus={this.props.makeFocuser("cropw")}
             onBlur={this.props.onUpdate}
@@ -154,6 +161,7 @@ export default class extends React.PureComponent {
           <SmallInput
             ref="croph"
             hintText="height"
+            width={45}
             disabled={this.props.encoding}
             onFocus={this.props.makeFocuser("croph")}
             onBlur={this.props.onUpdate}
@@ -162,6 +170,7 @@ export default class extends React.PureComponent {
           <SmallInput
             ref="cropx"
             hintText="left"
+            width={45}
             disabled={this.props.encoding}
             onFocus={this.props.makeFocuser("cropx")}
             onBlur={this.props.onUpdate}
@@ -170,6 +179,7 @@ export default class extends React.PureComponent {
           <SmallInput
             ref="cropy"
             hintText="top"
+            width={45}
             disabled={this.props.encoding}
             onFocus={this.props.makeFocuser("cropy")}
             onBlur={this.props.onUpdate}
@@ -178,15 +188,22 @@ export default class extends React.PureComponent {
           <SmallButton
             icon={<Icon name="eye" />}
             title="Auto-detect black borders"
-            style={{marginLeft: 0}}
             disabled={this.props.encoding}
             onClick={this.handleCropDetect}
+          />
+          <Sep margin={2.5} />
+          <SmallButton
+            icon={<Icon name="remove" />}
+            title="Discard crop"
+            disabled={this.props.encoding}
+            onClick={this.handleCropClear}
           />
         </Prop>
         <Prop name="scale">
           <SmallInput
             ref="scalew"
             hintText="width"
+            width={45}
             disabled={this.props.encoding}
             onFocus={this.props.makeFocuser("scalew")}
             onBlur={this.props.onUpdate}
@@ -195,6 +212,7 @@ export default class extends React.PureComponent {
           <SmallInput
             ref="scaleh"
             hintText="height"
+            width={45}
             disabled={this.props.encoding}
             onFocus={this.props.makeFocuser("scaleh")}
             onBlur={this.props.onUpdate}
@@ -243,6 +261,7 @@ export default class extends React.PureComponent {
             />
           : null}
           </SmallSelect>
+          <Sep/>
           <SmallButton
             icon={<Icon name="folder-open-o" />}
             title="Load external subtitle"

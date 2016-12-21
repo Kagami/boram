@@ -336,9 +336,9 @@ class CropArea extends React.PureComponent {
 
   domRect = null;
   vidRect = null;
-  wasEmpty = false;
   movOuter = false;
   movInner = false;
+  moved = false;
   baseX = 0;
   baseY = 0;
   startPos = "i";
@@ -507,22 +507,28 @@ class CropArea extends React.PureComponent {
   };
   handleOuterMouseDown = (e) => {
     this.movOuter = true;
-    this.wasEmpty = this.isEmpty();
+    this.moved = false;
     this.baseX = e.clientX;
     this.baseY = e.clientY;
-    this.setCrop({
-      width: 0,
-      height: 0,
-      left: e.clientX - this.domRect.left - this.vidRect.left,
-      top: e.clientY - this.domRect.top - this.vidRect.top,
-    });
+    this.startX = e.clientX - this.domRect.left - this.vidRect.left;
+    this.startY = e.clientY - this.domRect.top - this.vidRect.top;
   };
   handleOuterMouseMove = (e) => {
     e.preventDefault();
     const dx = e.clientX - this.baseX;
     const dy = e.clientY - this.baseY;
     if (this.movOuter) {
-      this.setCrop({width: dx, height: dy});
+      if (this.moved) {
+        this.setCrop({width: dx, height: dy});
+      } else {
+        this.moved = true;
+        this.setCrop({
+          width: 0,
+          height: 0,
+          left: this.startX,
+          top: this.startY,
+        });
+      }
     } else if (this.movInner) {
       let {startW: width, startH: height, startX: left, startY: top} = this;
       switch (this.startPos) {
@@ -571,10 +577,12 @@ class CropArea extends React.PureComponent {
   handleGlobalMouseUp = () => {
     if (this.movOuter) {
       this.movOuter = false;
-      if (this.isEmpty() && this.wasEmpty) {
+      if (this.moved) {
+        this.sendCrop();
+      } else {
+        // It was just a click.
         this.props.onClick();
       }
-      this.sendCrop();
     } else if (this.movInner) {
       this.movInner = false;
       this.sendCrop();

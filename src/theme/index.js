@@ -249,7 +249,6 @@ export const InlineCheckbox = (function() {
 export const SmallButton = (function() {
   const styles = {
     buttonOuter: {
-      margin: "0 10px",
       minWidth: 35,
       lineHeight: "26px",
     },
