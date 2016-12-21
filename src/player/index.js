@@ -291,14 +291,12 @@ export default class extends React.PureComponent {
     bottom: 0,
     left: 0,
     right: 0,
-    cursor: "default",
   },
   inner: {
     position: "absolute",
     border: "3px solid orange",
     boxSizing: "border-box",
     display: "none",
-    cursor: "move",
   },
 })
 class CropArea extends React.PureComponent {
@@ -307,6 +305,7 @@ class CropArea extends React.PureComponent {
     height: 0,
     left: 0,
     top: 0,
+    pos: "i",
   };
   componentDidMount() {
     window.addEventListener("webkitfullscreenchange", this.handleResize, false);
@@ -337,11 +336,14 @@ class CropArea extends React.PureComponent {
 
   domRect = null;
   vidRect = null;
-  resizing = false;
   wasEmpty = false;
-  moving = false;
+  movOuter = false;
+  movInner = false;
   baseX = 0;
   baseY = 0;
+  startPos = "i";
+  startW = 0;
+  startH = 0;
   startX = 0;
   startY = 0;
 
@@ -403,6 +405,29 @@ class CropArea extends React.PureComponent {
   isEmpty() {
     return !this.state.width || !this.state.height;
   }
+  getOuterCursor() {
+    return this.movInner ? this.getCursor() : "default";
+  }
+  getCursor() {
+    if (this.movOuter) return "default";
+    const pos = this.movInner ? this.startPos : this.state.pos;
+    switch (pos) {
+    case "nw":
+    case "se":
+      return "nwse-resize";
+    case "ne":
+    case "sw":
+      return "nesw-resize";
+    case "n":
+    case "s":
+      return "ns-resize";
+    case "e":
+    case "w":
+      return "ew-resize";
+    case "i":
+      return "move";
+    }
+  }
   getCSSCrop() {
     // Not available until DOM is rendered.
     if (!this.vidRect) return null;
@@ -410,7 +435,8 @@ class CropArea extends React.PureComponent {
     left += this.vidRect.left;
     top += this.vidRect.top;
     const display = this.isEmpty() ? "none" : "block";
-    return {width, height, left, top, display};
+    const cursor = this.getCursor();
+    return {width, height, left, top, display, cursor};
   }
   getFFCrop() {
     let {width: cropw, height: croph, left: cropx, top: cropy} = this.getCrop();
@@ -446,20 +472,21 @@ class CropArea extends React.PureComponent {
     cropy = Math.round(cropy / scalef * sar);
 
     this.setCrop({width: cropw, height: croph, left: cropx, top: cropy},
-                 null, {resizing: true});
+                 null, {movOuter: true});
   }
   setCrop(upd, cb = null, opts = {}) {
     let {width, height, left, top} = {...this.state, ...upd};
 
-    left = Math.max(0, left);
-    top = Math.max(0, top);
+    left = Math.min(Math.max(0, left), this.vidRect.width);
+    top = Math.min(Math.max(0, top), this.vidRect.height);
 
-    if (this.resizing || opts.resizing) {
+    if (this.movOuter || (this.movInner && this.startPos !== "i") ||
+        opts.movOuter) {
       width = width > 0 ? Math.min(width, this.vidRect.width - left)
                         : Math.max(-left, width);
       height = height > 0 ? Math.min(height, this.vidRect.height - top)
                           : Math.max(-top, height);
-    } else if (this.moving) {
+    } else if (this.movInner) {
       left = Math.min(left, this.vidRect.width - width);
       top = Math.min(top, this.vidRect.height - height);
     }
@@ -479,57 +506,124 @@ class CropArea extends React.PureComponent {
     this.clearCrop(this.sendCrop);
   };
   handleOuterMouseDown = (e) => {
-    this.resizing = true;
+    this.movOuter = true;
     this.wasEmpty = this.isEmpty();
     this.baseX = e.clientX;
     this.baseY = e.clientY;
     this.setCrop({
-      left: e.clientX - this.domRect.left - this.vidRect.left,
-      top: e.clientY - this.domRect.top - this.vidRect.top,
       width: 0,
       height: 0,
+      left: e.clientX - this.domRect.left - this.vidRect.left,
+      top: e.clientY - this.domRect.top - this.vidRect.top,
     });
   };
   handleOuterMouseMove = (e) => {
     e.preventDefault();
-    if (this.resizing) {
-      this.setCrop({
-        width: e.clientX - this.baseX,
-        height: e.clientY - this.baseY,
-      });
-    } else if (this.moving) {
-      this.setCrop({
-        left: this.startX + e.clientX - this.baseX,
-        top: this.startY + e.clientY - this.baseY,
-      });
+    const dx = e.clientX - this.baseX;
+    const dy = e.clientY - this.baseY;
+    if (this.movOuter) {
+      this.setCrop({width: dx, height: dy});
+    } else if (this.movInner) {
+      let {startW: width, startH: height, startX: left, startY: top} = this;
+      switch (this.startPos) {
+      case "nw":
+        left += dx;
+        width -= dx;
+        top += dy;
+        height -= dy;
+        break;
+      case "se":
+        width += dx;
+        height += dy;
+        break;
+      case "ne":
+        width += dx;
+        top += dy;
+        height -= dy;
+        break;
+      case "sw":
+        left += dx;
+        width -= dx;
+        height += dy;
+        break;
+      case "n":
+        top += dy;
+        height -= dy;
+        break;
+      case "s":
+        height += dy;
+        break;
+      case "e":
+        width += dx;
+        break;
+      case "w":
+        left += dx;
+        width -= dx;
+        break;
+      case "i":
+        left += dx;
+        top += dy;
+        break;
+      }
+      this.setCrop({width, height, left, top});
     }
   };
   handleGlobalMouseUp = () => {
-    if (this.resizing) {
-      this.resizing = false;
+    if (this.movOuter) {
+      this.movOuter = false;
       if (this.isEmpty() && this.wasEmpty) {
         this.props.onClick();
       }
       this.sendCrop();
-    } else if (this.moving) {
-      this.moving = false;
+    } else if (this.movInner) {
+      this.movInner = false;
       this.sendCrop();
     }
   };
   handleInnerMouseDown = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    this.moving = true;
+    this.movInner = true;
     this.baseX = e.clientX;
     this.baseY = e.clientY;
+    this.startPos = this.state.pos;
+    this.startW = this.state.width;
+    this.startH = this.state.height;
     this.startX = this.state.left;
     this.startY = this.state.top;
+  };
+  handleInnerMouseMove = (e) => {
+    const w = this.state.width;
+    const h = this.state.height;
+    const ox = e.nativeEvent.offsetX;
+    const oy = e.nativeEvent.offsetY;
+    const b = 10;
+    let pos = "i";
+    if (ox <= b && oy <= b) {
+      pos = "nw";
+    } else if (ox <= b && oy >= h - b) {
+      pos = "sw";
+    } else if (ox >= w - b && oy <= b) {
+      pos = "ne";
+    } else if (ox >= w - b && oy >= h - b) {
+      pos = "se";
+    } else if (ox <= 3) {
+      pos = "w";
+    } else if (oy <= 3) {
+      pos = "n";
+    } else if (ox >= w - b) {
+      pos = "e";
+    } else if (oy >= h - b) {
+      pos = "s";
+    }
+    this.setState({pos});
   };
   render() {
     const {classes} = this.sheet;
     return (
       <div
         ref="outer"
+        style={{cursor: this.getOuterCursor()}}
         className={classes.outer}
         onMouseDown={this.handleOuterMouseDown}
         onMouseMove={this.handleOuterMouseMove}
@@ -538,6 +632,7 @@ class CropArea extends React.PureComponent {
           style={this.getCSSCrop()}
           className={classes.inner}
           onMouseDown={this.handleInnerMouseDown}
+          onMouseMove={this.handleInnerMouseMove}
         />
       </div>
     );
