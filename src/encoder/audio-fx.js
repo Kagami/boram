@@ -63,6 +63,7 @@ export default class extends React.PureComponent {
           <SmallInput
             ref="fadeIn"
             hintText="in"
+            disabled={!this.props.hasAudio}
             onFocus={this.props.makeFocuser("fadeIn")}
             onBlur={this.props.onUpdate}
           />
@@ -70,6 +71,7 @@ export default class extends React.PureComponent {
           <SmallInput
             ref="fadeOut"
             hintText="out"
+            disabled={!this.props.hasAudio}
             onFocus={this.props.makeFocuser("fadeOut")}
             onBlur={this.props.onUpdate}
           />
@@ -78,6 +80,7 @@ export default class extends React.PureComponent {
           <SmallInput
             ref="amplify"
             hintText="factor"
+            disabled={!this.props.hasAudio}
             onFocus={this.props.makeFocuser("amplify")}
             onBlur={this.props.onUpdate}
           />
