@@ -298,6 +298,7 @@ export default class extends React.PureComponent {
     border: "3px solid orange",
     boxSizing: "border-box",
     display: "none",
+    cursor: "move",
   },
 })
 class CropArea extends React.PureComponent {
@@ -503,22 +504,16 @@ class CropArea extends React.PureComponent {
       });
     }
   };
-  handleGlobalMouseUp = (e) => {
+  handleGlobalMouseUp = () => {
     if (this.resizing) {
       this.resizing = false;
       if (this.isEmpty() && this.wasEmpty) {
         this.props.onClick();
       }
       this.sendCrop();
-    } if (this.moving) {
+    } else if (this.moving) {
       this.moving = false;
-      const deltaX = e.clientX - this.baseX;
-      const deltaY = e.clientY - this.baseY;
-      if (!deltaX && !deltaY) {
-        this.clearCrop(this.sendCrop);
-      } else {
-        this.sendCrop();
-      }
+      this.sendCrop();
     }
   };
   handleInnerMouseDown = (e) => {
