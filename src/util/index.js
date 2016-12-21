@@ -29,15 +29,7 @@ export function showSize(size, opts = {}) {
 }
 
 export function showBitrate(bitrate) {
-  if (bitrate < 1000) {
-    return bitrate + " bps";
-  } else if (bitrate < 1000 * 1000) {
-    bitrate /= 1000;
-    return bitrate.toFixed(2) + " Kbps";
-  } else {
-    bitrate /= 1000 * 1000;
-    return bitrate.toFixed(2) + " Mbps";
-  }
+  return Math.floor(bitrate / 1000) + " Kbps";
 }
 
 export function parseTime(time) {
