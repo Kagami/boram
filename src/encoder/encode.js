@@ -12,7 +12,7 @@ import {useSheet} from "../jss";
 import {BigProgress, BigButton, Pane, Sep} from "../theme";
 import {
   tmp, parseFrameRate, parseArgs,
-  getOpt, showTime, showSize, quoteArgs,
+  showSize, showBitrate, showTime, quoteArgs,
 } from "../util";
 
 @useSheet({
@@ -262,15 +262,13 @@ export default class extends React.PureComponent {
     return `$ ffmpeg ${quoteArgs(args)}\n`;
   }
   showStats(startTime) {
-    const args = parseArgs(this.props.rawArgs);
     const {size} = fs.statSync(this.state.output.path);
     const runTime = this.now() - startTime;
     return [
       this.sep(),
       `Output path: ${this.state.output.path}`,
       `Output duration: ${showTime(this.props._duration)}`,
-      `Output video bitrate: ${getOpt(args, "-b:v", "0")}`,
-      `Output audio bitrate: ${getOpt(args, "-b:a", "0")}`,
+      `Output bitrate: ${showBitrate(size / this.props._duration)}`,
       `Output file size: ${showSize(size)}`,
       `Overall time spent: ${showTime(runTime)}`,
       "",
