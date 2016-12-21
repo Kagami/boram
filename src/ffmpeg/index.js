@@ -139,14 +139,11 @@ export default makeRunner("ffmpeg", {
     const subtitles = [];
     const vfilters = [];
     const afilters = [];
-    const maybeSet = (name, value) => {
-      if (value != null) {
-        args.push(name, value.toString());
-      }
-    };
 
     // Input.
-    maybeSet("-ss", opts.start);
+    if (opts.start != null) {
+      args.push("-ss", opts.start);
+    }
     args.push("-i", escapeArg(this._escapeFilename(opts.inpath)));
     if (opts.end != null) {
       // We always use `-t` in resulting command because `-ss` before
@@ -177,7 +174,14 @@ export default makeRunner("ffmpeg", {
       assert(false);
     }
     args.push("-b:v", opts.vb ? `${opts.vb}k` : "0");
-    maybeSet("-crf", opts.quality);
+    if (opts.quality != null) {
+      if (opts.quality === 0) {
+        // Slightly different than "-crf 0".
+        args.push("-lossless", "1");
+      } else {
+        args.push("-crf", opts.quality.toString());
+      }
+    }
     // Enabled for VP9 by default but always force it just in case.
     args.push("-auto-alt-ref", "1", "-lag-in-frames", "25");
     // Bigger keyframe interval saves bitrate but a lot of users will
