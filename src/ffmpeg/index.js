@@ -139,7 +139,6 @@ export default makeRunner("ffmpeg", {
     const subtitles = [];
     const vfilters = [];
     const afilters = [];
-    const vb = this.getVideoBitrate(opts);
     const maybeSet = (name, value) => {
       if (value != null) {
         args.push(name, value.toString());
@@ -177,7 +176,7 @@ export default makeRunner("ffmpeg", {
     } else {
       assert(false);
     }
-    args.push("-b:v", vb ? `${vb}k` : "0");
+    args.push("-b:v", opts.vb ? `${opts.vb}k` : "0");
     maybeSet("-crf", opts.quality);
     // Enabled for VP9 by default but always force it just in case.
     args.push("-auto-alt-ref", "1", "-lag-in-frames", "25");

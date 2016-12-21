@@ -86,7 +86,7 @@ export default class extends React.PureComponent {
     mend: this.getFullDuration(),
     vtrackn: 0,
     deinterlace: false,
-    crop: {},
+    _crop: null,
     burnSubs: false,
     strackn: this.getSubTracks().length ? 0 : null,
     extSubPath: null,
@@ -150,7 +150,7 @@ export default class extends React.PureComponent {
     return duration < 6;
   }
   isSmallBitrate(opts) {
-    const vb = FFmpeg.getVideoBitrate(opts);
+    const {vb} = opts;
     const size = this.getMaxSide(opts);
     return (
       (size >= 1920 && vb < SMALL_FHD_BITRATE) ||
@@ -159,7 +159,7 @@ export default class extends React.PureComponent {
     );
   }
   isBigBitrate(opts) {
-    const vb = FFmpeg.getVideoBitrate(opts);
+    const {vb} = opts;
     const size = this.getMaxSide(opts);
     return (
       (size <= 1280 && vb > BIG_HD_BITRATE) ||
@@ -502,6 +502,7 @@ export default class extends React.PureComponent {
       inpath, atracks,
       _start, _duration,
     };
+    const _vb = opts.vb = FFmpeg.getVideoBitrate(opts);
     if (!modeCRF) {
       if (this.isShortClip(opts)) {
         warn("codecs", `Consider CRF mode for such short fragment`);
@@ -514,24 +515,27 @@ export default class extends React.PureComponent {
                         consider CRF mode or fix limit`);
       }
       if (this.isSmallBitrate(opts) || this.isBigBitrate(opts)) {
-        const vb = FFmpeg.getVideoBitrate(opts);
         warn("codecs", `Recommended bitrates:
                         ${SMALL_HD_BITRATE}÷${BIG_HD_BITRATE} (HD),
                         ${SMALL_FHD_BITRATE}÷${BIG_FHD_BITRATE} (FHD),
-                        ${SMALL_OTHER_BITRATE}÷${BIG_OTHER_BITRATE} (other);
-                        current: ${vb} Kbps`);
+                        ${SMALL_OTHER_BITRATE}÷${BIG_OTHER_BITRATE} (other)`);
       }
     }
     rawArgs = FFmpeg.getRawArgs(opts).join(" ");
     setText("codecs", "rawArgs", rawArgs);
     this.setState({
+      // Helper precomputed props:
+      // For CropArea.
+      _crop: {cropw, croph, cropx, cropy},
+      // For Codecs and Encode.
       _duration,
+      // For Codecs.
+      _vb,
+
       warnings,
       rawArgs,
       mstart: _start,
       mend: _start + _duration,
-      // For CropArea.
-      crop: {cropw, croph, cropx, cropy},
     });
   };
   handleRawArgs = (e) => {
@@ -590,7 +594,7 @@ export default class extends React.PureComponent {
           atracks={this.getAudioTracks()}
           mstart={this.state.mstart}
           mend={this.state.mend}
-          crop={this.state.crop}
+          crop={this.state._crop}
           onMarkStart={this.handleMarkStart}
           onMarkEnd={this.handleMarkEnd}
           onDeinterlace={this.handleMPVDeinterlace}
@@ -663,6 +667,7 @@ export default class extends React.PureComponent {
               warnings={this.state.warnings.codecs}
               errors={this.state.errors.codecs}
               _duration={this.state._duration}
+              _vb={this.state._vb}
               vcodec={this.state.vcodec}
               hasAudio={this.state.hasAudio}
               acodec={this.state.acodec}

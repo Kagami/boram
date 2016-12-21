@@ -318,15 +318,14 @@ class CropArea extends React.PureComponent {
   componentWillReceiveProps(nextProps) {
     const acrop = this.props.crop;
     const bcrop = nextProps.crop;
-    /* eslint-disable eqeqeq */
+    if (!acrop) return;
     // Check for nulls/undefined.
-    if (acrop.cropw != bcrop.cropw ||
-        acrop.croph != bcrop.croph ||
-        acrop.cropx != bcrop.cropx ||
-        acrop.cropy != bcrop.cropy) {
+    if (acrop.cropw !== bcrop.cropw ||
+        acrop.croph !== bcrop.croph ||
+        acrop.cropx !== bcrop.cropx ||
+        acrop.cropy !== bcrop.cropy) {
       this.setFFCrop(bcrop);
     }
-    /* eslint-enable eqeqeq */
   }
   componentWillUnmount() {
     window.removeEventListener("mouseup", this.handleGlobalMouseUp, false);

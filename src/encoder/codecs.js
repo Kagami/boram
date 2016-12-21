@@ -50,6 +50,11 @@ const HELP = {
     cursor: "pointer",
     WebkitUserSelect: "none",
   },
+  bitrate: {
+    fontSize: "16px",
+    cursor: "default",
+    WebkitUserSelect: "none",
+  },
   valueCheck: {
     lineHeight: "48px",
   },
@@ -58,6 +63,9 @@ const HELP = {
   },
 })
 export default class extends React.PureComponent {
+  isValid() {
+    return !this.props.errors || !this.props.errors.length;
+  }
   render() {
     const {classes} = this.sheet;
     return (
@@ -85,7 +93,7 @@ export default class extends React.PureComponent {
               onBlur={this.props.onUpdate}
             />
             <Sep/>
-            <ShowHide show={!this.props.errors || !this.props.errors.length}>
+            <ShowHide show={this.isValid()}>
               <span
                 className={classes.duration}
                 title="Resulting duration, click to reset"
@@ -119,6 +127,14 @@ export default class extends React.PureComponent {
               onFocus={this.props.makeFocuser("quality")}
               onBlur={this.props.onUpdate}
             />
+            <Sep/>
+            <ShowHide show={this.isValid() &&
+                            this.props.modeLimit &&
+                            !this.props.modeCRF}>
+              <span className={classes.bitrate} title="Resulting bitrate">
+                ({this.props._vb} Kbps)
+              </span>
+            </ShowHide>
           </Prop>
           <Prop name="audio codec">
             <SmallSelect
