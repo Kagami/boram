@@ -52,7 +52,7 @@ export default makeRunner("youtube-dl", {
       args.push(
         "--sub-lang", sfid,
         "--write-sub", "--embed-subs",
-        "--postprocessor-args", "-c:s ass -f matroska"
+        "--postprocessor-args", "-c:s ass -disposition:s:0 default -f matroska"
       );
     }
     args.push("--output", outpath, "--", url);
