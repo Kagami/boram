@@ -117,7 +117,7 @@ export class SmallInput extends React.PureComponent {
     input: {
       textAlign: "center",
     },
-  }
+  };
   getValue() {
     return this.refs.input.getValue();
   }

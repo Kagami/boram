@@ -73,7 +73,7 @@ export default class extends React.PureComponent {
       // Workaround window shrink issue.
       minHeight: 0,
     },
-  }
+  };
   state = {
     // Shouldn't be falsy because of Tabs component restrictions.
     tabIndex: 1,
@@ -98,7 +98,7 @@ export default class extends React.PureComponent {
     modeLimit: true,
     modeCRF: this.isShortClip(),
     rawArgs: "",
-  }
+  };
   componentDidMount() {
     this.handleAll();
   }

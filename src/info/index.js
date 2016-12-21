@@ -33,7 +33,7 @@ import {showErr} from "../util";
   },
 })
 export default class extends React.PureComponent {
-  state = {}
+  state = {};
   componentDidMount() {
     this.props.events.addListener("abort", this.abort);
     this.ff = FFprobe.getInfo(this.props.source.path);

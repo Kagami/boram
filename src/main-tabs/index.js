@@ -73,7 +73,7 @@ const DEFAULT_LABEL = "untitled";
 })
 export default class extends React.Component {
   // NOTE(Kagami): This component is _not_ pure.
-  state = {tabs: [], tabIndex: 0}
+  state = {tabs: [], tabIndex: 0};
   componentWillMount() {
     this.addTab();
   }
@@ -84,8 +84,8 @@ export default class extends React.Component {
     window.removeEventListener("beforeunload", this.handleGlobalClose, false);
     this.abort();
   }
-  closing = false
-  tabKey = 0
+  closing = false;
+  tabKey = 0;
   getInstance(i) {
     return this.refs[`instance${i}`];
   }

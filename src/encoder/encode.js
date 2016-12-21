@@ -42,7 +42,7 @@ class Output extends React.PureComponent {
     this.scrollToEnd();
   }
 
-  atEnd = true
+  atEnd = true;
   scrollToEnd() {
     if (this.atEnd) {
       this.refs.out.scrollTop = this.refs.out.scrollHeight;
@@ -65,7 +65,7 @@ class Output extends React.PureComponent {
     {label: "Clear", click: this.handleClear},
     {type: "separator"},
     {label: "Select all", click: this.handleSelectAll},
-  ])
+  ]);
   handleMenu = () => {
     this.menu.popup();
   };
@@ -89,8 +89,8 @@ export default class extends React.PureComponent {
     output: {
       overflow: "hidden",
     },
-  }
-  state = {progress: 0, log: "", output: null, target: this.getDefaultTarget()}
+  };
+  state = {progress: 0, log: "", output: null, target: this.getDefaultTarget()};
   componentDidMount() {
     this.props.events.addListener("abort", this.abort);
     this.tmpLogName = tmp.tmpNameSync({prefix: "boram-", postfix: "-0.log"});

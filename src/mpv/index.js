@@ -53,7 +53,7 @@ export default class extends React.PureComponent {
   frameBackStep() {
     this.postData("frame-back-step", null);
   }
-  sendKey = ({key, shiftKey, ctrlKey}) => {
+  sendKey({key, shiftKey, ctrlKey}) {
     // Don't need modifier events.
     if ([
       "Shift", "Control", "Alt",
@@ -122,7 +122,7 @@ export default class extends React.PureComponent {
       }
       break;
     }
-  }
+  };
   render() {
     const {classes} = this.sheet;
     return (

@@ -17,7 +17,7 @@
     "BORAM_WIN_BUILD": false,
     "BORAM_X64_BUILD": false,
   },
-  "plugins": ["react"],
+  "plugins": ["react", "class-property"],
   "extends": ["eslint:recommended", "plugin:react/recommended"],
   "rules": {
     // Old eslint defaults.
@@ -91,6 +91,7 @@
     "no-unused-labels": 2,
     "keyword-spacing": 2,
     "quotes": [2, "double", {"avoidEscape": true, "allowTemplateLiterals": true}],
+    "class-property/class-property-semicolon": 2,
 
     // React.
     "jsx-quotes": 2,

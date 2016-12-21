@@ -23,7 +23,7 @@ import {parseTime, showTime, parseSAR, tryRun} from "../util";
   },
 })
 export default class extends React.PureComponent {
-  state = {pause: true, time: 0, volume: 100, mute: false, fullscreen: false}
+  state = {pause: true, time: 0, volume: 100, mute: false, fullscreen: false};
   componentWillMount() {
     this.setTime(this.state.time);
   }
@@ -33,7 +33,7 @@ export default class extends React.PureComponent {
   componentWillUnmount() {
     document.removeEventListener("keydown", this.handleGlobaKey, false);
   }
-  duration = parseFloat(this.props.format.duration)
+  duration = parseFloat(this.props.format.duration);
   // NOTE(Kagami): currentTime/mstart/mend are floats so need
   // small adjustements in order to keep them in sync.
   isAlmostEqual(a, b) {
@@ -63,11 +63,11 @@ export default class extends React.PureComponent {
       return this.refs.mpv[action](...args);
     };
   }
-  setDeinterlace = this.bindMPV("setDeinterlace")
-  setSub = this.bindMPV("setSub")
+  setDeinterlace = this.bindMPV("setDeinterlace");
+  setSub = this.bindMPV("setSub");
   // "Stupid" play/pause actions.
-  play = this.bindMPV("play")
-  pause = this.bindMPV("pause")
+  play = this.bindMPV("play");
+  pause = this.bindMPV("pause");
   // "Smart" play/pause action.
   togglePlay = () => {
     const {time} = this.state;
@@ -306,7 +306,7 @@ class CropArea extends React.PureComponent {
     height: 0,
     left: 0,
     top: 0,
-  }
+  };
   componentDidMount() {
     window.addEventListener("webkitfullscreenchange", this.handleResize, false);
     window.addEventListener("resize", this.handleResize, false);
@@ -334,15 +334,15 @@ class CropArea extends React.PureComponent {
                                this.handleResize, false);
   }
 
-  domRect = null
-  vidRect = null
-  resizing = false
-  wasEmpty = false
-  moving = false
-  baseX = 0
-  baseY = 0
-  startX = 0
-  startY = 0
+  domRect = null;
+  vidRect = null;
+  resizing = false;
+  wasEmpty = false;
+  moving = false;
+  baseX = 0;
+  baseY = 0;
+  startX = 0;
+  startY = 0;
 
   setRects() {
     this.domRect = this.refs.outer.getClientRects()[0];
@@ -598,7 +598,7 @@ const Controls = useSheet({
 class Control extends React.PureComponent {
   handleKey = (e) => {
     e.preventDefault();
-  }
+  };
   render() {
     const {classes} = this.sheet;
     const {icon, flip, pressed, right, ...other} = this.props;
@@ -665,29 +665,29 @@ class Volume extends React.PureComponent {
       sel, {background: ""}, {named: false}
     );
   }
-  state = {shown: false}
+  state = {shown: false};
   isDragging() {
     return this.dragging;
   }
   toggleMute = () => {
     this.props.onChange({volume: this.props.volume, mute: !this.props.mute});
-  }
+  };
   handleMouseOver = () => {
     if (this.props.disabled) return;
     this.setState({shown: true});
-  }
+  };
   handleMouseOut = () => {
     this.setState({shown: false});
-  }
+  };
   handleVolumeMouseDown = () => {
     this.dragging = true;
-  }
+  };
   handleVolumeChange = (e) => {
     this.props.onChange({volume: +e.target.value, mute: false});
-  }
+  };
   handleVolumeMouseUp = () => {
     this.dragging = false;
-  }
+  };
   render() {
     const {classes} = this.sheet;
     let volPercent = this.props.volume;

@@ -23,7 +23,7 @@ export default class extends React.PureComponent {
     vfid: this.getVideoFormats()[0].key,
     afid: this.getAudioFormats()[0].key,
     sfid: this.getDefaultSubID(),
-  }
+  };
   componentDidMount() {
     if (BORAM_DEBUG) {
       if (process.env.BORAM_DEBUG_FORMAT) {

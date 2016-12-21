@@ -21,7 +21,7 @@ import ShowHide from "../show-hide";
   },
 })
 export default class extends React.PureComponent {
-  state = {}
+  state = {};
   componentWillMount() {
     if (BORAM_DEBUG) {
       let info = process.env.BORAM_DEBUG_INFO;
@@ -39,18 +39,18 @@ export default class extends React.PureComponent {
   handleSourcePathLoad = (source) => {
     this.props.onTabTitle(basename(source.path));
     this.props.onLoad(source);
-  }
+  };
   handleInfoLoad = (info) => {
     this.props.onTabTitle(info.title);
     this.setState({info});
-  }
+  };
   handleFormatLoad = (format) => {
     this.setState({format});
-  }
+  };
   handleCancel = () => {
     this.props.onTabTitle();
     this.setState({info: null, format: null});
-  }
+  };
   render() {
     const {classes} = this.sheet;
     return (

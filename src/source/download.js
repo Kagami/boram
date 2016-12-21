@@ -33,7 +33,7 @@ const YT_FEXT = ".mkv";
   },
 })
 export default class extends React.PureComponent {
-  state = {progress: 0, status: "", error: null}
+  state = {progress: 0, status: "", error: null};
   componentDidMount() {
     this.props.events.addListener("abort", this.abort);
     // Might actually end up MOV with .mkv extension but we'll remux it
@@ -46,7 +46,7 @@ export default class extends React.PureComponent {
   componentWillUnmount() {
     this.props.events.removeListener("abort", this.abort);
   }
-  canceling = false
+  canceling = false;
   handleDownload = () => {
     const progress = 0;
     this.setState({progress, status: "spawning youtube-dl", error: null});

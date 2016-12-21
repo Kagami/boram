@@ -11,21 +11,21 @@ import Encoder from "../encoder";
 import ShowHide from "../show-hide";
 
 export default class extends React.PureComponent {
-  state = {info: null}
-  events = new EventEmitter()
+  state = {info: null};
+  events = new EventEmitter();
   abort() {
     this.events.emit("abort");
   }
   handleInfoLoad = (info) => {
     this.setState({info});
-  }
+  };
   // Can only happen in single case: info component failed to
   // parse/validate provided source.
   handleSourceClear = () => {
     this.props.onTabTitle();
     this.setState({info: null});
     this.props.onSourceUpdate(null);
-  }
+  };
   render() {
     return (
       <div style={{height: "100%"}}>

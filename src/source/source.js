@@ -73,7 +73,7 @@ const COMMON_VIDEO_EXTENSIONS = [
   },
 })
 export default class extends React.PureComponent {
-  state = {url: ""}
+  state = {url: ""};
   componentDidMount() {
     this.props.events.addListener("abort", this.abort);
   }
@@ -99,26 +99,26 @@ export default class extends React.PureComponent {
       if (!selected) return;
       this.props.onSource({path: selected[0]});
     }
-  }
+  };
   handleFileLoad = () => {
     const file = this.refs.file.files[0];
     this.props.onSource({path: file.path});
-  }
+  };
   handleDrop = (e) => {
     e.preventDefault();
     const files = e.dataTransfer.files;
     if (!files.length) return;
     this.props.onSource({path: files[0].path});
-  }
+  };
   handleURLClick = (e) => {
     e.stopPropagation();
-  }
+  };
   handleTextClick = (e) => {
     e.stopPropagation();
-  }
+  };
   handleURLChange = (e) => {
     this.setState({url: e.target.value});
-  }
+  };
   handleInfoGet = (e = null) => {
     if (e) e.preventDefault();
     if (!this.state.url) return;
@@ -130,18 +130,18 @@ export default class extends React.PureComponent {
     }, err => {
       this.setState({infoLoading: false, infoError: err});
     });
-  }
+  };
   handleClearClick = () => {
     this.setState({infoError: null, url: ""});
     // We can't focus disabled input and state updates will be flushed
     // only on a next tick. This is a bit hacky.
     this.refs.url.disabled = false;
     this.refs.url.focus();
-  }
+  };
   handleSupportedClick = (e) => {
     e.preventDefault();
     shell.openExternal(YTDL_SUPPORTED_URL);
-  }
+  };
   render() {
     const {classes} = this.sheet;
     return (
