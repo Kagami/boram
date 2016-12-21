@@ -551,15 +551,6 @@ export default class extends React.PureComponent {
       this.refs.player.pause();
     }
   };
-  getTabTemplate({children, selected}) {
-    const style = {
-      // XXX(Kagami): Can't use display property because multiline
-      // TextField works badly inside fully hidden divs.
-      overflow: selected ? "visible" : "hidden",
-      height: selected ? "100%" : 0,
-    };
-    return <div style={style}>{children}</div>;
-  }
   handleSelect = (tabIndex) => {
     if (this.state.encoding) return;
     this.setState({tabIndex});
@@ -610,8 +601,8 @@ export default class extends React.PureComponent {
           onChange={this.handleSelect}
           className={classes.tabs}
           inkBarStyle={{display: "none"}}
+          tabTemplateStyle={{height: "100%"}}
           contentContainerClassName={classes.tabContent}
-          tabTemplate={this.getTabTemplate}
         >
           {this.getTabNode("info", 1,
             <Info

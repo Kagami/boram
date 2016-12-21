@@ -215,13 +215,6 @@ export default class extends React.Component {
       />
     );
   }
-  getTabTemplate({children, selected}) {
-    const style = {
-      display: selected ? "block" : "none",
-      height: "100%",
-    };
-    return <div style={style}>{children}</div>;
-  }
   render() {
     const {classes} = this.sheet;
     return (
@@ -229,8 +222,8 @@ export default class extends React.Component {
         value={this.state.tabIndex}
         onChange={this.handleSelect}
         inkBarStyle={{display: "none"}}
+        tabTemplateStyle={{height: "100%"}}
         contentContainerClassName={classes.tabContent}
-        tabTemplate={this.getTabTemplate}
       >
       {this.state.tabs.map((tab, i) =>
         <Tab

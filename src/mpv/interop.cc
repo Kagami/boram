@@ -283,7 +283,6 @@ class BoramInstance : public pp::Instance {
       glSetCurrentContextPPAPI(0);
       DIE("unable to bind 3d context");
     }
-
     glSetCurrentContextPPAPI(context_.pp_resource());
 
     return true;
@@ -337,6 +336,7 @@ class BoramInstance : public pp::Instance {
   }
 
   void MainLoop(int32_t) {
+    glSetCurrentContextPPAPI(context_.pp_resource());
     mpv_opengl_cb_draw(mpv_gl_, 0, width_, -height_);
     context_.SwapBuffers(
         callback_factory_.NewCallback(&BoramInstance::MainLoop));
