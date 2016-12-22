@@ -15,6 +15,20 @@ import {APP_PATH} from "../shared";
 // cleanup inside main process.
 export const tmp = remote.getGlobal("tmp");
 
+/** Like Number#toFixed but floors instead of rounding. */
+export function floorFixed(n, digits) {
+  const factor = Math.pow(10, digits);
+  n = Math.floor(n * factor) / factor;
+  return n.toFixed(digits);  // Fill with zeroes if neccessary
+}
+
+/** Like Number#toFixed but ceils instead of rounding. */
+export function ceilFixed(n, digits) {
+  const factor = Math.pow(10, digits);
+  n = Math.ceil(n * factor) / factor;
+  return n.toFixed(digits);
+}
+
 export function showSize(size, opts = {}) {
   const space = opts.tight ? "" : " ";
   if (size < 1024) {
@@ -57,12 +71,14 @@ function pad2(n) {
   return n < 10 ? "0" + n : n.toString();
 }
 
-export function showTime(duration, sep = ":") {
+export function showTime(duration, opts = {}) {
+  const sep = opts.sep || ":";
+  const round = opts.ceil ? ceilFixed : floorFixed;
   const h = Math.floor(duration / 3600);
   let ts = h ? h + sep : "";
   ts += pad2(duration % 3600 / 60) + sep;
   ts += pad2(duration % 60);
-  ts += (duration % 1).toFixed(3).slice(1, 5);
+  ts += round(duration % 1, 3).slice(1, 5);
   return ts;
 }
 

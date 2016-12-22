@@ -414,7 +414,7 @@ export default class extends React.PureComponent {
       return requireRange(v, 0, induration - 0.001);
     });
     if (what.marked === "mend" || what.marked === "both") {
-      end = mend > induration - 0.001 ? "" : showTime(mend);
+      end = mend > induration - 0.001 ? "" : showTime(mend, {ceil: true});
       setText("codecs", "end", end);
     }
     end = end || null;
@@ -538,8 +538,6 @@ export default class extends React.PureComponent {
       errors,
       rawArgs,
       focused,
-      mstart: _start,
-      mend: _start + _duration,
     });
   };
   handleRawArgs = (e) => {

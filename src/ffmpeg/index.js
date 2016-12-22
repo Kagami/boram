@@ -6,7 +6,7 @@
 import assert from "assert";
 import os from "os";
 import {WIN_FONTCONFIG_PATH} from "../shared";
-import {makeRunner, escapeArg, fixOpt, clearOpt} from "../util";
+import {ceilFixed, makeRunner, escapeArg, fixOpt, clearOpt} from "../util";
 if (BORAM_WIN_BUILD) {
   if (BORAM_X64_BUILD) {
     require.context(
@@ -146,10 +146,7 @@ export default makeRunner("ffmpeg", {
     }
     args.push("-i", escapeArg(this._escapeFilename(opts.inpath)));
     if (opts.end != null) {
-      // We always use `-t` in resulting command because `-ss` before
-      // `-i` resets timestamps, see:
-      // <https://trac.ffmpeg.org/wiki/Seeking#Notes>.
-      args.push("-t", opts._duration.toFixed(3));
+      args.push("-t", ceilFixed(opts._duration, 3));
     }
 
     // Streams.
