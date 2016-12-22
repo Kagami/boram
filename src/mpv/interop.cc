@@ -118,10 +118,11 @@ class BoramInstance : public pp::Instance {
         run_(false) {}
 
   virtual ~BoramInstance() {
-    if (mpv_gl_)
+    if (mpv_gl_) {
+      glSetCurrentContextPPAPI(context_.pp_resource());
       mpv_opengl_cb_uninit_gl(mpv_gl_);
-    if (mpv_)
-      mpv_terminate_destroy(mpv_);
+    }
+    mpv_terminate_destroy(mpv_);
     delete[] src_;
   }
 
@@ -278,12 +279,8 @@ class BoramInstance : public pp::Instance {
     };
 
     context_ = pp::Graphics3D(this, attrib_list);
-    if (!BindGraphics(context_)) {
-      context_ = pp::Graphics3D();
-      glSetCurrentContextPPAPI(0);
+    if (!BindGraphics(context_))
       DIE("unable to bind 3d context");
-    }
-    glSetCurrentContextPPAPI(context_.pp_resource());
 
     return true;
   }
@@ -304,6 +301,7 @@ class BoramInstance : public pp::Instance {
     if (!mpv_gl_)
       DIE("failed to create mpv GL API handle");
 
+    glSetCurrentContextPPAPI(context_.pp_resource());
     if (mpv_opengl_cb_init_gl(mpv_gl_, NULL, GetProcAddressMPV, NULL) < 0)
       DIE("failed to initialize mpv GL context");
 
@@ -336,6 +334,10 @@ class BoramInstance : public pp::Instance {
   }
 
   void MainLoop(int32_t) {
+    // TODO(Kagami): Seems like we need "ppapi-in-process" and mutex
+    // because multiple plugins in same window require correct context.
+    // See: <https://stackoverflow.com/a/31548087>,
+    // <https://github.com/electron/electron/issues/3300#issuecomment-197851126>
     glSetCurrentContextPPAPI(context_.pp_resource());
     mpv_opengl_cb_draw(mpv_gl_, 0, width_, -height_);
     context_.SwapBuffers(
