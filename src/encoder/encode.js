@@ -231,6 +231,7 @@ export default class extends React.PureComponent {
         this.handleOpen();
       } else {
         handleLog(this.showStats(startTime));
+        this.updateTarget();
       }
     }, ({code, signal}) => {
       progress = 0;
@@ -281,22 +282,6 @@ export default class extends React.PureComponent {
   isNormalEncoding() {
     return this.props.encoding && !this.state.preview;
   }
-  getDefaultTarget() {
-    const dir = remote.app.getPath("desktop");
-    const bareName = path
-      .parse(this.props.source.saveAs || this.props.source.path)
-      .name;
-
-    let index = 0;
-    let target = null;
-    do {
-      const suffix = `-${index}`;
-      const name = `${bareName}${index ? suffix : ""}.webm`;
-      target = path.join(dir, name);
-      index += 1;
-    } while (fs.existsSync(target));
-    return target;
-  }
   toggleEncode({preview}) {
     const encoding = !this.props.encoding;
     if (encoding) {
@@ -308,8 +293,39 @@ export default class extends React.PureComponent {
       this.cancel();
     }
   }
-  clearState = () => {
-    this.setState({progress: 0, log: "", output: null});
+  getTarget(sample) {
+    let {dir, name: bareName} = path.parse(sample);
+    bareName = bareName.replace(/-\d+$/, "");
+    let index = 0;
+    let target = "";
+    do {
+      const suffix = `-${index + 1}`;
+      const name = `${bareName}${index ? suffix : ""}.webm`;
+      target = path.join(dir, name);
+      index += 1;
+    } while (fs.existsSync(target));
+    return target;
+  }
+  getDefaultTarget() {
+    const dir = remote.app.getPath("desktop");
+    const name = path.basename(this.props.source.saveAs ||
+                               this.props.source.path);
+    return this.getTarget(path.join(dir, name));
+  }
+  updateTarget() {
+    const target = this.getTarget(this.state.target);
+    this.setState({target});
+  }
+  handleSelectTarget = () => {
+    const target = remote.dialog.showSaveDialog({
+      title: "Select destination path",
+      defaultPath: this.state.target,
+      filters: [
+        {name: "WebM", extensions: ["webm"]},
+      ],
+    });
+    if (!target) return;
+    this.setState({target});
   };
   handlePreviewToggle = () => {
     this.toggleEncode({preview: true});
@@ -325,16 +341,8 @@ export default class extends React.PureComponent {
     if (!this.state.output) return;
     shell.showItemInFolder(this.state.output.path);
   };
-  handleSelectTarget = () => {
-    const target = remote.dialog.showSaveDialog({
-      title: "Select destination path",
-      defaultPath: this.state.target,
-      filters: [
-        {name: "WebM", extensions: ["webm"]},
-      ],
-    });
-    if (!target) return;
-    this.setState({target});
+  clearState = () => {
+    this.setState({progress: 0, log: "", output: null});
   };
   render() {
     const {styles} = this.constructor;
