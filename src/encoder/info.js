@@ -9,7 +9,7 @@ import {useSheet} from "../jss";
 import {CompactProp as Prop} from "../theme";
 import {
   showTime, showBitrate, showSize, showLang,
-  parseFrameRate, showFrameRate,
+  parseFrameRate, showFrameRate, parseSAR,
 } from "../util";
 
 @useSheet({
@@ -39,6 +39,22 @@ export default class extends React.PureComponent {
     const lang = showLang(track);
     return lang ? <Prop name="language">{lang}</Prop> : null;
   }
+  getResolution(track) {
+    const {width, height, sample_aspect_ratio} = track;
+    const sar = parseSAR(sample_aspect_ratio);
+    let dwidth = width;
+    let dheight = height;
+    if (sar > 1) {
+      dwidth *= sar;
+    } else {
+      dheight *= sar;
+    }
+    if (sar === 1) {
+      return `${width}x${height}`;
+    } else {
+      return `${dwidth}x${dheight} (coded ${width}x${height})`;
+    }
+  }
   getTrackNode(track, i) {
     const {classes} = this.sheet;
     switch (track.codec_type) {
@@ -47,7 +63,7 @@ export default class extends React.PureComponent {
         <div key={track.index} className={classes.track}>
           <div className={classes.header}>Video #{i}</div>
           <Prop name="codec">{track.codec_name}</Prop>
-          <Prop name="resolution">{track.width}x{track.height}</Prop>
+          <Prop name="resolution">{this.getResolution(track)}</Prop>
           <Prop name="frame rate">
             {showFrameRate(parseFrameRate(track.avg_frame_rate))}
           </Prop>
