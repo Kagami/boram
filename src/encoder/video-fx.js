@@ -117,6 +117,7 @@ export default class extends React.PureComponent {
       <HelpPane
         help={HELP}
         focused={this.props.focused}
+        warnings={this.props.warnings}
         errors={this.props.errors}
       >
         <Prop name="video track">
@@ -216,6 +217,14 @@ export default class extends React.PureComponent {
             disabled={this.props.encoding}
             onFocus={this.props.makeFocuser("scaleh")}
             onBlur={this.props.onUpdate}
+          />
+          <Sep size={10} />
+          <InlineCheckbox
+            label="fix sar"
+            title="Make output video non-anamorphic (recommended)"
+            checked={this.props.fixSAR}
+            disabled={this.props.encoding || !this.props._anamorph}
+            onCheck={this.props.makeChecker("fixSAR")}
           />
         </Prop>
         {/*<Prop name="speed">

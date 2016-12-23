@@ -15,7 +15,7 @@ import VideoFX from "./video-fx";
 import AudioFX from "./audio-fx";
 import Codecs from "./codecs";
 import Encode from "./encode";
-import {parseTime, showTime} from "../util";
+import {parseTime, showTime, parseSAR} from "../util";
 
 const DEFAULT_LIMIT = 19;
 const DEFAULT_BITRATE = 5000;
@@ -87,6 +87,7 @@ export default class extends React.PureComponent {
     vtrackn: 0,
     deinterlace: false,
     _crop: null,
+    fixSAR: this.isAnamorph(0),
     burnSubs: false,
     strackn: this.getSubTracks().length ? 0 : null,
     extSubPath: null,
@@ -166,6 +167,10 @@ export default class extends React.PureComponent {
       (size <= 1920 && vb > BIG_FHD_BITRATE) ||
       vb > BIG_OTHER_BITRATE
     );
+  }
+  isAnamorph(vtrackn) {
+    const {sample_aspect_ratio} = this.getVideoTracks()[vtrackn];
+    return parseSAR(sample_aspect_ratio) !== 1;
   }
 
   makeFocuser = (name) => {
@@ -248,6 +253,7 @@ export default class extends React.PureComponent {
 
     let allValid = true;
     const warnings = {
+      videoFX: [],
       codecs: [],
     };
     const errors = {
@@ -304,6 +310,7 @@ export default class extends React.PureComponent {
     let cropy = getText("videoFX", "cropy");
     let scalew = getText("videoFX", "scalew");
     let scaleh = getText("videoFX", "scaleh");
+    const fixSAR = get("fixSAR");
     let speed = ""; //getText("videoFX", "speed");
     let fps = ""; //getText("videoFX", "fps");
     const burnSubs = get("burnSubs");
@@ -485,7 +492,7 @@ export default class extends React.PureComponent {
       vtrackn,
       deinterlace,
       cropw, croph, cropx, cropy,
-      scalew, scaleh,
+      scalew, scaleh, fixSAR,
       speed, fps,
       burnSubs, strackn, extSubPath,
       // afx.
@@ -521,6 +528,11 @@ export default class extends React.PureComponent {
                         ${SMALL_FHD_BITRATE}÷${BIG_FHD_BITRATE} (FHD),
                         ${SMALL_OTHER_BITRATE}÷${BIG_OTHER_BITRATE} (other)`);
       }
+    }
+    if (this.isAnamorph(vtrackn) && !fixSAR &&
+        (scalew == null || scaleh == null)) {
+      warn("videoFX", `Output anamorphic video,
+                       some sites will handle it poorly`);
     }
     rawArgs = FFmpeg.getRawArgs(opts).join(" ");
     setText("codecs", "rawArgs", rawArgs);
@@ -623,11 +635,14 @@ export default class extends React.PureComponent {
               mstart={this.state.mstart}
               focused={this.state.focused}
               encoding={this.state.encoding}
+              warnings={this.state.warnings.videoFX}
               errors={this.state.errors.videoFX}
               vtracks={this.getVideoTracks()}
               stracks={this.getSubTracks()}
               vtrackn={this.state.vtrackn}
               deinterlace={this.state.deinterlace}
+              fixSAR={this.state.fixSAR}
+              _anamorph={this.isAnamorph(this.state.vtrackn)}
               burnSubs={this.state.burnSubs}
               strackn={this.state.strackn}
               extSubPath={this.state.extSubPath}
