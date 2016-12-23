@@ -168,9 +168,12 @@ export default class extends React.PureComponent {
       vb > BIG_OTHER_BITRATE
     );
   }
-  isAnamorph(vtrackn) {
+  getSAR(vtrackn) {
     const {sample_aspect_ratio} = this.getVideoTracks()[vtrackn];
-    return parseSAR(sample_aspect_ratio) !== 1;
+    return parseSAR(sample_aspect_ratio);
+  }
+  isAnamorph(vtrackn) {
+    return this.getSAR(vtrackn) !== 1;
   }
 
   makeFocuser = (name) => {
@@ -341,6 +344,7 @@ export default class extends React.PureComponent {
     const mend = get("mend");
     const induration = this.getFullDuration();
     const useExtSub = strackn === this.getSubTracks().length;
+    const _sar = this.getSAR(vtrackn);
     const focused = null;
     // Will contain exact values.
     let _start = null;
@@ -492,7 +496,7 @@ export default class extends React.PureComponent {
       vtrackn,
       deinterlace,
       cropw, croph, cropx, cropy,
-      scalew, scaleh, fixSAR,
+      scalew, scaleh, fixSAR, _sar,
       speed, fps,
       burnSubs, strackn, extSubPath,
       // afx.

@@ -214,8 +214,27 @@ export default makeRunner("ffmpeg", {
       vfilters.push(`crop=${crop.join(":")}`);
     }
     // Both values must be set if any is specified.
-    // TODO(Kagami): Clear SAR?
-    if (opts.scalew != null || opts.scaleh != null) {
+    if (opts.fixSAR && opts._sar !== 1) {
+      if (opts.scalew == null && opts.scaleh == null) {
+        if (opts._sar > 1) {
+          scale.push("iw");
+          scale.push("iw/dar");
+        } else {
+          scale.push("ih*dar");
+          scale.push("ih");
+        }
+      } else if (opts.scalew == null) {
+        scale.push(`${opts.scaleh}*dar`);
+        scale.push(opts.scaleh);
+      } else if (opts.scaleh == null) {
+        scale.push(opts.scalew);
+        scale.push(`${opts.scalew}/dar`);
+      } else {
+        scale.push(opts.scalew);
+        scale.push(opts.scaleh);
+      }
+      vfilters.push(`scale=${scale.join(":")}`);
+    } else if (opts.scalew != null || opts.scaleh != null) {
       scale.push(opts.scalew == null ? -2 : opts.scalew);
       scale.push(opts.scaleh == null ? -2 : opts.scaleh);
       vfilters.push(`scale=${scale.join(":")}`);
