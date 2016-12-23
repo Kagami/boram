@@ -216,14 +216,16 @@ export function tryRun(fn, arg, def) {
 }
 
 export function getRunPath(exe) {
-  try {
-    return which.sync(exe);
-  } catch (e) {
-    // We ship all required binaries with Windows version, on Linux few
-    // deps should be installed separately.
-    if (BORAM_WIN_BUILD) {
-      return path.join(APP_PATH, exe);
-    } else {
+  const overrideEnv = `BORAM_${exe.toUpperCase().replace(/-/, "_")}`;
+  const overridePath = process.env[overrideEnv];
+  if (overridePath) {
+    return overridePath;
+  } else if (BORAM_WIN_BUILD) {
+    return path.join(APP_PATH, exe);
+  } else {
+    try {
+      return which.sync(exe);
+    } catch (e) {
       return null;
     }
   }
