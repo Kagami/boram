@@ -29,6 +29,9 @@ if (BORAM_DEBUG) {
 if (process.env.BORAM_NO_HWACCEL) {
   app.disableHardwareAcceleration();
 }
+if (process.env.BORAM_FIX_GPU) {
+  app.commandLine.appendSwitch("ignore-gpu-blacklist");
+}
 
 if (BORAM_WIN_BUILD) {
   const arch = require("arch")();
