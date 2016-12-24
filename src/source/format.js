@@ -38,6 +38,9 @@ export default class extends React.PureComponent {
     if (a.height !== b.height) return b.height - a.height;
     if (a.width !== b.width) return b.width - a.width;
     if (a.fps !== b.fps) return b.fps - a.fps;
+    // Prefer HDR.
+    if (a.vcodec === "vp9.2") return -1;
+    if (b.vcodec === "vp9.2") return 1;
     // VP9 at high resolution/FPS is better than H.264.
     if (a.vcodec && b.vcodec) {
       if (a.width > 1920 || a.height > 1080 ||
@@ -53,12 +56,19 @@ export default class extends React.PureComponent {
     if (a.tbr !== b.tbr) return b.tbr - a.tbr;
     return 0;
   }
+  getVCodecName({vcodec, ext}) {
+    return vcodec === "vp9.2"
+      ? "vp9 hdr"
+      : (vcodec || ext).replace(/\..+$/, "");
+  }
+  getACodecName({acodec}) {
+    return (acodec && acodec !== "none")
+      ? "+" + acodec.trim().replace(/\..+$/, "")
+      : "";
+  }
   getVideoText(format) {
-    const {vcodec, ext, acodec, width, height, fps, filesize} = format;
-    let text = `${(vcodec || ext).replace(/\..+$/, "")}`;
-    if (acodec && acodec !== "none") {
-      text += `+${acodec.trim().replace(/\..+$/, "")}`;
-    }
+    const {width, height, fps, filesize} = format;
+    let text = this.getVCodecName(format) + this.getACodecName(format);
     if (width && height) text += ` ${width}x${height}`;
     if (fps > 1) text += ` ${fps}fps`;
     if (filesize) text += ` (${showSize(filesize, {tight: true})})`;
@@ -70,6 +80,7 @@ export default class extends React.PureComponent {
       .sort(this.compareVideoFormats)
       .map(f => ({
         key: f.format_id,
+        vcodec: f.vcodec,
         text: this.getVideoText(f),
       }));
     return formats.length ? formats : [{key: null, text: "none"}];
@@ -146,8 +157,9 @@ export default class extends React.PureComponent {
   };
   handleDownload = () => {
     const {vfid, afid, sfid} = this.state;
+    const vcodec = this.getVideoFormats().find(f => f.key === vfid).vcodec;
     const sext = this.getSubFormats().find(f => f.key === sfid).ext;
-    this.props.onLoad({vfid, afid, sfid, sext});
+    this.props.onLoad({vfid, afid, sfid, vcodec, sext});
   };
   render() {
     const {classes} = this.sheet;

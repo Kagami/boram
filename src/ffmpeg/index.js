@@ -53,6 +53,7 @@ export default makeRunner("ffmpeg", {
       "-i", this._escapeFilename(inpath),
       "-map", "0",
       "-c", "copy",
+      "-strict", "unofficial",
       "-metadata", `title=${title}`,
       "-f", "matroska", this._escapeFilename(outpath),
     ]);

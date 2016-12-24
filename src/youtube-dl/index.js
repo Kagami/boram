@@ -27,19 +27,28 @@ export default makeRunner("youtube-dl", {
     ]).then(JSON.parse);
   },
   download({url, format, outpath}, onUpdate) {
-    const {vfid, afid, sfid} = format;
+    const {vfid, afid, sfid, vcodec} = format;
+    const ppArgs = [];
     const args = [
       "--no-part",
       "--no-playlist",
       "--format", vfid + (afid ? `+${afid}` : ""),
       "--merge-output-format", "mkv",
     ];
+    if (vcodec === "vp9.2") {
+      // See <https://trac.ffmpeg.org/ticket/6042>.
+      ppArgs.push("-strict", "unofficial");
+    }
     if (sfid) {
-      args.push(
-        "--sub-lang", sfid,
-        "--write-sub", "--embed-subs",
-        "--postprocessor-args", "-c:s ass -disposition:s:0 default -f matroska"
+      args.push("--sub-lang", sfid, "--write-sub", "--embed-subs");
+      ppArgs.push(
+        "-c:s", "ass",
+        "-disposition:s:0", "default",
+        "-f", "matroska"
       );
+    }
+    if (ppArgs.length) {
+      args.push("--postprocessor-args", ppArgs.join(" "));
     }
     args.push("--output", outpath, "--", url);
 
