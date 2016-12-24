@@ -45,9 +45,9 @@ export default class extends React.PureComponent {
     if (a.vcodec && b.vcodec) {
       if (a.width > 1920 || a.height > 1080 ||
           ((a.width === 1920 || a.height === 1080) && a.fps > 30)) {
-        if (a.vcodec === "vp9" && b.vcodec.startsWith("avc")) {
+        if (a.vcodec.startsWith("vp9") && b.vcodec.startsWith("avc")) {
           return -1;
-        } else if (b.vcodec === "vp9" && a.vcodec.startsWith("avc")) {
+        } else if (a.vcodec.startsWith("avc") && b.vcodec.startsWith("vp9")) {
           return 1;
         }
       }
