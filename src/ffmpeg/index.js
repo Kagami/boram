@@ -139,6 +139,7 @@ export default makeRunner("ffmpeg", {
     const subtitles = [];
     const vfilters = [];
     const afilters = [];
+    const round2 = (s) => `floor((${s}+1)/2)*2`;
 
     // Input.
     if (opts.start != null) {
@@ -213,27 +214,27 @@ export default makeRunner("ffmpeg", {
     if (crop.length) {
       vfilters.push(`crop=${crop.join(":")}`);
     }
-    // Both values must be set if any is specified.
     if (opts.fixSAR && opts._sar !== 1) {
       if (opts.scalew == null && opts.scaleh == null) {
         if (opts._sar > 1) {
           scale.push("iw");
-          scale.push("iw/dar");
+          scale.push(round2("iw/dar"));
         } else {
-          scale.push("ih*dar");
+          scale.push(round2("ih*dar"));
           scale.push("ih");
         }
       } else if (opts.scalew == null) {
-        scale.push(`${opts.scaleh}*dar`);
+        scale.push(round2(`${opts.scaleh}*dar`));
         scale.push(opts.scaleh);
       } else if (opts.scaleh == null) {
         scale.push(opts.scalew);
-        scale.push(`${opts.scalew}/dar`);
+        scale.push(round2(`${opts.scalew}/dar`));
       } else {
         scale.push(opts.scalew);
         scale.push(opts.scaleh);
       }
       vfilters.push(`scale=${scale.join(":")}`);
+      vfilters.push("setsar=1");
     } else if (opts.scalew != null || opts.scaleh != null) {
       scale.push(opts.scalew == null ? -2 : opts.scalew);
       scale.push(opts.scaleh == null ? -2 : opts.scaleh);
