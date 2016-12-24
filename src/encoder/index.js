@@ -538,7 +538,7 @@ export default class extends React.PureComponent {
       warn("videoFX", `Output anamorphic video,
                        some sites will handle it poorly`);
     }
-    rawArgs = FFmpeg.getRawArgs(opts).join(" ");
+    rawArgs = FFmpeg.getRawArgs(opts);
     setText("codecs", "rawArgs", rawArgs);
     this.setState({
       // Helper precomputed props:

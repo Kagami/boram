@@ -296,7 +296,7 @@ export default makeRunner("ffmpeg", {
       }
     }
 
-    return args;
+    return args.join(" ");
   },
   _getCommonArgs(baseArgs) {
     return ["-hide_banner", "-nostdin", "-y"].concat(baseArgs);
