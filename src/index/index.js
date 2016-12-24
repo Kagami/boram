@@ -25,54 +25,59 @@ global.tmp.setGracefulCleanup();
 if (BORAM_DEBUG) {
   require("electron-debug")({enabled: true});
 }
-
 if (process.env.BORAM_NO_HWACCEL) {
   app.disableHardwareAcceleration();
 }
 if (process.env.BORAM_FIX_GPU) {
   app.commandLine.appendSwitch("ignore-gpu-blacklist");
 }
+// Can't be run on ready.
+(function() {
+  const pluginPath = getPluginPath();
+  if (!pluginPath) {
+    dialog.showErrorBox(
+      "Unsupported location detected",
+      "Because of Chromium limitation, boram can't be run from path " +
+      "with non-ASCII characters. Please run boram as ASCII-only path."
+    );
+    return app.exit(1);
+  }
+  app.commandLine.appendSwitch(
+    "register-pepper-plugins", `${pluginPath};application/x-boram`
+  );
+})();
 
-if (BORAM_WIN_BUILD) {
-  const arch = require("arch")();
-  const wrongBuildMsg = (BORAM_X64_BUILD && arch !== "x64")
-    ? "You're trying to run x64 build on x86 system."
-    : (!BORAM_X64_BUILD && arch !== "x86")
-      // Strictly not an error but x64 build will be faster.
-      ? "You're trying to run x86 build on x64 system."
-      : null;
-  if (wrongBuildMsg) {
-    dialog.showErrorBox("Wrong build", wrongBuildMsg);
-    app.exit(1);
+function runtimeChecks() {
+  if (BORAM_WIN_BUILD) {
+    const arch = require("arch")();
+    const wrongBuildMsg = (BORAM_X64_BUILD && arch !== "x64")
+      ? "You're trying to run x64 build on x86 system."
+      : (!BORAM_X64_BUILD && arch !== "x86")
+        // Strictly not an error but x64 build will be faster.
+        ? "You're trying to run x86 build on x64 system."
+        : null;
+    if (wrongBuildMsg) {
+      dialog.showErrorBox("Wrong build", wrongBuildMsg);
+      return app.exit(1);
+    }
+  }
+
+  if (BORAM_WIN_BUILD) {
+    require("../fonts").setupWindowsFontconfig();
+  }
+
+  if (!BORAM_WIN_BUILD) {
+    try {
+      require("./deps").checkLinuxDeps();
+    } catch (e) {
+      dialog.showErrorBox(e.message, "Dependencies check failed. Exiting.");
+      return app.exit(1);
+    }
   }
 }
 
-if (!BORAM_WIN_BUILD && !require("./deps").checkLinuxDeps()) {
-  dialog.showErrorBox(
-    "Dependency missing",
-    "Dependencies check failed. Exiting."
-  );
-  app.exit(1);
-}
-
-const pluginPath = getPluginPath();
-if (!pluginPath) {
-  dialog.showErrorBox(
-    "Unsupported location detected",
-    "Because of Chromium limitation, boram can't be run from path " +
-    "with non-ASCII characters. Please run boram as ASCII-only path."
-  );
-  app.exit(1);
-}
-app.commandLine.appendSwitch(
-  "register-pepper-plugins", `${pluginPath};application/x-boram`
-);
-
-if (BORAM_WIN_BUILD) {
-  require("../fonts").setupWindowsFontconfig();
-}
-
 app.on("ready", () => {
+  runtimeChecks();
   const win = new BrowserWindow({
     width: 960,
     height: 960,

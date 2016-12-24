@@ -3,8 +3,6 @@
  * @module boram/index/deps
  */
 
-/* eslint-disable no-console */
-
 import which from "which";
 
 function hasBinary(exe) {
@@ -20,17 +18,13 @@ export function checkLinuxDeps() {
   // TODO(Kagami): Check for libmpv.
   // TODO(Kagami): Check for version and required codecs?
   if (!hasBinary("ffmpeg")) {
-    console.error("Please install ffmpeg.");
-    return false;
+    throw new Error("Please install ffmpeg");
   }
   if (!hasBinary("ffprobe")) {
-    console.error("ffprobe not found.");
-    return false;
+    throw new Error("ffprobe not found");
   }
   // No need to check versions - anything should be fine.
   if (!hasBinary("youtube-dl") && !hasBinary("python")) {
-    console.error("Please install youtube-dl or python.");
-    return false;
+    throw new Error("Please install youtube-dl or python");
   }
-  return true;
 }
