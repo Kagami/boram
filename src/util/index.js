@@ -171,7 +171,7 @@ export function fixOpt(arr, key, newval, opts = {}) {
   let prev = false;
   arr.forEach((v, i) => {
     if (prev) {
-      arr[i] = newval;
+      arr[i] = typeof newval === "function" ? newval(v) : newval;
       prev = false;
       found = true;
     } else if (v === key) {
@@ -180,7 +180,8 @@ export function fixOpt(arr, key, newval, opts = {}) {
   });
   if (!found) {
     if (opts.add) {
-      arr.push(key, newval);
+      const v = typeof newval === "function" ? newval(null) : newval;
+      arr.push(key, v);
     }
   }
 }

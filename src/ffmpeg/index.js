@@ -235,8 +235,11 @@ export default makeRunner("ffmpeg", {
         scale.push(opts.scaleh);
       }
       vfilters.push(`scale=${scale.join(":")}`);
+      // Clear minor SAR changes.
       vfilters.push("setsar=1");
     } else if (opts.scalew != null || opts.scaleh != null) {
+      // Rounding to even is not neccessary with libvpx but e.g. 854x480
+      // is much nicer than 853x480 when scaling to 480p.
       scale.push(opts.scalew == null ? -2 : opts.scalew);
       scale.push(opts.scaleh == null ? -2 : opts.scaleh);
       vfilters.push(`scale=${scale.join(":")}`);
@@ -307,6 +310,11 @@ export default makeRunner("ffmpeg", {
     const args = this._getCommonArgs(baseArgs);
     fixOpt(args, "-c:v", "libx264");
     fixOpt(args, "-crf", "18", {add: true});
+    // x264 doesn't support odd dimensions.
+    fixOpt(args, "-vf", (vf) => {
+      vf = vf ? vf + "," : "";
+      return vf + "scale=floor((iw+1)/2)*2:-2";
+    }, {add: true});
     // Not needed or libvpx-specific.
     clearOpt(args, [
       "-b:v",
