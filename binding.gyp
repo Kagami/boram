@@ -13,14 +13,8 @@
           "ldflags": ["-static-libstdc++"],
         }, "OS=='win'", {
           "defines": ["BORAM_WIN_BUILD"],
-          "include_dirs": [
-            "C:/nacl_sdk/pepper_49/include",
-            "C:/mpv-dev/include",
-          ],
-          "library_dirs": [
-            "C:/nacl_sdk/pepper_49/lib/win_x86_32_host/Release",
-            "C:/mpv-dev/32",
-          ],
+          "include_dirs": ["C:/nacl_sdk/pepper_49/include", "C:/mpv-dev/include"],
+          "library_dirs": ["C:/nacl_sdk/pepper_49/lib/win_x86_32_host/Release", "C:/mpv-dev/32"],
           "libraries": ["-llibmpv.dll.a"],
         }],
       ],
