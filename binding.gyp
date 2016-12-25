@@ -10,7 +10,7 @@
           "include_dirs": ["$(NACL_SDK_ROOT)/include"],
           "library_dirs": ["$(NACL_SDK_ROOT)/lib/linux_host/Release"],
           "libraries": ["-lmpv"],
-          "ldflags": ["-static-libstdc++"],
+          "ldflags": ["-static-libstdc++", "-static-libgcc"],
         }, "OS=='win'", {
           "defines": ["BORAM_WIN_BUILD"],
           "include_dirs": ["C:/nacl_sdk/pepper_49/include", "C:/mpv-dev/include"],
@@ -26,12 +26,14 @@
         {
           "target_name": "ffmpeg",
           "libraries": ["-lavcodec", "-lavformat", "-lavutil"],
+          "ldflags": ["-static-libstdc++", "-static-libgcc"],
         },
         {
           "target_name": "checklib",
           "type": "executable",
           "sources": ["src/index/checklib.c"],
           "libraries": ["-ldl"],
+          "ldflags": ["-static-libstdc++", "-static-libgcc"],
         },
       ],
     }],
