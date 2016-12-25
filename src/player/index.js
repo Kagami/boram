@@ -447,16 +447,24 @@ class CropArea extends React.PureComponent {
     }
     const {dwidth, sar} = this.getTrackDims();
     const scalef = dwidth / this.vidRect.width;
-    cropw = Math.round(cropw * scalef / sar);
-    croph = Math.round(croph * scalef / sar);
-    cropx = Math.round(cropx * scalef / sar);
-    cropy = Math.round(cropy * scalef / sar);
+
+    if (sar > 1) {
+      cropw /= sar;
+      cropx /= sar;
+    } else {
+      croph /= sar;
+      cropy /= sar;
+    }
+    cropw = Math.round(cropw * scalef);
+    croph = Math.round(croph * scalef);
+    cropx = Math.round(cropx * scalef);
+    cropy = Math.round(cropy * scalef);
+
     return {cropw, croph, cropx, cropy};
   }
   setFFCrop(crop) {
     const {width, height, dwidth, sar} = this.getTrackDims();
     const scalef = dwidth / this.vidRect.width;
-
     let {cropw, croph, cropx, cropy} = crop;
     if (cropw == null && croph == null) return this.clearCrop();
     // We allow to skip some values in UI, so need to emulate lavfi's
@@ -466,10 +474,17 @@ class CropArea extends React.PureComponent {
     cropx = cropx == null ? (width - cropw) / 2 : cropx;
     cropy = cropy == null ? (height - croph) / 2 : cropy;
 
-    cropw = Math.round(cropw / scalef * sar);
-    croph = Math.round(croph / scalef * sar);
-    cropx = Math.round(cropx / scalef * sar);
-    cropy = Math.round(cropy / scalef * sar);
+    if (sar > 1) {
+      cropw *= sar;
+      cropx *= sar;
+    } else {
+      croph *= sar;
+      cropy *= sar;
+    }
+    cropw = Math.round(cropw / scalef);
+    croph = Math.round(croph / scalef);
+    cropx = Math.round(cropx / scalef);
+    cropy = Math.round(cropy / scalef);
 
     this.setCrop({width: cropw, height: croph, left: cropx, top: cropy},
                  null, {movOuter: true});

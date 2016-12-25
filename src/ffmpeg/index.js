@@ -231,6 +231,7 @@ export default makeRunner("ffmpeg", {
         scale.push(opts.scalew);
         scale.push(round2(`${opts.scalew}/dar`));
       } else {
+        // Use unchanged user's values, just reset SAR.
         scale.push(opts.scalew);
         scale.push(opts.scaleh);
       }
