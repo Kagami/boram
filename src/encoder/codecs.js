@@ -63,9 +63,6 @@ const HELP = {
   },
 })
 export default class extends React.PureComponent {
-  isValid() {
-    return !this.props.errors || !this.props.errors.length;
-  }
   render() {
     const {classes} = this.sheet;
     return (
@@ -93,7 +90,7 @@ export default class extends React.PureComponent {
               onBlur={this.props.onUpdate}
             />
             <Sep/>
-            <ShowHide show={this.isValid()}>
+            <ShowHide show={this.props.allValid}>
               <span
                 className={classes.duration}
                 title="Resulting duration, click to reset"
@@ -128,7 +125,7 @@ export default class extends React.PureComponent {
               onBlur={this.props.onUpdate}
             />
             <Sep/>
-            <ShowHide show={this.isValid() &&
+            <ShowHide show={this.props.allValid &&
                             this.props.modeLimit &&
                             !this.props.modeCRF}>
               <span className={classes.bitrate} title="Resulting bitrate">
@@ -182,6 +179,7 @@ export default class extends React.PureComponent {
         <Prop name="raw args" nameClassName={classes.nameArgs}>
           <ArgsInput
             ref="rawArgs"
+            disabled={!this.props.allValid}
             onChange={this.props.onRawArgs}
           />
         </Prop>
