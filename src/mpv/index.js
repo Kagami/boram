@@ -87,7 +87,11 @@ export default class extends React.PureComponent {
     const msg = {type, data};
     // if (type !== "wakeup")
     //   console.log("@@@ SEND", JSON.stringify(msg));
-    this.refs.plugin.postMessage(msg);
+    try {
+      this.refs.plugin.postMessage(msg);
+    } catch (e) {
+      // Allow to interact with non-initialized plugin.
+    }
   }
   handleMessage = (e) => {
     const msg = e.data;
