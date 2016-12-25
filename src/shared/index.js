@@ -15,3 +15,4 @@ export const PAGE_PATH = path.join(APP_PATH, "index.html");
 export const ICON_BIG_PATH = path.join(APP_PATH, "icon-big.png");
 export const WIN_ICON_PATH = path.join(APP_PATH, "icon.ico");
 export const WIN_FONTCONFIG_PATH = path.join(DATA_PATH, "fonts.conf");
+export const LINUX_CHECKLIB_PATH = path.join(APP_PATH, "checklib");

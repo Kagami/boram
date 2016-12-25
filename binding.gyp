@@ -27,6 +27,12 @@
           "target_name": "ffmpeg",
           "libraries": ["-lavcodec", "-lavformat", "-lavutil"],
         },
+        {
+          "target_name": "checklib",
+          "type": "executable",
+          "sources": ["src/index/checklib.c"],
+          "libraries": ["-ldl"],
+        },
       ],
     }],
   ],
