@@ -762,10 +762,8 @@ class Volume extends React.PureComponent {
   constructor(props) {
     super(props);
     const {classes} = this.sheet;
-    const sel = `.${classes.slider}::-webkit-slider-runnable-track`;
-    this.progressRule = this.sheet.addRule(
-      sel, {background: ""}, {named: false}
-    );
+    const className = `${classes.slider}::-webkit-slider-runnable-track`;
+    this.progressRule = this.sheet.addRule("", {"background": ""}, {className});
   }
   state = {shown: false};
   isDragging() {
@@ -929,10 +927,8 @@ class Seek extends React.PureComponent {
   constructor(props) {
     super(props);
     const {classes} = this.sheet;
-    const sel = `.${classes.range}::-webkit-slider-runnable-track`;
-    this.progressRule = this.sheet.addRule(
-      sel, {background: ""}, {named: false}
-    );
+    const className = `${classes.range}::-webkit-slider-runnable-track`;
+    this.progressRule = this.sheet.addRule("", {"background": ""}, {className});
   }
   handleKey = (e) => {
     e.preventDefault();

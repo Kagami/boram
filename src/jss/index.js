@@ -4,13 +4,14 @@
  */
 
 import jss from "jss";
+import global from "jss-global";
 import extend from "jss-extend";
 import nested from "jss-nested";
 import camelCase from "jss-camel-case";
 import defaultUnit from "jss-default-unit";
 
 // Plugins used across application.
-jss.use(extend(), nested(), camelCase(), defaultUnit());
+jss.use(global(), extend(), nested(), camelCase(), defaultUnit());
 
 /** Application components should use that reexport. */
 export {jss};

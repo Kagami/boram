@@ -15,7 +15,7 @@ import "file!./roboto-light.ttf";
 import "file!./roboto-regular.ttf";
 import "file!./roboto-medium.ttf";
 
-@useSheet({
+@useSheet({"@global": {
   body: {
     margin: 0,
     fontSize: "18px",
@@ -66,7 +66,7 @@ import "file!./roboto-medium.ttf";
   "a[href]:hover": {
     color: "red",
   },
-}, {named: false})
+}})
 class Index extends React.PureComponent {
   componentDidMount() {
     // Prevent default behavior from changing page on dropped file.
