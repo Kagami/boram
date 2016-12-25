@@ -5,7 +5,7 @@
 
 import path from "path";
 import {APP_PATH} from "../shared";
-import {makeRunner} from "../util";
+import {makeRunner, getRunPath} from "../util";
 require("file!../../bin/youtube-dl." + (BORAM_WIN_BUILD ? "exe" : "zip"));
 
 export default makeRunner("youtube-dl", {
@@ -14,7 +14,7 @@ export default makeRunner("youtube-dl", {
       return [runpath, args];
     } else {
       const zippath = path.join(APP_PATH, "youtube-dl.zip");
-      return ["python", [zippath].concat(args)];
+      return [getRunPath("python"), [zippath].concat(args)];
     }
   },
   getInfo(url) {

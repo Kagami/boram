@@ -8,6 +8,9 @@ import which from "which";
 import {LINUX_CHECKLIB_PATH} from "../shared";
 
 function hasBinary(exe) {
+  // Make sure to keep in sync with util module.
+  const overrideEnv = `BORAM_${exe.toUpperCase().replace(/-/, "_")}`;
+  if (process.env[overrideEnv]) return true;
   try {
     which.sync(exe);
     return true;
