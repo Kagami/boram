@@ -67,7 +67,7 @@ export function parseTime(time) {
 }
 
 function pad2(n) {
-  n |= 0;
+  n = Math.floor(n);
   return n < 10 ? "0" + n : n.toString();
 }
 
@@ -75,10 +75,12 @@ export function showTime(duration, opts = {}) {
   const sep = opts.sep || ":";
   const round = opts.ceil ? ceilFixed : floorFixed;
   const h = Math.floor(duration / 3600);
+  // Try to avoid floating point inaccuracy.
+  const frac = parseFloat((duration % 1).toFixed(4));
   let ts = h ? h + sep : "";
   ts += pad2(duration % 3600 / 60) + sep;
   ts += pad2(duration % 60);
-  ts += round(duration % 1, 3).slice(1, 5);
+  ts += round(frac, 3).slice(1, 5);
   return ts;
 }
 

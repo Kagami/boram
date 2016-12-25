@@ -687,7 +687,7 @@ export default class extends React.PureComponent {
               warnings={this.state.warnings.codecs}
               errors={this.state.errors.codecs}
               allValid={this.state.allValid}
-              _duration={this.state._duration}
+              _duration={this.state._duration || 0}
               _vb={this.state._vb}
               vcodec={this.state.vcodec}
               hasAudio={this.state.hasAudio}
