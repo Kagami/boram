@@ -70,7 +70,11 @@ function runtimeChecks() {
     try {
       require("./deps").checkLinuxDeps();
     } catch (e) {
-      dialog.showErrorBox(e.message, "Dependencies check failed. Exiting.");
+      dialog.showErrorBox(
+        e.message,
+        "Dependencies check failed. " +
+        "Install required components and try again."
+      );
       return app.exit(1);
     }
   }

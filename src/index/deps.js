@@ -31,15 +31,15 @@ function hasLibrary(lib) {
 export function checkLinuxDeps() {
   // TODO(Kagami): Check for version and required codecs?
   if (!hasBinary("ffmpeg")) {
-    throw new Error("Please install ffmpeg");
+    throw new Error("ffmpeg not found");
   }
   if (!hasBinary("ffprobe")) {
     throw new Error("ffprobe not found");
   }
   if (!hasBinary("youtube-dl") && !hasBinary("python")) {
-    throw new Error("Please install youtube-dl or python");
+    throw new Error("youtube-dl/python not found");
   }
   if (!hasLibrary("libmpv.so.1") && !hasLibrary("libmpv.so")) {
-    throw new Error("Please install libmpv");
+    throw new Error("libmpv not found");
   }
 }
