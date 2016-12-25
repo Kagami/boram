@@ -62,6 +62,9 @@ const BIG_OTHER_BITRATE = 20000;
   invalidTab: {
     color: "red !important",
   },
+  noticeTab: {
+    color: "orange !important",
+  },
   tabContent: {
     flex: 1,
     height: 0,
@@ -575,6 +578,8 @@ export default class extends React.PureComponent {
     const disabled = this.state.encoding && !active;
     const errors = this.state.errors[key];
     const invalid = errors && errors.length;
+    const warnings = this.state.warnings[key];
+    const notice = warnings && warnings.length;
     return (
       <Tab
         value={index}
@@ -585,6 +590,7 @@ export default class extends React.PureComponent {
           [classes.activeTab]: active,
           [classes.disabledTab]: disabled,
           [classes.invalidTab]: invalid,
+          [classes.noticeTab]: notice,
         })}
       >
         {children}
