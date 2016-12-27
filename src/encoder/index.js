@@ -538,7 +538,7 @@ export default class extends React.PureComponent {
     if (this.isAnamorph(vtrackn) && !fixSAR &&
         (scalew == null || scaleh == null)) {
       warn("videoFX", `Output anamorphic video,
-                       some sites will handle it poorly`);
+                       some players will handle it poorly`);
     }
     rawArgs = FFmpeg.getRawArgs(opts);
     setText("codecs", "rawArgs", rawArgs);
