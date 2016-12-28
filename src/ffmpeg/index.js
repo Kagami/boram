@@ -80,7 +80,6 @@ export default makeRunner("ffmpeg", {
     });
   },
   getCropArea({inpath, vtrackn, start}) {
-    // TODO(Kagami): Use more frames?
     start = (start + 5).toString();
     return this._run([
       "-v", "error", "-nostdin", "-y",
@@ -161,13 +160,12 @@ export default makeRunner("ffmpeg", {
     args.push("-threads", os.cpus().length);
     if (opts.vcodec === "vp9") {
       args.push("-c:v", "libvpx-vp9", "-speed", "1");
-      // tile-columns=6 by default but won't harm.
+      // In case default will change.
       args.push("-tile-columns", "6");
       // frame-parallel should be disabled.
       args.push("-frame-parallel", "0");
     } else if (opts.vcodec === "vp8") {
-      // TODO(Kagami): Auto-insert colormatrix conversion?
-      // TODO(Kagami): Slices?
+      // TODO(Kagami): Tune slices setting?
       args.push("-c:v", "libvpx", "-speed", "0");
     } else {
       assert(false);
@@ -181,7 +179,7 @@ export default makeRunner("ffmpeg", {
         args.push("-crf", opts.quality.toString());
       }
     }
-    // Enabled for VP9 by default but always force it just in case.
+    // In case default will change.
     args.push("-auto-alt-ref", "1", "-lag-in-frames", "25");
     // Bigger keyframe interval saves bitrate but a lot of users will
     // complain if they can't seek video and savings are not that high
