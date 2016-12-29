@@ -6,15 +6,14 @@
 ## Features
 
 * Open-source, cross-platform, works on Windows and Linux
-* VP9/VP8/Opus/Vorbis/2pass/limit/CRF/CQ/raw-args support
+* VP9/VP8/Opus/Vorbis/2pass/limit/CRF/CQ/raw-args modes support
 * Industry-grade codec settings, considered defaults
 * Can download source from almost any streaming site, thanks to [youtube-dl](https://rg3.github.io/youtube-dl/)
 * Displays almost any video with embedded player, thanks to [mpv](https://mpv.io/)
+* Supports hardsubbing out of the box, automatically setups Fontconfig on Windows
 * Simple yet powerful interface, source video centric design
 * Multiple encodes at once in single window
-* Most popular effects are built-in and possible to use [any available ffmpeg filter](https://ffmpeg.org/ffmpeg-filters.html)
 * Fast filters result preview, no need to go through trial and error
-* And more…
 
 ## Install
 
