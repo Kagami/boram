@@ -20,12 +20,13 @@ import {parseTime, showTime, parseSAR} from "../util";
 const DEFAULT_LIMIT = 19;
 const DEFAULT_BITRATE = 5000;
 const DEFAULT_Q = 25;
-const DEFAULT_OPUS_BITRATE = 128;
-const DEFAULT_VORBIS_Q = 4;
 const MIN_VP8_Q = 4;
 const MAX_VP8_Q = 63;
 const MIN_VP9_Q = 0;
 const MAX_VP9_Q = 63;
+const DEFAULT_AUDIO_CODEC = "opus";
+const DEFAULT_OPUS_BITRATE = 128;
+const DEFAULT_VORBIS_Q = 4;
 const MIN_OPUS_BITRATE = 6;
 const MAX_OPUS_BITRATE = 510;
 const MIN_VORBIS_Q = -1;
@@ -100,7 +101,7 @@ export default class extends React.PureComponent {
     hasAudio: !!this.getAudioTracks().length,
     atrackn: this.getAudioTracks().length ? 0 : null,
     vcodec: "vp9",
-    acodec: "opus",
+    acodec: DEFAULT_AUDIO_CODEC,
     mode2Pass: true,
     modeLimit: true,
     modeCRF: this.isShortClip(),
@@ -181,6 +182,11 @@ export default class extends React.PureComponent {
   isAnamorph(vtrackn) {
     return this.getSAR(vtrackn) !== 1;
   }
+  canCopyAudio(atrackn) {
+    if (atrackn == null) return false;
+    const t = this.getAudioTracks()[atrackn];
+    return t.codec_name === "vorbis" || t.codec_name === "opus";
+  }
 
   makeFocuser = (name) => {
     return () => {
@@ -244,6 +250,16 @@ export default class extends React.PureComponent {
     this.setState(upd);
     this.handleAll(upd);
     this.refs.player.setSub({strackn, extSubPath});
+  };
+  handleAudioTrack = (e, _, atrackn) => {
+    const upd = {atrackn};
+    const what = {selected: "atrackn"};
+    if (this.state.acodec === "copy" && !this.canCopyAudio(atrackn)) {
+      upd.acodec = DEFAULT_AUDIO_CODEC;
+      what.selected = "acodec";
+    }
+    this.setState(upd);
+    this.handleAll(upd, what);
   };
   handleAll = (upd, what = {}) => {
     const nextState = Object.assign({}, this.state, upd);
@@ -345,7 +361,7 @@ export default class extends React.PureComponent {
     let rawArgs = "";
     // Helpers.
     const inpath = this.props.source.path;
-    const atracks = this.getAudioTracks();
+    const atrack = hasAudio ? this.getAudioTracks()[atrackn] : null;
     const mstart = get("mstart");
     const mend = get("mend");
     const induration = this.getFullDuration();
@@ -474,13 +490,16 @@ export default class extends React.PureComponent {
       setText("codecs", "ab", ab);
     }
     ab = validate("codecs", "ab", ab, v => {
-      v = v || (acodec === "opus" ? DEFAULT_OPUS_BITRATE : DEFAULT_VORBIS_Q);
       if (acodec === "opus") {
+        v = v || DEFAULT_OPUS_BITRATE;
         v = requireFloat(v);
         return requireRange(v, MIN_OPUS_BITRATE, MAX_OPUS_BITRATE);
       } else if (acodec === "vorbis") {
+        v = v || DEFAULT_VORBIS_Q;
         v = requireInt(v);
         return requireRange(v, MIN_VORBIS_Q, MAX_VORBIS_Q);
+      } else if (acodec === "copy") {
+        return null;
       } else {
         assert(false);
       }
@@ -511,7 +530,7 @@ export default class extends React.PureComponent {
       acodec, ab,
       mode2Pass, modeLimit, modeCRF,
       // helpers.
-      inpath, atracks,
+      inpath, atrack,
       _start, _duration,
     };
     const _vb = opts.vb = FFmpeg.getVideoBitrate(opts);
@@ -539,6 +558,10 @@ export default class extends React.PureComponent {
         (scalew == null || scaleh == null)) {
       warn("videoFX", `Output anamorphic video,
                        some players will handle it poorly`);
+    }
+    if (acodec !== "copy" && this.canCopyAudio(atrackn) &&
+        fadeIn == null && fadeOut == null && amplify == null) {
+      warn("codecs", "Consider copy audio codec to avoid reencode");
     }
     rawArgs = FFmpeg.getRawArgs(opts);
     setText("codecs", "rawArgs", rawArgs);
@@ -674,7 +697,9 @@ export default class extends React.PureComponent {
               atracks={this.getAudioTracks()}
               hasAudio={this.state.hasAudio}
               atrackn={this.state.atrackn}
+              acodec={this.state.acodec}
               onUpdate={this.handleAll}
+              onAudioTrack={this.handleAudioTrack}
             />
           )}
           {this.getTabNode(4, "codecs", "codecs",
@@ -687,6 +712,7 @@ export default class extends React.PureComponent {
               warnings={this.state.warnings.codecs}
               errors={this.state.errors.codecs}
               allValid={this.state.allValid}
+              copyableAudio={this.canCopyAudio(this.state.atrackn)}
               _duration={this.state._duration || 0}
               _vb={this.state._vb}
               vcodec={this.state.vcodec}

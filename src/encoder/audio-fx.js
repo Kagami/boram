@@ -48,7 +48,7 @@ export default class extends React.PureComponent {
             hintText="no audio"
             value={this.props.atrackn}
             disabled={!this.props.hasAudio}
-            onChange={this.props.makeSelecter("atrackn")}
+            onChange={this.props.onAudioTrack}
           >
           {this.props.atracks.map((t, i) =>
             <MenuItem
@@ -63,7 +63,7 @@ export default class extends React.PureComponent {
           <SmallInput
             ref="fadeIn"
             hintText="in"
-            disabled={!this.props.hasAudio}
+            disabled={!this.props.hasAudio || this.props.acodec === "copy"}
             onFocus={this.props.makeFocuser("fadeIn")}
             onBlur={this.props.onUpdate}
           />
@@ -71,7 +71,7 @@ export default class extends React.PureComponent {
           <SmallInput
             ref="fadeOut"
             hintText="out"
-            disabled={!this.props.hasAudio}
+            disabled={!this.props.hasAudio || this.props.acodec === "copy"}
             onFocus={this.props.makeFocuser("fadeOut")}
             onBlur={this.props.onUpdate}
           />
@@ -80,7 +80,7 @@ export default class extends React.PureComponent {
           <SmallInput
             ref="amplify"
             hintText="factor"
-            disabled={!this.props.hasAudio}
+            disabled={!this.props.hasAudio || this.props.acodec === "copy"}
             onFocus={this.props.makeFocuser("amplify")}
             onBlur={this.props.onUpdate}
           />

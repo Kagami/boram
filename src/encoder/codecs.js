@@ -142,12 +142,15 @@ export default class extends React.PureComponent {
             >
               <MenuItem primaryText="opus" value="opus" />
               <MenuItem primaryText="vorbis" value="vorbis" />
+            {this.props.copyableAudio ?
+              <MenuItem primaryText="copy" value="copy" />
+            : null}
             </SmallSelect>
             <Sep/>
             <SmallInput
               ref="ab"
-              hintText={this.props.acodec === "opus" ? "bitrate" : "quality"}
-              disabled={!this.props.hasAudio}
+              hintText={this.props.acodec === "vorbis" ? "quality" : "bitrate"}
+              disabled={!this.props.hasAudio || this.props.acodec === "copy"}
               onFocus={this.props.makeFocuser("ab")}
               onBlur={this.props.onUpdate}
             />

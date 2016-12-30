@@ -124,6 +124,11 @@ export default makeRunner("ffmpeg", {
     if (hasAudio) {
       if (acodec === "vorbis") {
         ab = this._getVorbisBitrate(ab);
+      } else if (acodec === "copy") {
+        // TODO(Kagami): ffprobe doesn't return "bit_rate" field per
+        // stream for some reason, so use approximation. Find some
+        // better way instead.
+        ab = 128;
       }
     } else {
       ab = 0;
@@ -267,23 +272,26 @@ export default makeRunner("ffmpeg", {
       args.push("-vf", escapeArg(vfilters.join(",")));
     }
 
+    // Audio.
     if (opts.hasAudio) {
-      // Audio.
       if (opts.acodec === "opus") {
         args.push("-c:a", "libopus");
         args.push("-b:a", `${opts.ab}k`);
       } else if (opts.acodec === "vorbis") {
         args.push("-c:a", "libvorbis");
         args.push("-q:a", opts.ab.toString());
+      } else if (opts.acodec === "copy") {
+        args.push("-c:a", "copy");
       } else {
         assert(false);
       }
-      const atrack = opts.atracks[opts.atrackn];
-      if (atrack.channels > 2) {
+    }
+
+    // Audio effects.
+    if (opts.hasAudio && opts.acodec !== "copy") {
+      if (opts.atrack.channels > 2) {
         args.push("-ac", "2");
       }
-
-      // Audio filters.
       // Amplify should go before fade.
       if (opts.amplify) {
         afilters.push(`acompressor=makeup=${opts.amplify}`);
