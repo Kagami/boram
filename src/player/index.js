@@ -52,8 +52,9 @@ export default class extends React.PureComponent {
     );
   }
   getSliderMarkEnd() {
-    return (!this.props.mstart &&
+    return (this.props.mstart === 0 &&
             this.isAlmostEqual(this.props.mend, this.duration))
+      // Don't hightlight the entire rage.
       ? 0
       : this.props.mend;
   }
@@ -71,11 +72,10 @@ export default class extends React.PureComponent {
   // "Smart" play/pause action.
   togglePlay = () => {
     const {time} = this.state;
-    const mend = this.props.mend || this.duration;
     const action = this.state.pause ? "play" : "pause";
     if (action === "play" &&
         this.state.loopCut &&
-        (time < this.props.mstart + 0.001 || time > mend - 0.001)) {
+        (time < this.props.mstart + 0.001 || time > this.props.mend - 0.001)) {
       // We can start playing right away and `handleTime` will handle
       // `loopCut` anyway but that will play out-of-loop video for some
       // period of time.
@@ -149,10 +149,9 @@ export default class extends React.PureComponent {
   };
   handleTime = (time) => {
     if (this.seekDragging) return;
-    const mend = this.props.mend || this.duration;
     if (!this.state.pause &&
         this.state.loopCut &&
-        (time < this.props.mstart + 0.001 || time > mend - 0.001)) {
+        (time < this.props.mstart + 0.001 || time > this.props.mend - 0.001)) {
       this.seek(this.props.mstart);
       return;
     }
@@ -177,6 +176,12 @@ export default class extends React.PureComponent {
   };
   handleMarkEnd = () => {
     this.props.onMarkEnd(this.state.time);
+  };
+  handleSeekStart = () => {
+    this.seek(this.props.mstart);
+  };
+  handleSeekEnd = () => {
+    this.seek(this.props.mend);
   };
   handleTimeControl = (e) => {
     const prettyTime = e.target.value;
@@ -230,9 +235,10 @@ export default class extends React.PureComponent {
           />
           <Control
             icon="scissors"
-            title="Mark fragment start"
+            title="Click to mark start, right-click to seek"
             disabled={this.isMarkStartDisabled()}
             onClick={this.handleMarkStart}
+            onContextMenu={this.handleSeekStart}
           />
           <Time
             ref="time"
@@ -244,9 +250,10 @@ export default class extends React.PureComponent {
           <Control
             flip
             icon="scissors"
-            title="Mark fragment end"
+            title="Click to mark end, right-click to seek"
             disabled={this.isMarkEndDisabled()}
             onClick={this.handleMarkEnd}
+            onContextMenu={this.handleSeekEnd}
           />
           <Control
             icon="repeat"
