@@ -8,6 +8,7 @@ import {remote} from "electron";
 import React from "react";
 import {useSheet} from "../jss";
 import FFmpeg from "../ffmpeg";
+import ShowHide from "../show-hide";
 import {
   HelpPane,
   Prop, SmallInput,
@@ -219,13 +220,15 @@ export default class extends React.PureComponent {
             onBlur={this.props.onUpdate}
           />
           <Sep size={10} />
-          <InlineCheckbox
-            label="fix sar"
-            title="Make output video non-anamorphic (recommended)"
-            checked={this.props.fixSAR}
-            disabled={this.props.encoding || !this.props._anamorph}
-            onCheck={this.props.makeChecker("fixSAR")}
-          />
+          <ShowHide show={this.props._anamorph}>
+            <InlineCheckbox
+              label="fix sar"
+              title="Make output video non-anamorphic (recommended)"
+              checked={this.props.fixSAR}
+              disabled={this.props.encoding}
+              onCheck={this.props.makeChecker("fixSAR")}
+            />
+          </ShowHide>
         </Prop>
         {/*<Prop name="speed">
           <SmallInput
