@@ -105,6 +105,9 @@ export default class extends React.Component {
       e.returnValue = false;
       setTimeout(() => {
         const choice = remote.dialog.showMessageBox({
+          // Normally dialogs in win build should use .ico icon too, but
+          // for some reason it looks much worse than png, even with
+          // multiple dimensions included.
           icon: ICON_BIG_PATH,
           title: "Confirm",
           message: "Close all tabs and quit?",

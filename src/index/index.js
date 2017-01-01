@@ -10,9 +10,6 @@ import {ICON_BIG_PATH, WIN_ICON_PATH, PAGE_PATH} from "../shared";
 import {getPluginPath} from "./plugin";
 import "file!./package.json";
 import "file!./index.html";
-// TODO(Kagami): Normally dialogs in win build should use .ico icon too,
-// but for some reason it looks much worse than png, even with multiple
-// dimensions included.
 import "file!./icon-big.png";
 if (BORAM_WIN_BUILD) {
   require("file!./icon.ico");
