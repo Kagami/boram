@@ -72,8 +72,7 @@ function runtimeChecks() {
     } catch (e) {
       dialog.showErrorBox(
         e.message,
-        "Dependencies check failed. " +
-        "Install required components and try again."
+        "Install required dependencies and try again."
       );
       return app.exit(1);
     }
