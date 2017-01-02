@@ -10,7 +10,7 @@ import {APP_PATH, DATA_PATH, WIN_FONTCONFIG_PATH} from "../shared";
 import fontsConfTmpl from "raw!./fonts.conf.tmpl";
 import "file!./aliases.conf";
 
-// https://stackoverflow.com/a/27979933
+// <https://stackoverflow.com/a/27979933>.
 function escapeXML(unsafe) {
   return unsafe.replace(/[<>&'"]/g, function (c) {
     switch (c) {

@@ -90,7 +90,7 @@ export default class extends React.PureComponent {
     try {
       this.refs.plugin.postMessage(msg);
     } catch (e) {
-      // Allow to interact with non-initialized plugin.
+      // Don't break functionality when plugin failed to init.
     }
   }
   handleMessage = (e) => {

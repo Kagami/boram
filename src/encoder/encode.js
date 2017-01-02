@@ -55,7 +55,7 @@ class Output extends React.PureComponent {
     this.props.onClear();
   };
   handleSelectAll = () => {
-    // https://stackoverflow.com/a/23255927
+    // <https://stackoverflow.com/a/23255927>.
     const range = document.createRange();
     range.selectNodeContents(this.refs.out);
     const sel = window.getSelection();
