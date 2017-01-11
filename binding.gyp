@@ -24,8 +24,13 @@
     ["OS=='linux'", {
       "targets": [
         {
-          "target_name": "ffmpeg",
-          "libraries": ["-lavcodec", "-lavformat", "-lavutil"],
+          "target_name": "ffmpeg57",
+          "libraries": ["-l:libavformat.so.57"],
+          "ldflags": ["-static-libstdc++"],
+        },
+        {
+          "target_name": "ffmpeg56",
+          "libraries": ["-l:libavformat.so.56"],
           "ldflags": ["-static-libstdc++"],
         },
         {

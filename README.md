@@ -25,6 +25,8 @@ Download [latest release](https://github.com/Kagami/boram/releases), unpack and 
 
 Download [latest release](https://github.com/Kagami/boram/releases), unpack and run `./boram`. You need to have python, ffmpeg and libmpv installed.
 
+ffmpeg 3.x is required by default. Run `mv libffmpeg.so.56 libffmpeg.so` if you have ffmpeg 2.x.
+
 ## License
 
 boram's own code is licensed under [CC0](licenses/LICENSE.BORAM) but releases also include:
