@@ -559,7 +559,7 @@ export default class extends React.PureComponent {
       warn("videoFX", `Output anamorphic video,
                        some players will handle it poorly`);
     }
-    if (acodec !== "copy" && this.canCopyAudio(atrackn) &&
+    if (hasAudio && acodec !== "copy" && this.canCopyAudio(atrackn) &&
         fadeIn == null && fadeOut == null && amplify == null) {
       warn("codecs", "Consider copy audio codec to avoid reencode");
     }
