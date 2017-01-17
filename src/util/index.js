@@ -76,7 +76,7 @@ export function showTime(duration, opts = {}) {
   const round = opts.ceil ? ceilFixed : floorFixed;
   const h = Math.floor(duration / 3600);
   // Try to avoid floating point inaccuracy.
-  const frac = parseFloat((duration % 1).toFixed(4));
+  const frac = parseFloat((duration % 1).toFixed(5));
   let ts = h ? h + sep : "";
   ts += pad2(duration % 3600 / 60) + sep;
   ts += pad2(duration % 60);
