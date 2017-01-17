@@ -90,7 +90,7 @@ export default class extends React.Component {
     return this.refs[`instance${i}`];
   }
   addTab(opts) {
-    const tabs = this.state.tabs;
+    const {tabs} = this.state;
     tabs.push({
       key: this.tabKey++,
       label: DEFAULT_LABEL,
@@ -101,7 +101,8 @@ export default class extends React.Component {
     this.setState({tabs});
   }
   handleGlobalClose = (e) => {
-    if (!BORAM_DEBUG && !this.closing) {
+    const {tabs} = this.state;
+    if (!BORAM_DEBUG && !this.closing && (tabs.length > 1 || tabs[0].source)) {
       e.returnValue = false;
       setTimeout(() => {
         const choice = remote.dialog.showMessageBox({
@@ -130,12 +131,12 @@ export default class extends React.Component {
     }
   }
   handleTitleChange = (i, label = DEFAULT_LABEL) => {
-    const tabs = this.state.tabs;
+    const {tabs} = this.state;
     tabs[i].label = label;
     this.setState({tabs});
   };
   handleProgressChange = (i, progress = 0) => {
-    const tabs = this.state.tabs;
+    const {tabs} = this.state;
     tabs[i].progress = progress;
     this.setState({tabs});
   };
@@ -149,7 +150,7 @@ export default class extends React.Component {
     this.setState({tabIndex});
   };
   handleSourceUpdate = (i, source) => {
-    const tabs = this.state.tabs;
+    const {tabs} = this.state;
     tabs[i].source = source;
     this.setState({tabs});
   };
@@ -160,22 +161,24 @@ export default class extends React.Component {
     this.handleNew(null, {label, source});
   };
   handleClose = (i, e) => {
+    const {tabs} = this.state;
     e.stopPropagation();
-    const choice = remote.dialog.showMessageBox({
-      icon: ICON_BIG_PATH,
-      title: "Confirm",
-      message: "Close tab?",
-      buttons: ["OK", "Cancel"],
-    });
-    if (choice !== 0) return;
+    if (tabs[i].source) {
+      const choice = remote.dialog.showMessageBox({
+        icon: ICON_BIG_PATH,
+        title: "Confirm",
+        message: "Close tab?",
+        buttons: ["OK", "Cancel"],
+      });
+      if (choice !== 0) return;
+    }
     this.getInstance(i).abort();
-    const tabs = this.state.tabs;
     tabs.splice(i, 1);
     let tabIndex = this.state.tabIndex;
     tabIndex = Math.min(tabIndex, tabs.length - 1);
     tabIndex = Math.max(0, tabIndex);
     this.setState({tabs, tabIndex});
-    if (!this.state.tabs.length) {
+    if (!tabs.length) {
       this.addTab();
     }
   };
