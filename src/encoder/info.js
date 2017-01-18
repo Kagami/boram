@@ -45,9 +45,9 @@ export default class extends React.PureComponent {
     let dwidth = width;
     let dheight = height;
     if (sar > 1) {
-      dwidth *= sar;
-    } else {
-      dheight *= sar;
+      dwidth = Math.round(dwidth * sar);
+    } else if (sar < 1) {
+      dheight = Math.round(dheight * sar);
     }
     if (sar === 1) {
       return `${width}x${height}`;
