@@ -270,7 +270,7 @@ export default class extends React.PureComponent {
       this.sep(),
       `Output path: ${this.state.output.path}`,
       `Output duration: ${showTime(this.props._duration)}`,
-      `Output bitrate: ${showBitrate(size / this.props._duration)}`,
+      `Output bitrate: ${showBitrate(size / this.props._duration * 8)}`,
       `Output file size: ${showSize(size)}`,
       `Overall time spent: ${showTime(runTime)}`,
       "",
