@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <string>
 #include <unordered_map>
@@ -291,7 +292,9 @@ class BoramInstance : public pp::Instance {
     if (!mpv_)
       DIE("context init failed");
 
-    // mpv_set_option_string(mpv_, "terminal", "yes");
+    char* verbose = getenv("BORAM_VERBOSE");
+    if (verbose && strlen(verbose))
+      mpv_set_option_string(mpv_, "terminal", "yes");
 
     if (mpv_initialize(mpv_) < 0)
       DIE("mpv init failed");
