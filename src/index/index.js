@@ -82,7 +82,7 @@ app.on("ready", () => {
     width: 960,
     height: 960,
     minWidth: 640,
-    minHeight: 780,
+    minHeight: 640,
     // Works strangely on Linux. useContentSize=false enlarges window to
     // include borders and useContentSize=true enlarges even more.
     useContentSize: BORAM_WIN_BUILD,
