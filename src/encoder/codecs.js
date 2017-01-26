@@ -142,6 +142,9 @@ export default class extends React.PureComponent {
             >
               <MenuItem primaryText="opus" value="opus" />
               <MenuItem primaryText="vorbis" value="vorbis" />
+            {this.props.copyableAudio ?
+              <MenuItem primaryText="copy" value="copy" />
+            : null}
             </SmallSelect>
             <Sep/>
             <SmallInput

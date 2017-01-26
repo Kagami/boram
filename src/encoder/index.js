@@ -559,6 +559,10 @@ export default class extends React.PureComponent {
       warn("videoFX", `Output anamorphic video,
                        some players will handle it poorly`);
     }
+    if (hasAudio && acodec !== "copy" && this.canCopyAudio(atrackn) &&
+        fadeIn == null && fadeOut == null && amplify == null) {
+      warn("codecs", "Consider copy audio codec to avoid reencode");
+    }
     rawArgs = FFmpeg.getRawArgs(opts);
     setText("codecs", "rawArgs", rawArgs);
     this.setState({
@@ -708,6 +712,7 @@ export default class extends React.PureComponent {
               warnings={this.state.warnings.codecs}
               errors={this.state.errors.codecs}
               allValid={this.state.allValid}
+              copyableAudio={this.canCopyAudio(this.state.atrackn)}
               _duration={this.state._duration || 0}
               _vb={this.state._vb}
               vcodec={this.state.vcodec}
