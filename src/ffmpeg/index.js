@@ -128,7 +128,7 @@ export default makeRunner("ffmpeg", {
         // TODO(Kagami): ffprobe doesn't return "bit_rate" field per
         // stream for some reason, so use approximation. Find some
         // better way instead.
-        ab = 128;
+        ab = 320;
       }
     } else {
       ab = 0;
