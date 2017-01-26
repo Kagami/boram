@@ -154,6 +154,11 @@ export default makeRunner("ffmpeg", {
     if (opts.end != null) {
       args.push("-t", ceilFixed(opts._duration, 3));
     }
+    if (opts.start != null && opts.hasAudio && opts.acodec === "copy") {
+      // ffmpeg sets shifted timestamps for -ss before -i and copy audio
+      // modes. This hack avoids that.
+      args.push("-ss", "0");
+    }
 
     // Streams.
     args.push("-map", `0:V:${opts.vtrackn}`);
