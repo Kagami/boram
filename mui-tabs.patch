@@ -2,12 +2,12 @@ diff --git a/node_modules/material-ui/Tabs/Tab.js b/node_modules/material-ui/Tab
 index e0fd233..5f965c0 100644
 --- a/node_modules/material-ui/Tabs/Tab.js
 +++ b/node_modules/material-ui/Tabs/Tab.js
-@@ -103,7 +103,7 @@ var Tab = function (_Component) {
+@@ -104,7 +104,7 @@ var Tab = function (_Component) {
            style = _props.style,
            value = _props.value,
            width = _props.width,
--          other = (0, _objectWithoutProperties3.default)(_props, ['icon', 'index', 'onActive', 'onTouchTap', 'selected', 'label', 'style', 'value', 'width']);
-+          other = (0, _objectWithoutProperties3.default)(_props, ['icon', 'index', 'onActive', 'onTouchTap', 'selected', 'label', 'style', 'value', 'width', 'tabKey']);
+-          other = (0, _objectWithoutProperties3.default)(_props, ['icon', 'index', 'onActive', 'onTouchTap', 'selected', 'label', 'buttonStyle', 'style', 'value', 'width']);
++          other = (0, _objectWithoutProperties3.default)(_props, ['icon', 'index', 'onActive', 'onTouchTap', 'selected', 'label', 'buttonStyle', 'style', 'value', 'width', 'tabKey']);
  
  
        var styles = getStyles(this.props, this.context);
