@@ -19,7 +19,7 @@
 
 ### Windows
 
-Download [latest release](https://github.com/Kagami/boram/releases), unpack and run `boram.exe`.
+Download [latest release](https://github.com/Kagami/boram/releases), unpack and run `boram.exe`. 64-bit (x64) releases are preferred.
 
 ### Linux
 
