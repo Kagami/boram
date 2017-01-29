@@ -115,9 +115,7 @@ export default class extends React.PureComponent {
     return parseFloat(this.props.info.format.duration);
   }
   getVideoTracks() {
-    return this.props.info.streams.filter(t =>
-      t.codec_type === "video" && !t.disposition.attached_pic
-    );
+    return this.props.info.streams.filter(t => t.codec_type === "video");
   }
   getAudioTracks() {
     return this.props.info.streams.filter(t => t.codec_type === "audio");

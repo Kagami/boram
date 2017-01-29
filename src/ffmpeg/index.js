@@ -164,7 +164,7 @@ export default makeRunner("ffmpeg", {
     }
 
     // Streams.
-    args.push("-map", `0:V:${opts.vtrackn}`);
+    args.push("-map", `0:v:${opts.vtrackn}`);
     if (opts.hasAudio) {
       args.push("-map", `0:a:${opts.atrackn}`);
     }
