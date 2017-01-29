@@ -210,10 +210,10 @@ class BoramInstance : public pp::Instance {
         mpv_set_property(mpv_, "sid", MPV_FORMAT_INT64, &id);
       } else {
         std::string str_id = std::to_string(id);
-        const char* cmd_add[] = {"sub-remove", str_id.c_str(), NULL};
-        mpv_command(mpv_, cmd_add);
-        const char* cmd_remove[] = {"sub-add", path.AsString().c_str(), NULL};
+        const char* cmd_remove[] = {"sub-remove", str_id.c_str(), NULL};
         mpv_command(mpv_, cmd_remove);
+        const char* cmd_add[] = {"sub-add", path.AsString().c_str(), NULL};
+        mpv_command(mpv_, cmd_add);
       }
     } else if (type == "frame-step" || type == "frame-back-step") {
       const char* cmd[] = {type.c_str(), NULL};
