@@ -507,7 +507,8 @@ export default class extends React.PureComponent {
     if (what.checked === "deinterlace") {
       this.refs.player.setDeinterlace(deinterlace);
     }
-    if (what.selected === "strackn") {
+    if (what.selected === "strackn" ||
+        (what.checked === "burnSubs" && burnSubs)) {
       this.refs.player.setSub({strackn});
     }
     if (!allValid) return this.setState({allValid, warnings, errors, focused});
