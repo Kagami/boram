@@ -41,11 +41,7 @@ export default makeRunner("youtube-dl", {
     }
     if (sfid) {
       args.push("--sub-lang", sfid, "--write-sub", "--embed-subs");
-      ppArgs.push(
-        "-c:s", "ass",
-        "-disposition:s:0", "default",
-        "-f", "matroska"
-      );
+      ppArgs.push("-c:s", "ass", "-f", "matroska");
     }
     if (ppArgs.length) {
       args.push("--postprocessor-args", ppArgs.join(" "));
