@@ -37,6 +37,8 @@ export default makeRunner("youtube-dl", {
     ];
     if (vcodec === "vp9.2") {
       // See <https://trac.ffmpeg.org/ticket/6042>.
+      // Fixed in master but keep for compatibility with older versions:
+      // <https://github.com/FFmpeg/FFmpeg/commit/e7dec52>.
       ppArgs.push("-strict", "unofficial");
     }
     if (sfid) {

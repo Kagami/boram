@@ -53,6 +53,9 @@ export default makeRunner("ffmpeg", {
       "-i", this._escapeFilename(inpath),
       "-map", "0",
       "-c", "copy",
+      // See <https://trac.ffmpeg.org/ticket/6042>.
+      // Fixed in master but keep for compatibility with older versions:
+      // <https://github.com/FFmpeg/FFmpeg/commit/e7dec52>.
       "-strict", "unofficial",
       "-metadata", `title=${title}`,
       "-f", "matroska", this._escapeFilename(outpath),
