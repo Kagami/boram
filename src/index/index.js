@@ -22,14 +22,13 @@ global.tmp.setGracefulCleanup();
 if (BORAM_DEBUG) {
   require("electron-debug")({enabled: true});
 }
+// Plugin init would fail if activated, sort of debug option.
 if (process.env.BORAM_NO_HWACCEL) {
   app.disableHardwareAcceleration();
 }
-if (process.env.BORAM_FIX_GPU) {
-  app.commandLine.appendSwitch("ignore-gpu-blacklist");
-}
-// Can't be run on ready.
+// Plugin checks and setup. Can't be run on ready.
 (function() {
+  app.commandLine.appendSwitch("ignore-gpu-blacklist");
   const pluginPath = getPluginPath();
   if (!pluginPath) {
     dialog.showErrorBox(
