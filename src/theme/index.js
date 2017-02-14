@@ -61,49 +61,50 @@ export function Pane(props) {
   );
 }
 
-function makeProp(nameStyles) {
-  const styles = {
-    prop: {
-      display: "flex",
+export const Prop = useSheet({
+  prop: {
+    display: "flex",
+  },
+  name: {
+    width: 130,
+    lineHeight: "48px",
+    verticalAlign: "middle",
+    cursor: "default",
+    WebkitUserSelect: "none",
+    "&:first-letter": {
+      textTransform: "capitalize",
     },
-    name: {
-      width: 130,
-      lineHeight: "48px",
-      verticalAlign: "middle",
-      cursor: "default",
-      WebkitUserSelect: "none",
-      "&:first-letter": {
-        textTransform: "capitalize",
-      },
-      ...nameStyles,
-    },
-    value: {
-      boxSizing: "border-box",
-      flex: 1,
-      paddingRight: 5,
-      overflow: "hidden",
-      verticalAlign: "middle",
-      textOverflow: "ellipsis",
-      whiteSpace: "nowrap",
-      color: SECONDARY_COLOR,
-    },
-  };
-  return useSheet(styles)(function(props, {classes}) {
-    return (
-      <div className={classes.prop}>
-        <div className={cx(classes.name, props.nameClassName)}>
-          {props.name}:
-        </div>
-        <div className={cx(classes.value, props.valueClassName)}>
-          {props.children}
-        </div>
+  },
+  nameCompact: {
+    lineHeight: "inherit",
+  },
+  value: {
+    boxSizing: "border-box",
+    flex: 1,
+    paddingRight: 5,
+    overflow: "hidden",
+    verticalAlign: "middle",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+    color: SECONDARY_COLOR,
+  },
+})(function(props, {classes}) {
+  return (
+    <div className={classes.prop}>
+      <div className={cx(classes.name, props.nameClassName,
+                         props.compact && classes.nameCompact)}>
+        {props.name}:
       </div>
-    );
-  });
-}
+      <div className={cx(classes.value, props.valueClassName)}>
+        {props.children}
+      </div>
+    </div>
+  );
+});
 
-export const Prop = makeProp();
-export const CompactProp = makeProp({lineHeight: "inherit"});
+export const CompactProp = function(props) {
+  return <Prop {...props} compact>{props.children}</Prop>;
+};
 
 export class SmallInput extends React.PureComponent {
   static styles = {
@@ -363,32 +364,29 @@ export function Sep(props) {
   );
 }
 
-export const Tip = (function() {
-  const styles = {
-    tip: {
-      position: "fixed",
-      left: 50,
-      right: 50,
-      bottom: 30,
-      padding: 10,
-      color: "#333",
-      backgroundColor: BACKGROUND_COLOR,
-    },
-    icon: {
-      display: "inline-block",
-      marginRight: 15,
-      color: "#4078c0",
-    },
-  };
-  return function(props) {
-    return (
-      <Paper style={styles.tip}>
-        <Icon name={props.icon} style={styles.icon} />
-        {props.children}
-      </Paper>
-    );
-  };
-})();
+export const Tip = useSheet({
+  tip: {
+    position: "fixed",
+    left: 50,
+    right: 50,
+    bottom: 30,
+    padding: 10,
+    color: "#333 !important",
+    backgroundColor: `${BACKGROUND_COLOR} !important`,
+  },
+  icon: {
+    display: "inline-block",
+    marginRight: 15,
+    color: "#4078c0",
+  },
+})(function(props, {classes}) {
+  return (
+    <Paper className={classes.tip}>
+      <Icon name={props.icon} className={classes.icon} />
+      {props.children}
+    </Paper>
+  );
+});
 
 export const HelpPane = useSheet({
   outer: {
