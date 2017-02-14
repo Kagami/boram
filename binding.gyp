@@ -34,6 +34,11 @@
           "ldflags": ["-static-libstdc++"],
         },
         {
+          "target_name": "ffmpeg56-xenial",
+          "libraries": ["-l:libavformat-ffmpeg.so.56"],
+          "ldflags": ["-static-libstdc++"],
+        },
+        {
           "target_name": "checklib",
           "type": "executable",
           "sources": ["src/index/checklib.c"],
