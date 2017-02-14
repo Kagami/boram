@@ -23,9 +23,9 @@ Download [latest release](https://github.com/Kagami/boram/releases), unpack and 
 
 ### Linux
 
-Download [latest release](https://github.com/Kagami/boram/releases), unpack and run `./boram`. You need to have python, ffmpeg and libmpv installed.  
-ffmpeg 3.x is required by default. Run `mv libffmpeg.so.56 libffmpeg.so` if you have ffmpeg 2.x.  
-Run `mv libffmpeg-xenial.so.56 libffmpeg.so` if you use Ubuntu 16.04.
+Download [latest release](https://github.com/Kagami/boram/releases), unpack and run `./boram`. You need to have python, ffmpeg and libmpv installed. ffmpeg 3.x is implied by default. Run:
+* `mv libffmpeg.so.56 libffmpeg.so` if you have ffmpeg 2.x
+* `mv libffmpeg-xenial.so.56 libffmpeg.so` if you have ffmpeg 2.x and Ubuntu 16.04
 
 ## License
 
