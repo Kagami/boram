@@ -192,9 +192,10 @@ export default class extends React.PureComponent {
           </div>
         </div>
         <Tip icon="info-circle">
-          <span>Any video </span>
-          <a href onClick={this.handleSupportedClick}>
-            site supported by youtube-dl
+          <span>Any site </span>
+          <a href onClick={this.handleSupportedClick}
+             title="Open list in browser">
+            supported by youtube-dl
           </a>
           <span> is accepted</span>
         </Tip>
