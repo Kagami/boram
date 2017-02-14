@@ -25,9 +25,11 @@ const COMMON_VIDEO_EXTENSIONS = [
 
 @useSheet({
   source2: {
-    width: 600,
-    height: 600,
-    marginBottom: 50,
+    position: "absolute",
+    left: 50,
+    right: 50,
+    top: 30,
+    bottom: 100,
   },
   border: {
     height: "100%",
@@ -64,7 +66,7 @@ const COMMON_VIDEO_EXTENSIONS = [
     display: "-webkit-box",
     overflow: "hidden",
     textOverflow: "ellipsis",
-    WebkitLineClamp: 10,
+    WebkitLineClamp: 7,
     WebkitBoxOrient: "vertical",
   },
   icon: {
@@ -145,47 +147,49 @@ export default class extends React.PureComponent {
   render() {
     const {classes} = this.sheet;
     return (
-      <div className={classes.source2}>
-        <div
-          className={cx(classes.border,
-                        this.state.infoLoading && classes.borderDisabled)}
-          onDrop={this.handleDrop}
-          onClick={this.handleFormClick}
-        >
-          <form className={classes.form} onSubmit={this.handleInfoGet}>
-            <div className={classes.text}>
-              <div>Click/drag your source video here</div>
-              <span>or </span>
-              <input
-                autoFocus
-                ref="url"
-                type="text"
-                placeholder="enter URL"
-                value={this.state.url}
-                className={classes.input}
-                onClick={this.handleURLClick}
-                onChange={this.handleURLChange}
-                disabled={this.state.infoLoading || this.state.infoError}
-              />
-            </div>
-            <div className={classes.padding}>
-              <div className={classes.error} onClick={this.handleTextClick}>
-                {showErr(this.state.infoError)}
+      <div>
+        <div className={classes.source2}>
+          <div
+            className={cx(classes.border,
+                          this.state.infoLoading && classes.borderDisabled)}
+            onDrop={this.handleDrop}
+            onClick={this.handleFormClick}
+          >
+            <form className={classes.form} onSubmit={this.handleInfoGet}>
+              <div className={classes.text}>
+                <div>Click/drag your source video here</div>
+                <span>or </span>
+                <input
+                  autoFocus
+                  ref="url"
+                  type="text"
+                  placeholder="enter URL"
+                  value={this.state.url}
+                  className={classes.input}
+                  onClick={this.handleURLClick}
+                  onChange={this.handleURLChange}
+                  disabled={this.state.infoLoading || this.state.infoError}
+                />
               </div>
-            </div>
-            <Icon
-              ref="icon"
-              className={classes.icon}
-              name={this.state.infoError
-                    ? "remove"
-                    : this.state.url ? "external-link" : "folder-open-o"}
-              title={this.state.infoError
-                     ? "Clear error"
-                     : this.state.url
-                       ? "Request formats for that URL"
-                       : "Open file dialog"}
-            />
-          </form>
+              <div className={classes.padding}>
+                <div className={classes.error} onClick={this.handleTextClick}>
+                  {showErr(this.state.infoError)}
+                </div>
+              </div>
+              <Icon
+                ref="icon"
+                className={classes.icon}
+                name={this.state.infoError
+                      ? "remove"
+                      : this.state.url ? "external-link" : "folder-open-o"}
+                title={this.state.infoError
+                       ? "Clear error"
+                       : this.state.url
+                         ? "Request formats for that URL"
+                         : "Open file dialog"}
+              />
+            </form>
+          </div>
         </div>
         <Tip icon="info-circle">
           <span>Any video </span>
