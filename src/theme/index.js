@@ -366,7 +366,7 @@ export function Sep(props) {
 
 export const Tip = useSheet({
   tip: {
-    position: "fixed",
+    position: "absolute",
     left: 50,
     right: 50,
     bottom: 30,
