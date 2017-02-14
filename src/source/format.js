@@ -87,7 +87,10 @@ export default class extends React.PureComponent {
   }
 
   compareAudioFormats(a, b) {
-    return b.abr - a.abr;
+    // Target bitrate is uppermost (Opus@160k > Vorbis@128k).
+    if (a.abr !== b.abr) return b.abr - a.abr;
+    // Fallback to actual size.
+    return b.filesize - a.filesize;
   }
   getAudioText(format) {
     const {acodec, abr, filesize} = format;
