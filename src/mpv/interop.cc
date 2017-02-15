@@ -3,6 +3,7 @@
 #include <string.h>
 #include <string>
 #include <unordered_map>
+#include <mutex>
 #define GL_GLEXT_PROTOTYPES
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
@@ -116,7 +117,9 @@ class BoramInstance : public pp::Instance {
         src_(NULL),
         width_(0),
         height_(0),
-        run_(false) {}
+        gl_ready_(false),
+        is_painting_(false),
+        needs_paint_(false) {}
 
   virtual ~BoramInstance() {
     if (mpv_gl_) {
@@ -164,11 +167,8 @@ class BoramInstance : public pp::Instance {
 
     width_ = new_width;
     height_ = new_height;
-
-    if (!run_) {
-      run_ = true;
-      MainLoop(0);
-    }
+    gl_ready_ = true;
+    OnGetFrame(0);
   }
 
   virtual void HandleMessage(const Var& message) {
@@ -264,6 +264,13 @@ class BoramInstance : public pp::Instance {
         0, b->callback_factory_.NewCallback(&BoramInstance::HandleMPVEvents));
   }
 
+  static void HandleMPVUpdate(void* ctx) {
+    // printf("@@@ UPDATE\n");
+    BoramInstance* b = static_cast<BoramInstance*>(ctx);
+    pp::Module::Get()->core()->CallOnMainThread(
+        0, b->callback_factory_.NewCallback(&BoramInstance::OnGetFrame));
+  }
+
   bool InitGL() {
     if (!glInitializePPAPI(pp::Module::Get()->get_browser_interface()))
       DIE("unable to initialize GL PPAPI");
@@ -326,17 +333,42 @@ class BoramInstance : public pp::Instance {
     mpv_observe_property(mpv_, 0, "eof-reached", MPV_FORMAT_FLAG);
     mpv_observe_property(mpv_, 0, "deinterlace", MPV_FORMAT_FLAG);
     mpv_set_wakeup_callback(mpv_, HandleMPVWakeup, this);
+    mpv_opengl_cb_set_update_callback(mpv_gl_, HandleMPVUpdate, this);
 
     return true;
   }
 
-  void MainLoop(int32_t) {
+  void OnGetFrame(int32_t) {
+    if (!gl_ready_)
+      return;
+
+    render_mutex_.lock();
+    if (is_painting_) {
+      needs_paint_ = true;
+      render_mutex_.unlock();
+    } else {
+      is_painting_ = true;
+      needs_paint_ = false;
+      render_mutex_.unlock();
+      Render();
+    }
+  }
+
+  void Render() {
     // XXX(Kagami): Race condition if another plugin sets different
     // context in between calls?
     glSetCurrentContextPPAPI(context_.pp_resource());
     mpv_opengl_cb_draw(mpv_gl_, 0, width_, -height_);
     context_.SwapBuffers(
-        callback_factory_.NewCallback(&BoramInstance::MainLoop));
+        callback_factory_.NewCallback(&BoramInstance::PaintFinished));
+  }
+
+  void PaintFinished(int32_t) {
+    render_mutex_.lock();
+    is_painting_ = false;
+    render_mutex_.unlock();
+    if (needs_paint_)
+      OnGetFrame(0);
   }
 
   pp::CompletionCallbackFactory<BoramInstance> callback_factory_;
@@ -346,7 +378,10 @@ class BoramInstance : public pp::Instance {
   char* src_;
   int32_t width_;
   int32_t height_;
-  bool run_;
+  bool gl_ready_;
+  bool is_painting_;
+  bool needs_paint_;
+  std::mutex render_mutex_;
 };
 
 class BoramModule : public pp::Module {
