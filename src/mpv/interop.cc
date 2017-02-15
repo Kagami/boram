@@ -147,9 +147,6 @@ class BoramInstance : public pp::Instance {
   }
 
   virtual void DidChangeView(const pp::View& view) {
-    // Pepper specifies dimensions in DIPs (device-independent pixels).
-    // To generate a context that is at device-pixel resolution on HiDPI
-    // devices, scale the dimensions by view.GetDeviceScale().
     int32_t new_width = static_cast<int32_t>(
         view.GetRect().width() * view.GetDeviceScale());
     int32_t new_height = static_cast<int32_t>(
@@ -334,10 +331,8 @@ class BoramInstance : public pp::Instance {
   }
 
   void MainLoop(int32_t) {
-    // TODO(Kagami): Seems like we need "ppapi-in-process" and mutex
-    // because multiple plugins in same window require correct context.
-    // See: <https://stackoverflow.com/a/31548087>,
-    // <https://github.com/electron/electron/issues/3300#issuecomment-197851126>
+    // XXX(Kagami): Race condition if another plugin sets different
+    // context in between calls?
     glSetCurrentContextPPAPI(context_.pp_resource());
     mpv_opengl_cb_draw(mpv_gl_, 0, width_, -height_);
     context_.SwapBuffers(
