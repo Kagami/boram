@@ -33,6 +33,9 @@ export default class extends React.PureComponent {
   pause() {
     this.postData("pause", true);
   }
+  togglePause() {
+    this.postData("keypress", "SPACE");
+  }
   seek(time) {
     this.postData("seek", time);
   }

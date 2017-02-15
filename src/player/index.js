@@ -70,20 +70,19 @@ export default class extends React.PureComponent {
   play = this.bindMPV("play");
   pause = this.bindMPV("pause");
   // "Smart" play/pause action.
-  togglePlay = () => {
+  togglePause = () => {
     const {time} = this.state;
-    const action = this.state.pause ? "play" : "pause";
-    if (action === "play" &&
-        this.state.loopCut &&
+    const pause = !this.state.pause;
+    if (!pause && this.state.loopCut &&
         (time < this.props.mstart + 0.001 || time > this.props.mend - 0.001)) {
       // We can start playing right away and `handleTime` will handle
       // `loopCut` anyway but that will play out-of-loop video for some
       // period of time.
       this.seek(this.props.mstart);
-    } else if (action === "play" && time >= Math.floor(this.duration)) {
+    } else if (!pause && time >= Math.floor(this.duration)) {
       this.seek(0);
     }
-    this[action]();
+    this.refs.mpv.togglePause();
   };
   seek(time) {
     this.refs.mpv.seek(time);
@@ -223,7 +222,7 @@ export default class extends React.PureComponent {
           <CropArea
             vtrack={this.props.vtrack}
             crop={this.props.crop}
-            onClick={this.togglePlay}
+            onClick={this.togglePause}
             onCrop={this.props.onCrop}
           />
         </div>
@@ -231,7 +230,7 @@ export default class extends React.PureComponent {
           <Control
             icon={this.state.pause ? "play" : "pause"}
             title="Play/pause"
-            onClick={this.togglePlay}
+            onClick={this.togglePause}
           />
           <Control
             icon="scissors"
