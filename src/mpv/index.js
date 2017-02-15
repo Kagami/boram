@@ -85,8 +85,6 @@ export default class extends React.PureComponent {
   }
   postData(type, data) {
     const msg = {type, data};
-    // if (type !== "wakeup")
-    //   console.log("@@@ SEND", JSON.stringify(msg));
     try {
       this.refs.plugin.postMessage(msg);
     } catch (e) {
@@ -96,12 +94,7 @@ export default class extends React.PureComponent {
   handleMessage = (e) => {
     const msg = e.data;
     const {type, data} = msg;
-    // if (type !== "wakemeup")
-    //   console.log("@@@ RECV", JSON.stringify(msg));
     switch (type) {
-    case "wakemeup":
-      this.postData("wakeup", null);
-      break;
     case "pause":
       this.props.onPlayPause(data);
       break;

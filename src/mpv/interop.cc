@@ -181,9 +181,7 @@ class BoramInstance : public pp::Instance {
     std::string type = dict.Get("type").AsString();
     pp::Var data = dict.Get("data");
 
-    if (type == "wakeup") {
-      HandleMPVEvents();
-    } else if (type == "pause") {
+    if (type == "pause") {
       int pause = data.AsBool();
       mpv_set_property(mpv_, "pause", MPV_FORMAT_FLAG, &pause);
     } else if (type == "seek") {
@@ -239,7 +237,7 @@ class BoramInstance : public pp::Instance {
     PostMessage(dict);
   }
 
-  void HandleMPVEvents() {
+  void HandleMPVEvents(int32_t) {
     for (;;) {
       mpv_event* event = mpv_wait_event(mpv_, 0);
       // printf("@@@ EVENT %d\n", event->event_id);
@@ -264,9 +262,9 @@ class BoramInstance : public pp::Instance {
   }
 
   static void HandleMPVWakeup(void* ctx) {
-    // XXX(Kagami): Do a round-trip in order to process mpv events
-    // asynchronously. Use some better way?
-    static_cast<BoramInstance*>(ctx)->PostData("wakemeup", Var::Null());
+    BoramInstance* b = static_cast<BoramInstance*>(ctx);
+    pp::Module::Get()->core()->CallOnMainThread(
+        0, b->callback_factory_.NewCallback(&BoramInstance::HandleMPVEvents));
   }
 
   bool InitGL() {
