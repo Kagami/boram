@@ -394,12 +394,15 @@ export default class extends React.PureComponent {
                   height={30}
                   value={this.state.target}
                 />
-                <SmallButton
-                  icon={<Icon name="folder-open-o" />}
-                  title="Select destination path"
-                  disabled={this.props.encoding}
-                  onClick={this.handleSelectTarget}
-                />
+                <div>
+                  <Sep margin={2.5} />
+                  <SmallButton
+                    icon={<Icon name="folder-open-o" />}
+                    title="Select destination path"
+                    disabled={this.props.encoding}
+                    onClick={this.handleSelectTarget}
+                  />
+                </div>
               </Pane>
               {/*<Sep margin={2.5} />
               <InlineCheckbox

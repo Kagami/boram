@@ -81,7 +81,6 @@ export const Prop = useSheet({
   value: {
     boxSizing: "border-box",
     flex: 1,
-    paddingRight: 5,
     overflow: "hidden",
     verticalAlign: "middle",
     textOverflow: "ellipsis",
