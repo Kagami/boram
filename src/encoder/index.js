@@ -83,7 +83,7 @@ export default class extends React.PureComponent {
   };
   state = {
     // Shouldn't be falsy because of Tabs component restrictions.
-    tabIndex: 1,
+    tabIndex: BORAM_DEBUG ? (+process.env.BORAM_DEBUG_TAB || 1) : 1,
     encoding: false,
     focused: null,
     allValid: true,
@@ -729,6 +729,7 @@ export default class extends React.PureComponent {
               encoding={this.state.encoding}
               allValid={this.state.allValid}
               _duration={this.state._duration}
+              format={this.props.info.format}
               vtrack={this.getVideoTracks()[this.state.vtrackn]}
               mode2Pass={this.state.mode2Pass}
               rawArgs={this.state.rawArgs}

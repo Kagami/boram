@@ -344,7 +344,7 @@ export default makeRunner("ffmpeg", {
     args.push("-f", "matroska", this._escapeFilename(outpath));
     return args;
   },
-  getEncodeArgs({baseArgs, passn, passlog, outpath}) {
+  getEncodeArgs({baseArgs, passlog, passn, title, outpath}) {
     const args = this._getCommonArgs(baseArgs);
     if (passn === 1) {
       // <http://wiki.webmproject.org/ffmpeg/vp9-encoding-guide>.
@@ -361,8 +361,10 @@ export default makeRunner("ffmpeg", {
     } else if (passn === 2) {
       passlog = passlog.slice(0, -6);
       args.push("-pass", "2", "-passlogfile", passlog);
+      args.push("-metadata", `title=${title}`);
       args.push("-f", "webm", this._escapeFilename(outpath));
     } else if (passn === 0) {
+      args.push("-metadata", `title=${title}`);
       args.push("-f", "webm", this._escapeFilename(outpath));
     } else {
       assert(false);

@@ -94,11 +94,11 @@ const PASS2_COEFF = 1 - PASS1_COEFF;
 @useSheet({
   params: {
     display: "flex",
-    marginBottom: 5,
+    marginBottom: 10,
   },
   metadata: {
     flex: "0 40%",
-    marginRight: 10,
+    marginRight: 20,
   },
   path: {
     flex: "1",
@@ -214,6 +214,7 @@ export default class extends React.PureComponent {
     const fps = parseFrameRate(this.props.vtrack.avg_frame_rate);
     const totalFrames = Math.ceil(this.props._duration * fps);
     const passlog = this.tmpLogName;
+    const title = this.refs.title.getValue().trim();
     const outpath = preview ? this.tmpPreviewName : this.state.target;
     const output = {preview, path: outpath};
     const baseArgs = parseArgs(this.props.rawArgs);
@@ -230,13 +231,15 @@ export default class extends React.PureComponent {
     let encoding = true;
     let videop = preview
       ? run(FFmpeg.getPreviewArgs({baseArgs, outpath}))
-      : run(FFmpeg.getEncodeArgs({baseArgs, outpath, passlog, passn}));
-    if (this.props.mode2Pass && !preview) {
+      : run(FFmpeg.getEncodeArgs({baseArgs, passlog, passn, title, outpath}));
+    if (passn) {
       videop = videop.then(() => {
         frameParser.reset();
         passn = 2;
         handleLog(this.sep() + "\n");
-        return run(FFmpeg.getEncodeArgs({baseArgs, outpath, passlog, passn}));
+        return run(
+          FFmpeg.getEncodeArgs({baseArgs, passlog, passn, title, outpath})
+        );
       });
     }
     videop.then(() => {
@@ -311,6 +314,15 @@ export default class extends React.PureComponent {
       this.cancel();
     }
   }
+  getDefaultMetadata() {
+    const {tags} = this.props.format;
+    if (tags && tags.title) {
+      return tags.title;
+    } else {
+      const {source} = this.props;
+      return path.parse(source.saveAs || source.path).name;
+    }
+  }
   getTarget(sample) {
     let {dir, name: bareName} = path.parse(sample);
     bareName = bareName.replace(/-\d+$/, "");
@@ -375,10 +387,12 @@ export default class extends React.PureComponent {
             >
               <SmallInput
                 ref="title"
-                hintText="title"
+                hintText="metadata title tag"
                 left bottom
                 width="100%"
                 height={30}
+                defaultValue={this.getDefaultMetadata()}
+                disabled={this.props.encoding}
               />
             </Prop>
             <Prop
@@ -386,28 +400,22 @@ export default class extends React.PureComponent {
               className={classes.path}
               nameClassName={classes.name}
             >
-              <Pane space={5} style1={{flex: 1}} style2={{flex: 0}}>
-                <SmallInput
-                  ref="path"
-                  left bottom
-                  width="100%"
-                  height={30}
-                  value={this.state.target}
-                />
-                <div>
-                  <Sep margin={2.5} />
-                  <SmallButton
-                    icon={<Icon name="folder-open-o" />}
-                    title="Select destination path"
-                    disabled={this.props.encoding}
-                    onClick={this.handleSelectTarget}
-                  />
-                </div>
-              </Pane>
-              {/*<Sep margin={2.5} />
-              <InlineCheckbox
-                label="overwrite"
-              />*/}
+              <SmallInput
+                ref="path"
+                hintText="output file path"
+                left bottom
+                width="calc(100% - 40px)"
+                height={30}
+                defaultValue={this.state.target}
+                disabled={this.props.encoding}
+              />
+              <Sep margin={2.5} />
+              <SmallButton
+                icon={<Icon name="folder-open-o" />}
+                title="Select destination path"
+                disabled={this.props.encoding}
+                onClick={this.handleSelectTarget}
+              />
             </Prop>
           </div>
           <Pane space={5}>
