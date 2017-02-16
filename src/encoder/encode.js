@@ -400,22 +400,23 @@ export default class extends React.PureComponent {
               className={classes.path}
               nameClassName={classes.name}
             >
-              <SmallInput
-                ref="path"
-                hintText="output file path"
-                left bottom
-                width="calc(100% - 40px)"
-                height={30}
-                defaultValue={this.state.target}
-                disabled={this.props.encoding}
-              />
-              <Sep margin={2.5} />
-              <SmallButton
-                icon={<Icon name="folder-open-o" />}
-                title="Select destination path"
-                disabled={this.props.encoding}
-                onClick={this.handleSelectTarget}
-              />
+              <Pane space={5} flex1="1" flex2="0">
+                <SmallInput
+                  ref="path"
+                  hintText="output file path"
+                  left bottom
+                  width="100%"
+                  height={30}
+                  defaultValue={this.state.target}
+                  disabled={this.props.encoding}
+                />
+                <SmallButton
+                  icon={<Icon name="folder-open-o" />}
+                  title="Select destination path"
+                  disabled={this.props.encoding}
+                  onClick={this.handleSelectTarget}
+                />
+              </Pane>
             </Prop>
           </div>
           <Pane space={5}>

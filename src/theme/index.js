@@ -46,11 +46,12 @@ export function Pane(props) {
 
   const item1Style = Object.assign({
     [props.vertical ? "marginBottom" : "marginRight"]: props.space || 0,
+    flex: props.flex1 || "initial",
   }, props.style1);
 
   const item2Style = Object.assign({
     [props.vertical ? "height" : "width"]: props.size2 || "auto",
-    flex: props.size2 ? 0 : 1,
+    flex: props.flex2 || (props.size2 ? 0 : 1),
   }, props.style2);
 
   return (
