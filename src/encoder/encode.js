@@ -9,7 +9,12 @@ import {shell, remote} from "electron";
 import React from "react";
 import FFmpeg from "../ffmpeg";
 import {useSheet} from "../jss";
-import {BigProgress, BigButton, Pane, Sep} from "../theme";
+import {
+  Prop, Pane, Sep,
+  BigButton, SmallButton, Icon,
+  SmallInput,
+  BigProgress,
+} from "../theme";
 import {
   tmp, parseFrameRate, parseArgs,
   showSize, showBitrate, showTime, quoteArgs,
@@ -86,12 +91,25 @@ class Output extends React.PureComponent {
 const PASS1_COEFF = 0.3;
 const PASS2_COEFF = 1 - PASS1_COEFF;
 
+@useSheet({
+  params: {
+    display: "flex",
+    marginBottom: 5,
+  },
+  metadata: {
+    flex: "0 40%",
+    marginRight: 10,
+  },
+  path: {
+    flex: "1",
+  },
+  name: {
+    width: "inherit",
+    marginRight: 20,
+    lineHeight: "30px",
+  },
+})
 export default class extends React.PureComponent {
-  static styles = {
-    output: {
-      overflow: "hidden",
-    },
-  };
   state = {progress: 0, log: "", output: null, target: this.getDefaultTarget()};
   componentDidMount() {
     this.props.events.addListener("abort", this.abort);
@@ -345,50 +363,84 @@ export default class extends React.PureComponent {
     this.setState({progress: 0, log: "", output: null});
   };
   render() {
-    const {styles} = this.constructor;
+    const {classes} = this.sheet;
     return (
-      <Pane vertical space={5} style2={styles.output}>
-        <Pane space={5}>
-          <div>
-            <BigButton
-              width={85}
-              label="path"
-              title="Select destination path"
-              disabled={this.props.encoding}
-              onClick={this.handleSelectTarget}
-            />
-            <Sep margin={2.5} />
-            <BigButton
-              width={85}
-              label={this.isPreviewEncoding() ? "cancel" : "preview"}
-              title="Make preview encode"
-              disabled={!this.props.allValid || this.isNormalEncoding()}
-              onClick={this.handlePreviewToggle}
-            />
-            <Sep margin={2.5} />
-            <BigButton
-              width={85}
-              label={this.isNormalEncoding() ? "cancel" : "normal"}
-              title="Make normal encode"
-              disabled={!this.props.allValid || this.isPreviewEncoding()}
-              onClick={this.handleNormalToggle}
-            />
-            <Sep margin={2.5} />
-            <BigButton
-              width={85}
-              label="open"
-              title="Click to play, right-click to open directory"
-              disabled={!this.state.output}
-              onClick={this.handleOpen}
-              onContextMenu={this.handleOpenFolder}
-            />
+      <Pane vertical space={5} style2={{overflow: "hidden"}}>
+        <div>
+          <div className={classes.params}>
+            <Prop
+              name="metadata"
+              className={classes.metadata}
+              nameClassName={classes.name}
+            >
+              <SmallInput
+                ref="title"
+                hintText="title"
+                left bottom
+                width="100%"
+                height={30}
+              />
+            </Prop>
+            <Prop
+              name="path"
+              className={classes.path}
+              nameClassName={classes.name}
+            >
+              <Pane space={5} style1={{flex: 1}} style2={{flex: 0}}>
+                <SmallInput
+                  ref="path"
+                  left bottom
+                  width="100%"
+                  height={30}
+                  value={this.state.target}
+                />
+                <SmallButton
+                  icon={<Icon name="folder-open-o" />}
+                  title="Select destination path"
+                  disabled={this.props.encoding}
+                  onClick={this.handleSelectTarget}
+                />
+              </Pane>
+              {/*<Sep margin={2.5} />
+              <InlineCheckbox
+                label="overwrite"
+              />*/}
+            </Prop>
           </div>
-          <BigProgress value={this.state.progress} />
-        </Pane>
+          <Pane space={5}>
+            <div>
+              <BigButton
+                width={85}
+                label={this.isPreviewEncoding() ? "cancel" : "test"}
+                title="Make preview encode"
+                disabled={!this.props.allValid || this.isNormalEncoding()}
+                onClick={this.handlePreviewToggle}
+              />
+              <Sep margin={2.5} />
+              <BigButton
+                width={85}
+                label={this.isNormalEncoding() ? "cancel" : "normal"}
+                title="Make normal encode"
+                disabled={!this.props.allValid || this.isPreviewEncoding()}
+                onClick={this.handleNormalToggle}
+              />
+              <Sep margin={2.5} />
+              <BigButton
+                width={85}
+                label="open"
+                title="Click to play, right-click to open directory"
+                disabled={!this.state.output}
+                onClick={this.handleOpen}
+                onContextMenu={this.handleOpenFolder}
+              />
+            </div>
+            <BigProgress value={this.state.progress} />
+          </Pane>
+        </div>
         <Output
           value={this.state.log ||
                  (this.props.allValid
-                   ? `Ready to start.\nSaving to ${this.state.target}`
+                   ? "Ready to start."
                    : "Fix invalid settings.")}
           encoding={this.props.encoding}
           onClear={this.clearState}

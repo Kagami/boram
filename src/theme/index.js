@@ -90,7 +90,7 @@ export const Prop = useSheet({
   },
 })(function(props, {classes}) {
   return (
-    <div className={classes.prop}>
+    <div className={cx(classes.prop, props.className)}>
       <div className={cx(classes.name, props.nameClassName,
                          props.compact && classes.nameCompact)}>
         {props.name}:
@@ -107,18 +107,6 @@ export const CompactProp = function(props) {
 };
 
 export class SmallInput extends React.PureComponent {
-  static styles = {
-    outer: {
-      margin: 0,
-      textAlign: "center",
-    },
-    hint: {
-      width: "100%",
-    },
-    input: {
-      textAlign: "center",
-    },
-  };
   getValue() {
     return this.refs.input.getValue();
   }
@@ -138,21 +126,32 @@ export class SmallInput extends React.PureComponent {
     }
   };
   render() {
-    const {styles} = this.constructor;
-    const {style, ...other} = this.props;
-    const outerStyle = Object.assign(
-      {},
-      styles.outer,
-      {width: this.props.width || 50},
-      style,
-    );
+    const {style, width, height, left, bottom, ...other} = this.props;
+    const heightStyle = height == null ? null : {height};
+    const outerStyle = Object.assign({
+      margin: 0,
+      textAlign: "center",
+      width: width || 50,
+    }, heightStyle, style);
+    const hintStyle = {
+      width: "100%",
+      textAlign: left ? "left" : "center",
+      bottom: bottom ? 2 : 12,
+    };
+    const inputStyle = {
+      textAlign: left ? "left" : "center",
+    };
+    const underlineStyle = {
+      bottom: bottom ? 0 : 8,
+    };
     return (
       <TextField
         {...other}
         ref="input"
         style={outerStyle}
-        hintStyle={styles.hint}
-        inputStyle={styles.input}
+        hintStyle={hintStyle}
+        inputStyle={inputStyle}
+        underlineStyle={underlineStyle}
         onKeyDown={this.handleKeyDown}
       />
     );
