@@ -381,7 +381,7 @@ export default class extends React.PureComponent {
         <div>
           <div className={classes.params}>
             <Prop
-              name="metadata"
+              name="title"
               className={classes.metadata}
               nameClassName={classes.name}
             >
