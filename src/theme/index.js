@@ -338,11 +338,20 @@ export const BigButton = (function() {
 })();
 
 export function BigProgress(props) {
+  const styles = {
+    progress: {
+      height: 30,
+      borderRadius: 0,
+      backgroundColor: "#ddd",
+      border: "1px solid #ccc",
+      boxSizing: "border-box",
+    },
+  };
   return (
     <LinearProgress
       {...props}
       mode="determinate"
-      style={{height: 30, borderRadius: 0, backgroundColor: "#ccc"}}
+      style={styles.progress}
     />
   );
 }
