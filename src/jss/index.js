@@ -28,7 +28,7 @@ export function useSheet(styles, opts = {}) {
   // Fuck JSS. So great idea to generate exactly same hash for the same
   // prefix and content.
   // Provide hash to avoid huge "data-meta" values.
-  opts.meta = createHash(JSON.stringify(styles));
+  opts.meta = opts.meta || createHash(JSON.stringify(styles));
   const sheet = jss.createStyleSheet(styles, opts).attach();
   return function(target) {
     // Normal component.

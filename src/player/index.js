@@ -5,7 +5,7 @@
 
 import React from "react";
 import cx from "classnames";
-import {useSheet} from "../jss";
+import {jss, useSheet} from "../jss";
 import {Icon} from "../theme";
 import MPV from "../mpv";
 import {parseTime, showTime, parseSAR, tryRun} from "../util";
@@ -770,21 +770,27 @@ class Control extends React.PureComponent {
     },
 
     "&::-webkit-slider-runnable-track": {
-      height: "20px",
-      borderRadius: "10px",
+      height: 20,
+      borderRadius: 10,
       border: "1px solid #999",
     },
   },
   hidden: {
     display: "none",
   },
-}, {link: true})
+})
 class Volume extends React.PureComponent {
   constructor(props) {
     super(props);
-    const {classes} = this.sheet;
-    const className = `${classes.slider}::-webkit-slider-runnable-track`;
-    this.progressRule = this.sheet.addRule("", {"background": ""}, {className});
+    // We need to create new sheet per component because we edit them at
+    // runtime and multiple components will intersect with each other.
+    const sliderSheet = jss.createStyleSheet(
+      {slider: {"&::-webkit-slider-runnable-track": {}}},
+      {link: true, meta: Math.random().toString()}
+    ).attach();
+    this.sliderClass2 = sliderSheet.classes.slider;
+    const className = `${this.sliderClass2}::-webkit-slider-runnable-track`;
+    this.progressRule = sliderSheet.addRule("", {background: ""}, {className});
   }
   state = {shown: false};
   isDragging() {
@@ -842,7 +848,8 @@ class Volume extends React.PureComponent {
         <input
           type="range"
           title="Change volume"
-          className={cx(classes.slider, {[classes.hidden]: !this.state.shown})}
+          className={cx(classes.slider, this.sliderClass2,
+                        {[classes.hidden]: !this.state.shown})}
           value={this.props.mute ? 0 : this.props.volume}
           onMouseDown={this.handleVolumeMouseDown}
           onChange={this.handleVolumeChange}
@@ -909,7 +916,7 @@ class Time extends React.PureComponent {
     padding: "0 10px",
 
   },
-  range: {
+  slider: {
     display: "block",
     width: "100%",
     height: 28,
@@ -943,13 +950,17 @@ class Time extends React.PureComponent {
       borderRadius: 3,
     },
   },
-}, {link: true})
+})
 class Seek extends React.PureComponent {
   constructor(props) {
     super(props);
-    const {classes} = this.sheet;
-    const className = `${classes.range}::-webkit-slider-runnable-track`;
-    this.progressRule = this.sheet.addRule("", {"background": ""}, {className});
+    const sliderSheet = jss.createStyleSheet(
+      {slider: {"&::-webkit-slider-runnable-track": {}}},
+      {link: true, meta: Math.random().toString()}
+    ).attach();
+    this.sliderClass2 = sliderSheet.classes.slider;
+    const className = `${this.sliderClass2}::-webkit-slider-runnable-track`;
+    this.progressRule = sliderSheet.addRule("", {background: ""}, {className});
   }
   handleKey = (e) => {
     e.preventDefault();
@@ -974,7 +985,7 @@ class Seek extends React.PureComponent {
           {...other}
           step={0.1}
           type="range"
-          className={classes.range}
+          className={cx(classes.slider, this.sliderClass2)}
           onKeyDown={this.handleKey}
         />
       </div>
