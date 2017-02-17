@@ -346,6 +346,57 @@ export default class extends React.PureComponent {
     const target = this.getTarget(this.state.target);
     this.setState({target});
   }
+  isValidTarget() {
+    const {target} = this.state;
+    const dir = path.dirname(target);
+    // test 1
+    if (!path.isAbsolute(dir)) return false;
+    // test 2
+    try {
+      if (!fs.statSync(dir).isDirectory()) return false;
+      fs.accessSync(dir, fs.constants.W_OK);
+    } catch (e) {
+      return false;
+    }
+    // test 3
+    try {
+      if (!fs.statSync(target).isFile()) return false;
+    } catch (e) {
+      return true;
+    }
+    // test 4
+    try {
+      fs.accessSync(target, fs.constants.W_OK);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+  cachedValidTarget() {
+    // Cache lot of syscalls.
+    if (this.state.target === this.lastCachedTarget) {
+      return this.lastCachedResult;
+    }
+    const result = this.isValidTarget();
+    this.lastCachedTarget = this.state.target;
+    this.lastCachedResult = result;
+    return result;
+  }
+  isValid() {
+    return this.props.allValid && this.cachedValidTarget();
+  }
+  getOutput() {
+    if (this.state.log) return this.state.log;
+    if (!this.props.allValid) return "Fix invalid settings.";
+    if (!this.cachedValidTarget()) return "Fix invalid path.";
+    let msg = "Ready to start.";
+    // Syscall but get executed not so often: most of the time this
+    // function will exit after first line.
+    if (fs.existsSync(this.state.target)) {
+      msg += "\nWarning: file already exists.";
+    }
+    return msg;
+  }
   handleSelectTarget = () => {
     const target = remote.dialog.showSaveDialog({
       title: "Select destination path",
@@ -356,6 +407,9 @@ export default class extends React.PureComponent {
     });
     if (!target) return;
     this.setState({target});
+  };
+  handleTargetChange = (e) => {
+    this.setState({target: e.target.value.trim()});
   };
   handlePreviewToggle = () => {
     this.toggleEncode({preview: true});
@@ -407,8 +461,9 @@ export default class extends React.PureComponent {
                   left bottom
                   width="100%"
                   height={30}
-                  defaultValue={this.state.target}
+                  value={this.state.target}
                   disabled={this.props.encoding}
+                  onChange={this.handleTargetChange}
                 />
                 <SmallButton
                   icon={<Icon name="folder-open-o" />}
@@ -425,7 +480,7 @@ export default class extends React.PureComponent {
                 width={85}
                 label={this.isPreviewEncoding() ? "cancel" : "test"}
                 title="Make preview encode"
-                disabled={!this.props.allValid || this.isNormalEncoding()}
+                disabled={this.isNormalEncoding() || !this.isValid()}
                 onClick={this.handlePreviewToggle}
               />
               <Sep margin={2.5} />
@@ -433,7 +488,7 @@ export default class extends React.PureComponent {
                 width={85}
                 label={this.isNormalEncoding() ? "cancel" : "normal"}
                 title="Make normal encode"
-                disabled={!this.props.allValid || this.isPreviewEncoding()}
+                disabled={this.isPreviewEncoding() || !this.isValid()}
                 onClick={this.handleNormalToggle}
               />
               <Sep margin={2.5} />
@@ -450,10 +505,7 @@ export default class extends React.PureComponent {
           </Pane>
         </div>
         <Output
-          value={this.state.log ||
-                 (this.props.allValid
-                   ? "Ready to start."
-                   : "Fix invalid settings.")}
+          value={this.getOutput()}
           encoding={this.props.encoding}
           onClear={this.clearState}
         />
