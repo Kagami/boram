@@ -134,7 +134,10 @@ export default class extends React.PureComponent {
         <div className={cx(classes.status, this.state.error && classes.error)}>
           {this.state.error ? showErr(this.state.error) : this.state.status}
         </div>
-        <BigProgress value={this.state.progress} />
+        <BigProgress
+          height={40}
+          value={this.state.progress}
+        />
         <Sep vertical />
         <BigButton
           width={250}
