@@ -115,25 +115,29 @@ const PASS2_COEFF = 1 - PASS1_COEFF;
     display: "flex",
     marginBottom: 10,
   },
-  metadata: {
-    flex: "0 40%",
-    marginRight: 20,
+  preview: {
+    flex: "0 30%",
+    marginRight: 15,
+  },
+  title: {
+    flex: "0 25%",
+    marginRight: 15,
   },
   path: {
     flex: "1",
   },
   name: {
     width: "inherit",
-    marginRight: 20,
+    marginRight: 10,
     lineHeight: "30px",
   },
 })
 export default class extends React.PureComponent {
-  state = {progress: 0, log: "", output: null, target: this.getDefaultTarget()};
+  state = {progress: 0, log: "", target: this.getDefaultTarget()};
   componentDidMount() {
     this.props.events.addListener("abort", this.abort);
     this.tmpLogName = tmp.tmpNameSync({prefix: "boram-", postfix: "-0.log"});
-    this.tmpPreviewName = tmp.tmpNameSync({prefix: "boram-", postfix: ".mkv"});
+    this.tmpTestName = tmp.tmpNameSync({prefix: "boram-", postfix: ".mkv"});
   }
   componentWillUnmount() {
     this.props.events.removeListener("abort", this.abort);
@@ -141,7 +145,7 @@ export default class extends React.PureComponent {
   }
   cleanup() {
     try { fs.unlinkSync(this.tmpLogName); } catch (e) { /* skip */ }
-    try { fs.unlinkSync(this.tmpPreviewName); } catch (e) { /* skip */ }
+    try { fs.unlinkSync(this.tmpTestName); } catch (e) { /* skip */ }
   }
   abort = () => {
     this.cancel();
@@ -164,7 +168,7 @@ export default class extends React.PureComponent {
       },
     };
   }
-  start({preview}) {
+  start({test}) {
     /* eslint-disable no-use-before-define */
     const updateProgress = (frames) => {
       let inc = frames / totalFrames * 100;
@@ -234,8 +238,8 @@ export default class extends React.PureComponent {
     const totalFrames = Math.ceil(this.props._duration * fps);
     const passlog = this.tmpLogName;
     const title = this.refs.title.getValue().trim();
-    const outpath = preview ? this.tmpPreviewName : this.state.target;
-    const output = {preview, path: outpath};
+    const outpath = test ? this.tmpTestName : this.state.target;
+    const output = {test, path: outpath};
     const baseArgs = parseArgs(this.props.rawArgs);
     const frameParser = this.createFrameParser();
     const startTime = this.now();
@@ -246,10 +250,10 @@ export default class extends React.PureComponent {
     let log = "";
     let curpos = 0;
     let lastnl = 0;
-    let passn = (this.props.mode2Pass && !preview) ? 1 : 0;
+    let passn = (this.props.mode2Pass && !test) ? 1 : 0;
     let encoding = true;
-    let videop = preview
-      ? run(FFmpeg.getPreviewArgs({baseArgs, outpath}))
+    let videop = test
+      ? run(FFmpeg.getTestArgs({baseArgs, outpath}))
       : run(FFmpeg.getEncodeArgs({baseArgs, passlog, passn, title, outpath}));
     if (passn) {
       videop = videop.then(() => {
@@ -267,7 +271,7 @@ export default class extends React.PureComponent {
       this.setState({output, progress});
       this.props.onProgress(progress);
       this.props.onEncoding(encoding);
-      if (preview) {
+      if (test) {
         this.handleOpen();
       } else {
         handleLog(this.showStats(startTime));
@@ -316,24 +320,24 @@ export default class extends React.PureComponent {
       "",
     ].join("\n");
   }
-  isPreviewEncoding() {
-    return this.props.encoding && this.state.preview;
+  isTestEncoding() {
+    return this.props.encoding && this.state.test;
   }
   isNormalEncoding() {
-    return this.props.encoding && !this.state.preview;
+    return this.props.encoding && !this.state.test;
   }
-  toggleEncode({preview}) {
+  toggleEncode({test}) {
     const encoding = !this.props.encoding;
     if (encoding) {
       this.clearState();
-      this.setState({preview});
+      this.setState({test});
       this.props.onEncoding(encoding);
-      this.start({preview});
+      this.start({test});
     } else {
       this.cancel();
     }
   }
-  getDefaultMetadata() {
+  getDefaultTitle() {
     const {tags} = this.props.format;
     if (tags && tags.title) {
       return tags.title;
@@ -409,14 +413,41 @@ export default class extends React.PureComponent {
     if (!this.props.allValid) return "Fix invalid settings.";
     if (!this.cachedValidTarget()) return "Fix invalid path.";
     let msg = "Ready to start.";
-    // Syscall but get executed not so often: most of the time this
-    // function will exit after first line.
+    // Potentially slow syscall but get executed not so often.
     if (fs.existsSync(this.state.target)) {
       msg += "\nWarning: file already exists.";
     }
     return msg;
   }
-  handleSelectTarget = () => {
+  getPrettyPreview() {
+    const {preview} = this.state;
+    if (Number.isFinite(preview)) {
+      return showTime(preview);
+    } else {
+      return path.parse(preview || "").base;
+    }
+  }
+  handlePreviewReset = (e) => {
+    e.preventDefault();
+    this.setState({preview: null});
+  };
+  handlePreviewTime = () => {
+    this.setState({preview: this.props.onGetTime()});
+  };
+  handlePreviewImage = () => {
+    const selected = remote.dialog.showOpenDialog({
+      filters: [
+        {name: "Images", extensions: ["jpg", "png"]},
+        {name: "All files", extensions: ["*"]},
+      ],
+    });
+    if (!selected) return;
+    this.setState({preview: selected[0]});
+  };
+  handleTargetChange = (e) => {
+    this.setState({target: e.target.value});
+  };
+  handleTargetDialog = () => {
     const target = remote.dialog.showSaveDialog({
       title: "Select destination path",
       defaultPath: this.state.target,
@@ -427,14 +458,11 @@ export default class extends React.PureComponent {
     if (!target) return;
     this.setState({target});
   };
-  handleTargetChange = (e) => {
-    this.setState({target: e.target.value.trim()});
-  };
-  handlePreviewToggle = () => {
-    this.toggleEncode({preview: true});
+  handleTestToggle = () => {
+    this.toggleEncode({test: true});
   };
   handleNormalToggle = () => {
-    this.toggleEncode({preview: false});
+    this.toggleEncode({test: false});
   };
   handleOpen = () => {
     shell.openItem(this.state.output.path);
@@ -454,8 +482,43 @@ export default class extends React.PureComponent {
         <div>
           <div className={classes.params}>
             <Prop
+              name="preview"
+              className={classes.preview}
+              nameClassName={classes.name}
+            >
+              <Pane space={5} flex1="1" flex2="0">
+                <SmallInput
+                  hintText="empty"
+                  title="Click to reset"
+                  bottom
+                  width="100%"
+                  height={30}
+                  style={{cursor: "pointer"}}
+                  readOnly
+                  value={this.getPrettyPreview()}
+                  disabled={this.props.encoding}
+                  onMouseDown={this.handlePreviewReset}
+                />
+                <div>
+                  <SmallButton
+                    icon={<Icon name="clock-o" />}
+                    title="Use current video frame as a preview"
+                    disabled={this.props.encoding}
+                    onClick={this.handlePreviewTime}
+                  />
+                  <Sep margin={2.5} />
+                  <SmallButton
+                    icon={<Icon name="folder-open-o" />}
+                    title="Load image preview"
+                    disabled={this.props.encoding}
+                    onClick={this.handlePreviewImage}
+                  />
+                </div>
+              </Pane>
+            </Prop>
+            <Prop
               name="title"
-              className={classes.metadata}
+              className={classes.title}
               nameClassName={classes.name}
             >
               <SmallInput
@@ -464,7 +527,7 @@ export default class extends React.PureComponent {
                 left bottom
                 width="100%"
                 height={30}
-                defaultValue={this.getDefaultMetadata()}
+                defaultValue={this.getDefaultTitle()}
                 disabled={this.props.encoding}
               />
             </Prop>
@@ -475,7 +538,6 @@ export default class extends React.PureComponent {
             >
               <Pane space={5} flex1="1" flex2="0">
                 <SmallInput
-                  ref="path"
                   hintText="output file path"
                   left bottom
                   width="100%"
@@ -488,7 +550,7 @@ export default class extends React.PureComponent {
                   icon={<Icon name="folder-open-o" />}
                   title="Select destination path"
                   disabled={this.props.encoding}
-                  onClick={this.handleSelectTarget}
+                  onClick={this.handleTargetDialog}
                 />
               </Pane>
             </Prop>
@@ -497,17 +559,17 @@ export default class extends React.PureComponent {
             <div>
               <BigButton
                 width={85}
-                label={this.isPreviewEncoding() ? "cancel" : "test"}
-                title="Make preview encode"
+                label={this.isTestEncoding() ? "cancel" : "test"}
+                title="Make test encode"
                 disabled={this.isNormalEncoding() || !this.isValid()}
-                onClick={this.handlePreviewToggle}
+                onClick={this.handleTestToggle}
               />
               <Sep margin={2.5} />
               <BigButton
                 width={85}
                 label={this.isNormalEncoding() ? "cancel" : "normal"}
                 title="Make normal encode"
-                disabled={this.isPreviewEncoding() || !this.isValid()}
+                disabled={this.isTestEncoding() || !this.isValid()}
                 onClick={this.handleNormalToggle}
               />
               <Sep margin={2.5} />

@@ -321,7 +321,7 @@ export default makeRunner("ffmpeg", {
   _getCommonArgs(baseArgs) {
     return ["-hide_banner", "-nostdin", "-y"].concat(baseArgs);
   },
-  getPreviewArgs({baseArgs, outpath}) {
+  getTestArgs({baseArgs, outpath}) {
     const args = this._getCommonArgs(baseArgs);
     fixOpt(args, "-c:v", "libx264");
     fixOpt(args, "-crf", "18", {add: true});

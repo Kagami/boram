@@ -225,7 +225,7 @@ export default class extends React.PureComponent {
     this.setState(upd);
     this.handleAll(upd, {marked: "both"});
   };
-  handleResetFragment = () => {
+  handleFragmentReset = () => {
     const mstart = 0;
     const mend = this.getFullDuration();
     const upd = {mstart, mend};
@@ -579,6 +579,10 @@ export default class extends React.PureComponent {
   handleRawArgs = (e) => {
     this.setState({rawArgs: e.target.value});
   };
+  handleGetTime = () => {
+    // XXX(Kagami): Very kludgy.
+    return this.refs.player.getTime();
+  };
   handleEncodingState = (encoding) => {
     this.setState({encoding});
     if (encoding) {
@@ -718,7 +722,7 @@ export default class extends React.PureComponent {
               modeCRF={this.state.modeCRF}
               onUpdate={this.handleAll}
               onRawArgs={this.handleRawArgs}
-              onResetFragment={this.handleResetFragment}
+              onFragmentReset={this.handleFragmentReset}
             />
           )}
           {this.getTabNode(5, "encode", "encode",
@@ -733,6 +737,7 @@ export default class extends React.PureComponent {
               vtrack={this.getVideoTracks()[this.state.vtrackn]}
               mode2Pass={this.state.mode2Pass}
               rawArgs={this.state.rawArgs}
+              onGetTime={this.handleGetTime}
               onEncoding={this.handleEncodingState}
               onProgress={this.props.onProgress}
             />
