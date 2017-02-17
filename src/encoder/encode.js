@@ -33,6 +33,7 @@ import {
     wordBreak: "break-all",
     color: "#333",
     backgroundColor: "#f8f8f8",
+    outline: "none",
   },
 })
 class Output extends React.PureComponent {
@@ -76,11 +77,29 @@ class Output extends React.PureComponent {
   handleMenu = () => {
     this.menu.popup();
   };
+  handleKey = (e) => {
+    // From electron-input-menu.
+    const DOM_VK_C = 0x43;  // (67) "C" key
+    const c = e.keyCode;
+    const ctrlDown = e.ctrlKey || e.metaKey;  // OSX support
+    const altDown = e.altKey;
+    const shiftDown = e.shiftKey;
+    if (ctrlDown && !altDown && !shiftDown && c === DOM_VK_C) {
+      e.nativeEvent.stopImmediatePropagation();
+      remote.getCurrentWindow().webContents.copy();
+    }
+  };
 
   render() {
     const {classes} = this.sheet;
     return (
-      <pre ref="out" className={classes.output} onContextMenu={this.handleMenu}>
+      <pre
+        ref="out"
+        tabIndex="1"
+        className={classes.output}
+        onContextMenu={this.handleMenu}
+        onKeyDown={this.handleKey}
+      >
         {this.props.value}
       </pre>
     );
