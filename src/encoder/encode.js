@@ -116,11 +116,11 @@ const PASS2_COEFF = 1 - PASS1_COEFF;
     marginBottom: 10,
   },
   preview: {
-    flex: "0 30%",
+    flex: "0 20%",
     marginRight: 15,
   },
   title: {
-    flex: "0 25%",
+    flex: "0 30%",
     marginRight: 15,
   },
   path: {
@@ -137,7 +137,10 @@ export default class extends React.PureComponent {
   componentDidMount() {
     this.props.events.addListener("abort", this.abort);
     this.tmpLogName = tmp.tmpNameSync({prefix: "boram-", postfix: "-0.log"});
+    // We will re-use this path for temporal WebM but it's ok.
     this.tmpTestName = tmp.tmpNameSync({prefix: "boram-", postfix: ".mkv"});
+    this.tmpPreviewName = tmp.tmpNameSync({prefix: "boram-", postfix: ".webm"});
+    this.tmpConcatName = tmp.tmpNameSync({prefix: "boram-", postfix: ".txt"});
   }
   componentWillUnmount() {
     this.props.events.removeListener("abort", this.abort);
@@ -146,6 +149,8 @@ export default class extends React.PureComponent {
   cleanup() {
     try { fs.unlinkSync(this.tmpLogName); } catch (e) { /* skip */ }
     try { fs.unlinkSync(this.tmpTestName); } catch (e) { /* skip */ }
+    try { fs.unlinkSync(this.tmpPreviewName); } catch (e) { /* skip */ }
+    try { fs.unlinkSync(this.tmpConcatName); } catch (e) { /* skip */ }
   }
   abort = () => {
     this.cancel();
@@ -237,9 +242,9 @@ export default class extends React.PureComponent {
     const fps = parseFrameRate(this.props.vtrack.avg_frame_rate);
     const totalFrames = Math.ceil(this.props._duration * fps);
     const passlog = this.tmpLogName;
+    const {source, vcodec} = this.props;
+    const {preview, target} = this.state;
     const title = this.refs.title.getValue().trim();
-    const outpath = test ? this.tmpTestName : this.state.target;
-    const output = {test, path: outpath};
     const baseArgs = parseArgs(this.props.rawArgs);
     const frameParser = this.createFrameParser();
     const startTime = this.now();
@@ -251,6 +256,7 @@ export default class extends React.PureComponent {
     let curpos = 0;
     let lastnl = 0;
     let passn = (this.props.mode2Pass && !test) ? 1 : 0;
+    let outpath = (test || preview != null) ? this.tmpTestName : target;
     let encoding = true;
     let videop = test
       ? run(FFmpeg.getTestArgs({baseArgs, outpath}))
@@ -259,15 +265,34 @@ export default class extends React.PureComponent {
       videop = videop.then(() => {
         frameParser.reset();
         passn = 2;
-        handleLog(this.sep() + "\n");
+        handleLog(this.sep());
         return run(
           FFmpeg.getEncodeArgs({baseArgs, passlog, passn, title, outpath})
         );
       });
     }
+    if (!test && preview != null) {
+      videop = videop.then(() => {
+        const inpath = Number.isFinite(preview) ? source.path : preview;
+        const time = Number.isFinite(preview) ? preview : null;
+        outpath = this.tmpPreviewName;
+        handleLog(this.sep());
+        return run(FFmpeg.getPreviewArgs({inpath, time, vcodec, outpath}));
+      }).then(() => {
+        const inpath = this.tmpTestName;
+        const prevpath = this.tmpPreviewName;
+        const listpath = this.tmpConcatName;
+        outpath = listpath;
+        FFmpeg.writeConcat({inpath, prevpath, outpath});
+        outpath = target;
+        handleLog(this.sep());
+        return run(FFmpeg.getConcatArgs({inpath, listpath, outpath}));
+      });
+    }
     videop.then(() => {
       progress = 100;
       encoding = false;
+      const output = {test, path: outpath};
       this.setState({output, progress});
       this.props.onProgress(progress);
       this.props.onEncoding(encoding);
@@ -302,7 +327,7 @@ export default class extends React.PureComponent {
     return (new Date()).getTime() / 1000;
   }
   sep() {
-    return Array(51).join("=");
+    return Array(51).join("=") + "\n";
   }
   showArgs(args) {
     return `$ ffmpeg ${quoteArgs(args)}\n`;
@@ -310,8 +335,7 @@ export default class extends React.PureComponent {
   showStats(startTime) {
     const {size} = fs.statSync(this.state.output.path);
     const runTime = this.now() - startTime;
-    return [
-      this.sep(),
+    return this.sep() + [
       `Output path: ${this.state.output.path}`,
       `Output duration: ${showTime(this.props._duration)}`,
       `Output bitrate: ${showBitrate(size / this.props._duration * 8)}`,
@@ -506,13 +530,13 @@ export default class extends React.PureComponent {
                     disabled={this.props.encoding}
                     onClick={this.handlePreviewTime}
                   />
-                  <Sep margin={2.5} />
+                  {/*<Sep margin={2.5} />
                   <SmallButton
                     icon={<Icon name="folder-open-o" />}
                     title="Load image preview"
                     disabled={this.props.encoding}
                     onClick={this.handlePreviewImage}
-                  />
+                  />*/}
                 </div>
               </Pane>
             </Prop>

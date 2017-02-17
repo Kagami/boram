@@ -735,6 +735,7 @@ export default class extends React.PureComponent {
               _duration={this.state._duration}
               format={this.props.info.format}
               vtrack={this.getVideoTracks()[this.state.vtrackn]}
+              vcodec={this.state.vcodec}
               mode2Pass={this.state.mode2Pass}
               rawArgs={this.state.rawArgs}
               onGetTime={this.handleGetTime}

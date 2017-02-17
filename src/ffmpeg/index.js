@@ -4,6 +4,7 @@
  */
 
 import assert from "assert";
+import fs from "fs";
 import os from "os";
 import {WIN_FONTCONFIG_PATH} from "../shared";
 import {ceilFixed, makeRunner, escapeArg, fixOpt, clearOpt} from "../util";
@@ -29,7 +30,7 @@ if (BORAM_WIN_BUILD && !process.env.FONTCONFIG_FILE) {
 
 export default makeRunner("ffmpeg", {
   /**
-   * Escape FFmpeg filename argument.
+   * Escape FFmpeg's filename argument.
    * In particular paths like ":" and "-" are processed differently.
    * Note that you should not use this function if you really need
    * stdin/non-file protocol.
@@ -38,7 +39,7 @@ export default makeRunner("ffmpeg", {
     return `file:${fpath}`;
   },
   /**
-   * Escape FFmpeg filter argument
+   * Escape FFmpeg's filter argument.
    * See ffmpeg-filters(1), "Notes on filtergraph escaping".
    */
   _escapeFilterArg(arg) {
@@ -46,6 +47,14 @@ export default makeRunner("ffmpeg", {
     arg = arg.replace(/'/g, "'\\\\\\''");  // ' -> '\\\''
     arg = arg.replace(/:/g, "\\:");        // : -> \:
     return `'${arg}'`;
+  },
+  /**
+   * Escape FFmpeg's concat demuxer path argument.
+   * See ffmpeg-formats(1), "concat".
+   */
+  _escapeConcatArg(arg) {
+    arg = arg.replace(/'/g, "'\\''");  // ' -> '\''
+    return `file '${arg}'`;
   },
   setTitle({inpath, outpath, title}) {
     return this._run([
@@ -318,7 +327,7 @@ export default makeRunner("ffmpeg", {
 
     return args.join(" ");
   },
-  _getCommonArgs(baseArgs) {
+  _getCommonArgs(baseArgs = []) {
     return ["-hide_banner", "-nostdin", "-y"].concat(baseArgs);
   },
   getTestArgs({baseArgs, outpath}) {
@@ -369,6 +378,42 @@ export default makeRunner("ffmpeg", {
     } else {
       assert(false);
     }
+    return args;
+  },
+  getPreviewArgs({inpath, time, vcodec, outpath}) {
+    const args = this._getCommonArgs();
+    if (time != null) {
+      args.push("-ss", time.toString());
+    }
+    // FIXME(Kagami): Scale to source resolution.
+    args.push(
+      "-i", this._escapeFilename(inpath),
+      "-c:v", vcodec, "-b:v", "0", "-crf", "30",
+      "-r", "25",
+      // Let FFmpeg auto-select video track.
+      "-an", "-sn", "-dn",
+      "-frames:v", "1",
+      "-pix_fmt", "yuv420p",
+      "-f", "webm", this._escapeFilename(outpath)
+    );
+    return args;
+  },
+  writeConcat({inpath, prevpath, outpath}) {
+    // TODO(Kagami): Pass that from stdin to avoid extra file?
+    fs.writeFileSync(outpath, [
+      this._escapeConcatArg(prevpath),
+      this._escapeConcatArg(inpath),
+    ].join("\n"));
+  },
+  getConcatArgs({inpath, listpath, outpath}) {
+    const args = this._getCommonArgs();
+    args.push(
+      "-f", "concat", "-safe", "0", "-i", this._escapeFilename(listpath),
+      "-itsoffset", "0.04", "-i", this._escapeFilename(inpath),
+      "-map", "0:v", "-map", "1:a?",
+      "-c", "copy",
+      "-f", "webm", this._escapeFilename(outpath)
+    );
     return args;
   },
 });
