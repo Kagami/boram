@@ -385,7 +385,7 @@ export default makeRunner("ffmpeg", {
     if (time != null) {
       args.push("-ss", time.toString());
     }
-    // FIXME(Kagami): Scale to source resolution.
+    // FIXME(Kagami): Scale to target resolution.
     args.push(
       "-i", this._escapeFilename(inpath),
       "-c:v", vcodec, "-b:v", "0", "-crf", "30",

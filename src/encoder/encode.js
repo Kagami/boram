@@ -116,11 +116,11 @@ const PASS2_COEFF = 1 - PASS1_COEFF;
     marginBottom: 10,
   },
   preview: {
-    flex: "0 20%",
+    flex: "0 30%",
     marginRight: 15,
   },
   title: {
-    flex: "0 30%",
+    flex: "0 25%",
     marginRight: 15,
   },
   path: {
@@ -530,13 +530,13 @@ export default class extends React.PureComponent {
                     disabled={this.props.encoding}
                     onClick={this.handlePreviewTime}
                   />
-                  {/*<Sep margin={2.5} />
+                  <Sep margin={2.5} />
                   <SmallButton
                     icon={<Icon name="folder-open-o" />}
                     title="Load image preview"
                     disabled={this.props.encoding}
                     onClick={this.handlePreviewImage}
-                  />*/}
+                  />
                 </div>
               </Pane>
             </Prop>
