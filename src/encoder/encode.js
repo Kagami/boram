@@ -136,9 +136,9 @@ export default class extends React.PureComponent {
   state = {progress: 0, log: "", target: this.getDefaultTarget()};
   componentDidMount() {
     this.props.events.addListener("abort", this.abort);
-    this.tmpLogName = tmp.tmpNameSync({prefix: "boram-", postfix: "-0.log"});
     // We will re-use this path for temporal WebM but it's ok.
     this.tmpTestName = tmp.tmpNameSync({prefix: "boram-", postfix: ".mkv"});
+    this.tmpLogName = tmp.tmpNameSync({prefix: "boram-", postfix: "-0.log"});
     this.tmpPreviewName = tmp.tmpNameSync({prefix: "boram-", postfix: ".webm"});
     this.tmpConcatName = tmp.tmpNameSync({prefix: "boram-", postfix: ".txt"});
   }
@@ -147,8 +147,8 @@ export default class extends React.PureComponent {
     this.cleanup();
   }
   cleanup() {
-    try { fs.unlinkSync(this.tmpLogName); } catch (e) { /* skip */ }
     try { fs.unlinkSync(this.tmpTestName); } catch (e) { /* skip */ }
+    try { fs.unlinkSync(this.tmpLogName); } catch (e) { /* skip */ }
     try { fs.unlinkSync(this.tmpPreviewName); } catch (e) { /* skip */ }
     try { fs.unlinkSync(this.tmpConcatName); } catch (e) { /* skip */ }
   }

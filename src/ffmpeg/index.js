@@ -399,7 +399,6 @@ export default makeRunner("ffmpeg", {
     return args;
   },
   writeConcat({inpath, prevpath, outpath}) {
-    // TODO(Kagami): Pass that from stdin to avoid extra file?
     fs.writeFileSync(outpath, [
       this._escapeConcatArg(prevpath),
       this._escapeConcatArg(inpath),
