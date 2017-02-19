@@ -101,6 +101,7 @@ export default class extends React.PureComponent {
   toggleLoopCut = () => {
     this.setState({loopCut: !this.state.loopCut});
   };
+  // FIXME(Kagami): This stops working after ~10 quick toggles.
   toggleFullscreen = () => {
     if (this.state.fullscreen) {
       document.webkitExitFullscreen();
