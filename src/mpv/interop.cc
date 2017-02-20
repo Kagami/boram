@@ -151,30 +151,22 @@ class BoramInstance : public pp::Instance {
   }
 
   virtual void DidChangeView(const pp::View& view) {
-    // Seems like DidChangeView shouldn't be called from different
-    // threads so we don't need locks.
     int32_t new_width = static_cast<int32_t>(
         view.GetRect().width() * view.GetDeviceScale());
     int32_t new_height = static_cast<int32_t>(
         view.GetRect().height() * view.GetDeviceScale());
     // printf("@@@ RESIZE %d %d\n", new_width, new_height);
 
-    // Seems like it just schedules resize on next `SwapBuffers` call so
-    // we don't need to wait until rendering is finished.
+    // Always called on main thread so don't need locks.
     context_.ResizeBuffers(new_width, new_height);
     width_ = new_width;
     height_ = new_height;
 
-    // XXX(Kagami): `mpv_opengl_cb_draw` call right after
-    // `mpv_opengl_cb_set_update_callback` causes rendering being
-    // stucked because of race condition in mpv 0.18. See:
-    // <https://github.com/mpv-player/mpv/commit/bc77565>.
-    if (gl_ready_) {
-      OnGetFrame(0);
-    } else {
+    if (!gl_ready_) {
       gl_ready_ = true;
-      mpv_opengl_cb_set_update_callback(mpv_gl_, HandleMPVUpdate, this);
+      LoadMPV();
     }
+    OnGetFrame(0);
   }
 
   virtual void HandleMessage(const Var& message) {
@@ -339,12 +331,15 @@ class BoramInstance : public pp::Instance {
     mpv_observe_property(mpv_, 0, "eof-reached", MPV_FORMAT_FLAG);
     mpv_observe_property(mpv_, 0, "deinterlace", MPV_FORMAT_FLAG);
 
+    return true;
+  }
+
+  void LoadMPV() {
     mpv_set_wakeup_callback(mpv_, HandleMPVWakeup, this);
+    mpv_opengl_cb_set_update_callback(mpv_gl_, HandleMPVUpdate, this);
 
     const char* cmd[] = {"loadfile", src_, NULL};
     mpv_command(mpv_, cmd);
-
-    return true;
   }
 
   void OnGetFrame(int32_t) {
