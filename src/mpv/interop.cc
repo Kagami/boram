@@ -271,6 +271,7 @@ class BoramInstance : public pp::Instance {
   }
 
   static void HandleMPVUpdate(void* ctx) {
+    // printf("@@@ UPDATE\n");
     BoramInstance* b = static_cast<BoramInstance*>(ctx);
     pp::Module::Get()->core()->CallOnMainThread(
         0, b->callback_factory_.NewCallback(&BoramInstance::OnGetFrame));
