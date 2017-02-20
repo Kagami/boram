@@ -15,6 +15,8 @@
   globals: {
     "BORAM_DEBUG": false,
     "BORAM_WIN_BUILD": false,
+    "BORAM_MAC_BUILD": false,
+    "BORAM_LIN_BUILD": false,
     "BORAM_X64_BUILD": false,
   },
   "plugins": ["react", "class-property"],

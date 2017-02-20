@@ -14,10 +14,18 @@ const APP_PATH = path.join("dist", "app");
 const BORAM_DEBUG = process.env.NODE_ENV !== "production";
 const BORAM_PLATFORM = process.env.BORAM_PLATFORM || "";
 const BORAM_WIN_BUILD = BORAM_PLATFORM.startsWith("win");
+const BORAM_MAC_BUILD = BORAM_PLATFORM.startsWith("mac");
+const BORAM_LIN_BUILD = BORAM_PLATFORM.startsWith("lin");
 const BORAM_X64_BUILD = BORAM_PLATFORM.endsWith("64");
 const ExtractLoader = ExtractTextPlugin.extract("css");
 const COMMON_PLUGINS = [
-  new webpack.DefinePlugin({BORAM_DEBUG, BORAM_WIN_BUILD, BORAM_X64_BUILD}),
+  new webpack.DefinePlugin({
+    BORAM_DEBUG,
+    BORAM_WIN_BUILD,
+    BORAM_MAC_BUILD,
+    BORAM_LIN_BUILD,
+    BORAM_X64_BUILD,
+  }),
   new ExtractTextPlugin("index.css"),
 ];
 const PLUGINS = BORAM_DEBUG ? COMMON_PLUGINS : COMMON_PLUGINS.concat([

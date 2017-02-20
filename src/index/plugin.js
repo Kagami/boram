@@ -16,7 +16,9 @@ function containsNonASCII(str) {
 }
 
 export function getPluginPath() {
-  const pluginName = BORAM_WIN_BUILD ? "boram.dll" : "libboram.so";
+  const pluginName = BORAM_WIN_BUILD
+    ? "boram.dll"
+    : (BORAM_MAC_BUILD ? "libboram.dylib" : "libboram.so");
   const fullPluginPath = path.join(APP_PATH, pluginName);
   let pluginPath = path.relative(process.cwd(), fullPluginPath);
   // "plugin.so" doesn't work, "./plugin.so" is required.
