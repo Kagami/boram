@@ -3,6 +3,7 @@
  * @module boram/youtube-dl
  */
 
+import assert from "assert";
 import path from "path";
 import {APP_PATH} from "../shared";
 import {makeRunner, getRunPath} from "../util";
@@ -10,11 +11,18 @@ require("file!../../bin/youtube-dl." + (BORAM_WIN_BUILD ? "exe" : "zip"));
 
 export default makeRunner("youtube-dl", {
   _fixPathArgs(runpath, args) {
-    if (runpath || BORAM_WIN_BUILD) {
-      return [runpath, args];
-    } else {
+    // Special case for ytdl on Mac: we run it with python.
+    if (BORAM_MAC_BUILD || !runpath) {
+      // We always pack youtube-dl binary on Windows.
+      assert(!BORAM_WIN_BUILD);
+      // Can be run as executable but this way we get better error
+      // message if Python is not installed.
+      const altexe = "python";
+      runpath = getRunPath(altexe, {system: true});
       const zippath = path.join(APP_PATH, "youtube-dl.zip");
-      return [getRunPath("python"), [zippath].concat(args)];
+      return [runpath, [zippath].concat(args), altexe];
+    } else {
+      return [runpath, args];
     }
   },
   getInfo(url) {

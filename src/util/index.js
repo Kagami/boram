@@ -218,19 +218,21 @@ export function tryRun(fn, arg, def) {
   }
 }
 
-export function getRunPath(exe) {
+export function getRunPath(exe, opts = {}) {
   const overrideEnv = `BORAM_${exe.toUpperCase().replace(/-/, "_")}`;
   const overridePath = process.env[overrideEnv];
   if (overridePath) {
     return overridePath;
-  } else if (BORAM_WIN_BUILD) {
-    return path.join(APP_PATH, exe);
-  } else {
+  } else if (opts.system || BORAM_LIN_BUILD) {
     try {
       return which.sync(exe);
     } catch (e) {
       return null;
     }
+  } else {
+    // Don't prefer binaries from PATH on Win/Mac because they might be
+    // broken or not suited for WebM encoding.
+    return path.join(APP_PATH, exe);
   }
 }
 
@@ -238,16 +240,18 @@ export function makeRunner(exe, obj) {
   return {
     ...obj,
     _run(args, onLog) {
+      let altexe = "";
       let stdout = "";
       let stderr = "";
       let runpath = getRunPath(exe);
       if (this._fixPathArgs) {
-        [runpath, args] = this._fixPathArgs(runpath, args);
+        [runpath, args, altexe] = this._fixPathArgs(runpath, args);
       }
       let child = null;
       const runner = new Promise((resolve, reject) => {
         if (!runpath) {
-          throw new Error(`Failed to run ${exe}: executable not found`);
+          throw new Error(`Failed to run ${exe}: ` +
+                          `${altexe || "executable"} not found`);
         }
         try {
           child = spawn(runpath, args, {stdio: ["ignore", "pipe", "pipe"]});
