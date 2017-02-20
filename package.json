@@ -4,11 +4,11 @@
   "private": true,
   "description": "Cross-platform WebM converter",
   "scripts": {
-    "start": "rm -rf dist && webpack --watch",
+    "start-lin64": "rm -rf dist && BORAM_PLATFORM=lin64 webpack --watch",
     "dev": "electron dist/app",
     "test": "eslint .",
     "app": "rm -rf dist/app && NODE_ENV=production webpack",
-    "mpv-dev": "rm -f \"${BORAM_WIN_PREBUILT_ROOT}/boram.node\" && rm -f \"${BORAM_MAC_PREBUILT_ROOT}/boram.node\" && node-gyp rebuild && cp build/Release/boram.node dist/app/libboram.so && cp build/Release/ffmpeg57.node node_modules/electron/dist/libffmpeg.so && cp build/Release/checklib dist/app",
+    "mpv-lin64-dev": "rm -f \"${BORAM_WIN_PREBUILT_ROOT}/boram.node\" && rm -f \"${BORAM_MAC_PREBUILT_ROOT}/boram.node\" && node-gyp rebuild && cp build/Release/boram.node dist/app/libboram.so && cp build/Release/ffmpeg57.node node_modules/electron/dist/libffmpeg.so && cp build/Release/checklib dist/app",
     "mpv-win32-prebuild": "del E:\\boram.node && node-gyp rebuild --arch=ia32 && copy build\\Release\\boram.node E:\\",
     "mpv-mac64-prebuild": "node-gyp rebuild",
     "mpv-win32": "cp \"${BORAM_WIN_PREBUILT_ROOT}/boram.node\" dist/app/boram.dll",
