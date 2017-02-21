@@ -43,6 +43,9 @@ export default makeRunner("youtube-dl", {
       "--format", vfid + (afid ? `+${afid}` : ""),
       "--merge-output-format", "mkv",
     ];
+    if (BORAM_MAC_BUILD) {
+      args.push("--ffmpeg-location", getRunPath("ffmpeg"));
+    }
     if (vcodec === "vp9.2") {
       // See <https://trac.ffmpeg.org/ticket/6042>.
       // Fixed in master but keep for compatibility with older versions:
