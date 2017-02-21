@@ -5,7 +5,7 @@
 
 ## Features
 
-* Open-source, cross-platform, works on Windows and Linux
+* Open-source, cross-platform, works on Windows, Mac and Linux
 * VP9/VP8/Opus/Vorbis/2pass/limit/CRF/CQ/raw-args modes support
 * Industry-grade codec settings, considered defaults
 * Can download source from almost any streaming site, thanks to [youtube-dl](https://rg3.github.io/youtube-dl/)
@@ -20,6 +20,10 @@
 ### Windows
 
 Download [latest release](https://github.com/Kagami/boram/releases), unpack and run `boram.exe`. 64-bit (x64) releases are preferred.
+
+### Mac OS
+
+Download [latest release](https://github.com/Kagami/boram/releases), unpack and run `boram`.
 
 ### Linux
 
