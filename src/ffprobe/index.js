@@ -18,6 +18,8 @@ if (BORAM_WIN_BUILD) {
       /\.dll$|[\/\\]ffprobe\.exe$/
     );
   }
+} else if (BORAM_MAC_BUILD) {
+  require.context("../../bin/mac64", false, /\.dylib$|[\/\\]ffprobe$/);
 }
 
 export default makeRunner("ffprobe", {

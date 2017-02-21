@@ -7,6 +7,8 @@ import React from "react";
 import {useSheet} from "../jss";
 if (BORAM_WIN_BUILD) {
   require("file!../../bin/32/mpv-1.dll");
+} else if (BORAM_MAC_BUILD) {
+  require.context("../../bin/mac64", false, /\.dylib$/);
 }
 
 @useSheet({

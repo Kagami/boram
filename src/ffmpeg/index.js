@@ -22,6 +22,8 @@ if (BORAM_WIN_BUILD) {
       /\.dll$|[\/\\]ffmpeg\.exe$/
     );
   }
+} else if (BORAM_MAC_BUILD) {
+  require.context("../../bin/mac64", false, /\.dylib$|[\/\\]ffmpeg$/);
 }
 
 if (BORAM_WIN_BUILD && !process.env.FONTCONFIG_FILE) {

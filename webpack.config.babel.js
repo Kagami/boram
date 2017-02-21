@@ -74,9 +74,11 @@ export default {
       {test: infa(".+\\.css"), loader: ExtractLoader},
       {test: infa(".+\\.woff2(\\?v=[\\d.]+)?"), loader: "file"},
       {test: infa(".+\\.(ttf|eot|svg|woff)(\\?v=[\\d.]+)?"), loader: "skip"},
-      // Predefined loaders for FFmpeg binaries because we can't(?) add
-      // loaders to `require.context`.
-      {test: intree("bin", "ffmpeg.*", ".+\\.(exe|dll)"), loader: "file"},
+      // Predefined loaders for binaries because we can't(?) add loaders
+      // to `require.context`.
+      {test: intree("bin", "ffmpeg[-\\w]*", "bin", ".+"), loader: "file"},
+      {test: intree("bin", "mac64", ".+\\.dylib"), loader: "file"},
+      {test: intree("bin", "mac64", "[^.]+"), loader: "file?name=[name]"},
     ],
   },
   fileLoader: {
