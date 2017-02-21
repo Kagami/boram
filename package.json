@@ -4,7 +4,7 @@
   "private": true,
   "description": "Cross-platform WebM converter",
   "scripts": {
-    "start-lin64": "rm -rf dist && BORAM_PLATFORM=lin64 webpack --watch",
+    "start": "rm -rf dist && webpack --watch",
     "dev": "electron dist/app",
     "test": "eslint .",
     "app": "rm -rf dist/app && NODE_ENV=production webpack",

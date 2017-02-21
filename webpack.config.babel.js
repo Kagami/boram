@@ -1,3 +1,4 @@
+import assert from "assert";
 import path from "path";
 import webpack from "webpack";
 import ExtractTextPlugin from "extract-text-webpack-plugin";
@@ -12,10 +13,12 @@ function infa(...parts) {
 
 const APP_PATH = path.join("dist", "app");
 const BORAM_DEBUG = process.env.NODE_ENV !== "production";
-const BORAM_PLATFORM = process.env.BORAM_PLATFORM || "";
+const BORAM_PLATFORM = process.env.BORAM_PLATFORM || "lin64";
 const BORAM_WIN_BUILD = BORAM_PLATFORM.startsWith("win");
 const BORAM_MAC_BUILD = BORAM_PLATFORM.startsWith("mac");
 const BORAM_LIN_BUILD = BORAM_PLATFORM.startsWith("lin");
+assert(BORAM_WIN_BUILD || BORAM_MAC_BUILD || BORAM_LIN_BUILD,
+       "Unknown platform");
 const BORAM_X64_BUILD = BORAM_PLATFORM.endsWith("64");
 const ExtractLoader = ExtractTextPlugin.extract("css");
 const COMMON_PLUGINS = [
