@@ -4,7 +4,6 @@
 #include <locale.h>
 #include <string>
 #include <unordered_map>
-#include <mutex>
 #define GL_GLEXT_PROTOTYPES
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
@@ -343,14 +342,12 @@ class BoramInstance : public pp::Instance {
   }
 
   void OnGetFrame(int32_t) {
-    render_mutex_.lock();
+    // Always called on main thread so don't need locks.
     if (is_painting_) {
       needs_paint_ = true;
-      render_mutex_.unlock();
     } else {
       is_painting_ = true;
       needs_paint_ = false;
-      render_mutex_.unlock();
       Render();
     }
   }
@@ -365,9 +362,7 @@ class BoramInstance : public pp::Instance {
   }
 
   void PaintFinished(int32_t) {
-    render_mutex_.lock();
     is_painting_ = false;
-    render_mutex_.unlock();
     if (needs_paint_)
       OnGetFrame(0);
   }
@@ -382,7 +377,6 @@ class BoramInstance : public pp::Instance {
   bool gl_ready_;
   bool is_painting_;
   bool needs_paint_;
-  std::mutex render_mutex_;
 };
 
 class BoramModule : public pp::Module {
