@@ -36,6 +36,9 @@ export default class extends React.PureComponent {
     this.postData("pause", true);
   }
   togglePause() {
+    // Workaround to avoid extra frame being rendered after pause. See:
+    // <https://github.com/mpv-player/mpv/issues/4152>. Fixed in 0.25+,
+    // keep this for compatibility with older versions.
     this.postData("keypress", "SPACE");
   }
   seek(time) {
