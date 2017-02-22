@@ -165,13 +165,13 @@ export default makeRunner("ffmpeg", {
       args.push("-ss", opts.start);
     }
     args.push("-i", escapeArg(this._escapeFilename(opts.inpath)));
+    if (opts.start != null && opts.hasAudio && opts.acodec === "copy") {
+      // Make resulting video begin in zero timestamp. This is only
+      // needed when we copy audio.
+      args.push("-ss", "0");
+    }
     if (opts.end != null) {
       args.push("-t", ceilFixed(opts._duration, 3));
-    }
-    if (opts.start != null && opts.hasAudio && opts.acodec === "copy") {
-      // ffmpeg sets shifted timestamps for -ss before -i and copy audio
-      // modes. This hack avoids that.
-      args.push("-ss", "0");
     }
 
     // Streams.
