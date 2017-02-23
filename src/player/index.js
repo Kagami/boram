@@ -41,12 +41,14 @@ export default class extends React.PureComponent {
   }
   isMarkStartDisabled() {
     return (
+      this.props.encoding ||
       this.isAlmostEqual(this.state.time, this.duration) ||
       this.isAlmostEqual(this.state.time, this.props.mstart)
     );
   }
   isMarkEndDisabled() {
     return (
+      this.props.encoding ||
       this.isAlmostEqual(this.state.time, 0) ||
       this.isAlmostEqual(this.state.time, this.props.mend)
     );

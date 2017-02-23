@@ -634,6 +634,7 @@ export default class extends React.PureComponent {
           mstart={this.state.mstart}
           mend={this.state.mend}
           crop={this.state._crop}
+          encoding={this.state.encoding}
           onMarkStart={this.handleMarkStart}
           onMarkEnd={this.handleMarkEnd}
           onDeinterlace={this.handleMPVDeinterlace}
