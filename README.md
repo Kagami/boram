@@ -1,4 +1,4 @@
-# boram ![](src/index/icon.png)
+# boram ![](src/index/icon-big.png)
 
 ![](https://raw.githubusercontent.com/Kagami/boram/assets/boram-source.png)
 ![](https://raw.githubusercontent.com/Kagami/boram/assets/boram-encode.png)
