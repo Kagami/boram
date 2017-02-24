@@ -2,6 +2,7 @@
   "targets": [
     {
       "target_name": "boram",
+      "win_delay_load_hook": "false",
       "sources": ["src/mpv/interop.cc"],
       "libraries": ["-lppapi", "-lppapi_cpp", "-lppapi_gles2"],
       "conditions": [
