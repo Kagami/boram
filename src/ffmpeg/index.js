@@ -9,19 +9,8 @@ import os from "os";
 import {WIN_FONTCONFIG_PATH} from "../shared";
 import {ceilFixed, makeRunner, escapeArg, fixOpt, clearOpt} from "../util";
 if (BORAM_WIN_BUILD) {
-  if (BORAM_X64_BUILD) {
-    require.context(
-      "../../bin/ffmpeg-latest-win64-shared/bin",
-      false,
-      /\.dll$|[\/\\]ffmpeg\.exe$/
-    );
-  } else {
-    require.context(
-      "../../bin/ffmpeg-latest-win32-shared/bin",
-      false,
-      /\.dll$|[\/\\]ffmpeg\.exe$/
-    );
-  }
+  require.context("../../bin/win32/bin-video", false,
+                  /\.dll$|[\/\\]ffmpeg\.exe$/);
 } else if (BORAM_MAC_BUILD) {
   require.context("../../bin/mac64", false, /\.dylib$|[\/\\]ffmpeg$/);
 }

@@ -17,9 +17,8 @@
         }, "OS=='mac'", {
           "library_dirs": ["$(NACL_SDK_ROOT)/lib/mac_host/Release"],
         }, "OS=='win'", {
-          "defines": ["BORAM_WIN_BUILD"],
-          "include_dirs": ["C:/nacl_sdk/pepper_49/include", "C:/mpv-dev/include"],
-          "library_dirs": ["C:/nacl_sdk/pepper_49/lib/win_x86_32_host/Release", "C:/mpv-dev/32"],
+          "include_dirs": ["C:/nacl_sdk/pepper_49/include", "C:/mingw/local32/include"],
+          "library_dirs": ["C:/nacl_sdk/pepper_49/lib/win_x86_32_host/Release", "C:/mingw/local32/lib"],
           "libraries": ["-llibmpv.dll.a"],
         }],
       ],

@@ -76,7 +76,7 @@ export default {
       {test: infa(".+\\.(ttf|eot|svg|woff)(\\?v=[\\d.]+)?"), loader: "skip"},
       // Predefined loaders for binaries because we can't(?) add loaders
       // to `require.context`.
-      {test: intree("bin", "ffmpeg[-\\w]*", "bin", ".+"), loader: "file"},
+      {test: intree("bin", "win32", ".+\\.(dll|exe)"), loader: "file"},
       {test: intree("bin", "mac64", ".+\\.dylib"), loader: "file"},
       {test: intree("bin", "mac64", "[^.]+"), loader: "file?name=[name]"},
     ],

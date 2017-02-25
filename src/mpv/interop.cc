@@ -14,13 +14,8 @@
 #include <ppapi/cpp/graphics_3d.h>
 #include <ppapi/lib/gl/gles2/gl2ext_ppapi.h>
 #include <ppapi/utility/completion_callback_factory.h>
-#ifdef BORAM_WIN_BUILD
-#include "client.h"
-#include "opengl_cb.h"
-#else
 #include <mpv/client.h>
 #include <mpv/opengl_cb.h>
-#endif
 
 // Fix for MSVS.
 #ifdef PostMessage

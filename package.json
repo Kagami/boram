@@ -23,7 +23,7 @@
     "release-mac64": "rm -rf dist/*darwin-x64* && BORAM_PLATFORM=mac64 npm run app && npm run mpv-mac64 && chmod +x dist/app/{*.dylib,ffmpeg,ffprobe} && npm run pack-mac64",
     "release-lin64": "rm -rf dist/*linux-x64* && BORAM_PLATFORM=lin64 npm run app && npm run mpv-lin64 && npm run pack-lin64",
     "release": "rm -rf dist && npm run release-win32 && npm run release-win64 && npm run release-mac64 && npm run release-lin64",
-    "binaries": "rm -rf bin && mkdir bin && cd bin && wget https://yt-dl.org/latest/youtube-dl -O youtube-dl.zip && wget https://yt-dl.org/latest/youtube-dl.exe && wget https://ffmpeg.zeranoe.com/builds/win32/shared/ffmpeg-latest-win32-shared.7z && 7z x ffmpeg-latest-win32-shared.7z && wget https://ffmpeg.zeranoe.com/builds/win64/shared/ffmpeg-latest-win64-shared.7z && 7z x ffmpeg-latest-win64-shared.7z && wget https://mpv.srsfckn.biz/mpv-dev-latest.7z && 7z x mpv-dev-latest.7z && cp -a \"${BORAM_MAC_PREBUILT_ROOT}/deps\" mac64"
+    "binaries": "rm -rf bin && mkdir bin && cd bin && wget https://yt-dl.org/latest/youtube-dl -O youtube-dl.zip && wget https://yt-dl.org/latest/youtube-dl.exe && cp -a \"${BORAM_WIN_PREBUILT_ROOT}/local32\" win32 && cp -a \"${BORAM_MAC_PREBUILT_ROOT}/deps\" mac64"
   },
   "babel": {
     "plugins": [
