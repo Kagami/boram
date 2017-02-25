@@ -6,17 +6,12 @@
 import assert from "assert";
 import fs from "fs";
 import os from "os";
-import {WIN_FONTCONFIG_PATH} from "../shared";
 import {ceilFixed, makeRunner, escapeArg, fixOpt, clearOpt} from "../util";
 if (BORAM_WIN_BUILD) {
   require.context("../../bin/win32/bin-video", false,
                   /\.dll$|[\/\\]ffmpeg\.exe$/);
 } else if (BORAM_MAC_BUILD) {
   require.context("../../bin/mac64", false, /\.dylib$|[\/\\]ffmpeg$/);
-}
-
-if (BORAM_WIN_BUILD && !process.env.FONTCONFIG_FILE) {
-  process.env.FONTCONFIG_FILE = WIN_FONTCONFIG_PATH;
 }
 
 export default makeRunner("ffmpeg", {

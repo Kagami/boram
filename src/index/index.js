@@ -58,10 +58,6 @@ function runtimeChecks() {
     }
   }
 
-  if (BORAM_WIN_BUILD) {
-    require("../fonts").setupWindowsFontconfig();
-  }
-
   if (BORAM_LIN_BUILD) {
     try {
       require("./deps").checkLinuxDeps();
