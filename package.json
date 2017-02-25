@@ -8,7 +8,7 @@
     "dev": "electron dist/app",
     "test": "eslint .",
     "app": "rm -rf dist/app && NODE_ENV=production webpack",
-    "mpv-lin64-dev": "rm -f \"${BORAM_WIN_PREBUILT_ROOT}/boram*.node\" && rm -f \"${BORAM_MAC_PREBUILT_ROOT}/boram.node\" && node-gyp rebuild && cp build/Release/boram.node dist/app/libboram.so && cp build/Release/ffmpeg57.node node_modules/electron/dist/libffmpeg.so && cp build/Release/checklib dist/app",
+    "mpv-lin64-dev": "rm -f \"${BORAM_WIN_PREBUILT_ROOT}\"/boram*.node && rm -f \"${BORAM_MAC_PREBUILT_ROOT}/boram.node\" && node-gyp rebuild && cp build/Release/boram.node dist/app/libboram.so && cp build/Release/ffmpeg57.node node_modules/electron/dist/libffmpeg.so && cp build/Release/checklib dist/app",
     "mpv-win32-prebuild": "del E:\\boram32.node && node-gyp rebuild --arch=ia32 && copy build\\Release\\boram.node E:\\boram32.node",
     "mpv-win64-prebuild": "del E:\\boram64.node && node-gyp rebuild --arch=x64 && copy build\\Release\\boram.node E:\\boram64.node",
     "mpv-mac64-prebuild": "node-gyp rebuild && install_name_tool -change /usr/local/opt/mpv/lib/libmpv.1.dylib '@loader_path/libmpv.1.dylib' build/Release/boram.node",
