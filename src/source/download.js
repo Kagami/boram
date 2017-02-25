@@ -4,13 +4,14 @@
  */
 
 import fs from "fs";
+import {remote} from "electron";
+import tmp from "tmp";
 import React from "react";
 import cx from "classnames";
 import YouTubeDL from "../youtube-dl";
-import FFmpeg from "../ffmpeg";
 import {useSheet} from "../jss";
 import {BigProgress, BigButton, Sep} from "../theme";
-import {tmp, showErr} from "../util";
+import {showErr} from "../util";
 
 const YT_FEXT = ".mkv";
 
@@ -36,11 +37,11 @@ export default class extends React.PureComponent {
   state = {progress: 0, status: "", error: null};
   componentDidMount() {
     this.props.events.addListener("abort", this.abort);
-    // Might actually end up MOV with .mkv extension but we'll remux it
-    // to Matroska right away and FFmpeg doesn't care about input ext.
-    this.tmpYTName = tmp.tmpNameSync({prefix: "boram-", postfix: YT_FEXT});
     // Source provider passed further. Cleaned only on cancel/exit.
-    this.tmpSource = tmp.fileSync({prefix: "boram-", postfix: ".mkv"});
+    // Might actually end up being flv/mov with .mkv extension but
+    // FFmpeg doesn't care about filenames.
+    this.sourceName = tmp.tmpNameSync({prefix: "boram-", postfix: YT_FEXT});
+    remote.getGlobal("removeOnQuit")(this.sourceName);
     this.handleDownload();
   }
   componentWillUnmount() {
@@ -48,34 +49,21 @@ export default class extends React.PureComponent {
   }
   canceling = false;
   handleDownload = () => {
-    const progress = 0;
-    this.setState({progress, status: "spawning youtube-dl", error: null});
-    this.props.onProgress(progress);
+    this.setState({progress: 0, status: "spawning youtube-dl", error: null});
+    this.props.onProgress(0);
     const {info, format} = this.props;
     const url = info.webpage_url;
-    const outpath = this.tmpYTName;
+    const outpath = this.sourceName;
     this.ytdl = YouTubeDL.download({url, format, outpath}, (upd) => {
       const {progress, status} = upd;
       this.setState({progress, status});
       this.props.onProgress(progress);
     });
     this.ytdl.then(() => {
-      const progress = 100;
-      this.setState({progress, status: "writing title to metadata"});
-      this.props.onProgress(progress);
-      const inpath = this.tmpYTName;
-      const outpath = this.tmpSource.name;
-      // URL might be rather long to put it into title (e.g. extra query
-      // args) but that's hard to fix in general case.
-      const title = `${info.title} <${url}>`;
-      this.ff = FFmpeg.setTitle({inpath, outpath, title});
-      return this.ff;
-    }).then(() => {
       // We hope ytdl already made all correct escapings.
       const saveAs = info._filename;
-      const source = {saveAs, path: this.tmpSource.name};
-      this.props.onLoad(source);
-      this.cleanYT();
+      const title = `${info.title} <${url}>`;
+      this.props.onLoad({saveAs, title, path: outpath});
     }, (error) => {
       const progress = 0;
       this.props.onProgress(progress);
@@ -88,11 +76,7 @@ export default class extends React.PureComponent {
   // ytdl doesn't clean after itself, so here we go...
   cleanYT = () => {
     const {vfid, afid, sfid, sext} = this.props.format;
-    const cleanName = this.tmpYTName.slice(0, -YT_FEXT.length);
-
-    // Basic download target, e.g.: "1.mkv".
-    // (Note that we disable ".part" files.)
-    try { fs.unlinkSync(this.tmpYTName); } catch (e) { /* skip */ }
+    const cleanName = this.sourceName.slice(0, -YT_FEXT.length);
 
     // Postprocessors, e.g.: "1.temp.mkv".
     const ppName = `${cleanName}.temp${YT_FEXT}`;
@@ -100,9 +84,9 @@ export default class extends React.PureComponent {
 
     // Multi-format downloads, e.g.: "1.mkv.f137", "1.mkv.f251".
     if (afid) {
-      const vfName = `${this.tmpYTName}.f${vfid}`;
+      const vfName = `${this.sourceName}.f${vfid}`;
       try { fs.unlinkSync(vfName); } catch (e) { /* skip */ }
-      const afName = `${this.tmpYTName}.f${afid}`;
+      const afName = `${this.sourceName}.f${afid}`;
       try { fs.unlinkSync(afName); } catch (e) { /* skip */ }
     }
 
@@ -121,10 +105,7 @@ export default class extends React.PureComponent {
     // Next time component will be recreated.
     this.canceling = true;
     this.abort();
-    // Not needed anymore. Also no need to clean manually on abort
-    // because `setGracefulCleanup` from main process will clean for us.
-    // It will do that even when the current component is unmounted.
-    try { this.tmpSource.removeCallback(); } catch (e) { /* skip */ }
+    try { fs.unlinkSync(this.sourceName); } catch (e) { /* skip */ }
     this.props.onCancel();
   };
   render() {

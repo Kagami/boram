@@ -8,12 +8,7 @@ import path from "path";
 import {spawn} from "child_process";
 import which from "which";
 import {parse as _parseArgs} from "shell-quote";
-import {remote} from "electron";
 import {APP_PATH} from "../shared";
-
-// Renderer process doesn't receive process exit events so need to setup
-// cleanup inside main process.
-export const tmp = remote.getGlobal("tmp");
 
 /** Like Number#toFixed but floors instead of rounding. */
 export function floorFixed(n, digits) {

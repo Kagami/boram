@@ -6,6 +6,7 @@
 import fs from "fs";
 import path from "path";
 import {shell, remote} from "electron";
+import tmp from "tmp";
 import React from "react";
 import FFmpeg from "../ffmpeg";
 import {useSheet} from "../jss";
@@ -16,7 +17,7 @@ import {
   BigProgress,
 } from "../theme";
 import {
-  tmp, parseFrameRate, parseArgs,
+  parseFrameRate, parseArgs,
   showSize, showBitrate, showTime, quoteArgs,
 } from "../util";
 
@@ -362,12 +363,14 @@ export default class extends React.PureComponent {
     }
   }
   getDefaultTitle() {
+    const {saveAs, title, path: inpath} = this.props.source;
     const {tags} = this.props.format;
-    if (tags && tags.title) {
+    if (title) {
+      return title;
+    } else if (tags && tags.title) {
       return tags.title;
     } else {
-      const {source} = this.props;
-      return path.parse(source.saveAs || source.path).name;
+      return path.parse(saveAs || inpath).name;
     }
   }
   getTarget(sample) {

@@ -47,20 +47,6 @@ export default makeRunner("ffmpeg", {
     arg = arg.replace(/'/g, "'\\''");  // ' -> '\''
     return `file '${arg}'`;
   },
-  setTitle({inpath, outpath, title}) {
-    return this._run([
-      "-v", "error", "-nostdin", "-y",
-      "-i", this._escapeFilename(inpath),
-      "-map", "0",
-      "-c", "copy",
-      // See <https://trac.ffmpeg.org/ticket/6042>.
-      // Fixed in master but keep for compatibility with older versions:
-      // <https://github.com/FFmpeg/FFmpeg/commit/e7dec52>.
-      "-strict", "unofficial",
-      "-metadata", `title=${title}`,
-      "-f", "matroska", this._escapeFilename(outpath),
-    ]);
-  },
   hasInterlace({inpath, vtrackn, start}) {
     // TODO(Kagami): BFF?
     start = (start + 5).toString();

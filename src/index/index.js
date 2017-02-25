@@ -3,6 +3,7 @@
  * @module boram/index
  */
 
+import fs from "fs";
 import url from "url";
 import {BrowserWindow, app, dialog} from "electron";
 import {name, version} from "json!../../package.json";
@@ -15,9 +16,10 @@ if (BORAM_WIN_BUILD) {
   require("file!./icon.ico");
 }
 
-// Used by renderer process.
-global.tmp = require("tmp");
-global.tmp.setGracefulCleanup();
+const toRemoveNames = [];
+global.removeOnQuit = function(name) {
+  toRemoveNames.push(name);
+};
 
 if (BORAM_DEBUG) {
   require("electron-debug")({enabled: true});
@@ -97,4 +99,10 @@ app.on("ready", () => {
 
 app.on("window-all-closed", () => {
   app.quit();
+});
+
+app.on("quit", () => {
+  toRemoveNames.forEach(name => {
+    try { fs.unlinkSync(name); } catch (e) { /* skip */ }
+  });
 });
