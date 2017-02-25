@@ -38,8 +38,8 @@ boram's own code is licensed under [CC0](licenses/LICENSE.BORAM) but releases al
 
 * Libraries from dependencies section of [package.json](package.json)
 * [Chromium](licenses/LICENSE.CHROMIUM) and [Electron](licenses/LICENSE.ELECTRON) components
-* [Font Awesome font](licenses/LICENSE.FONTAWESOME)
-* [Roboto font](licenses/LICENSE.ROBOTO)
 * [youtube-dl binaries](licenses/LICENSE.PYTHON)
 * [FFmpeg binaries](licenses/LICENSE.FFMPEG)
 * [mpv binaries](licenses/LICENSE.MPV)
+* [Font Awesome font](licenses/LICENSE.FONTAWESOME)
+* [Roboto font](licenses/LICENSE.ROBOTO)
