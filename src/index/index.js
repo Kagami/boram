@@ -7,7 +7,7 @@ import fs from "fs";
 import url from "url";
 import {BrowserWindow, app, dialog} from "electron";
 import {name, version} from "json!../../package.json";
-import {ICON_BIG_PATH, WIN_ICON_PATH, PAGE_PATH} from "../shared";
+import {APP_PATH, ICON_BIG_PATH, WIN_ICON_PATH, PAGE_PATH} from "../shared";
 import {getPluginPath} from "./plugin";
 import "file!./package.json";
 import "file!./index.html";
@@ -31,6 +31,12 @@ if (process.env.BORAM_NO_HWACCEL) {
 // Plugin checks and setup. Can't be run on ready.
 (function() {
   app.commandLine.appendSwitch("ignore-gpu-blacklist");
+  if (!BORAM_LIN_BUILD) {
+    // Workaround issue with non-ASCII paths. Can't use on Linux because
+    // renderer process is spawned by zygote which don't inherit our
+    // CWD. See: <https://github.com/electron/electron/issues/3306>.
+    process.chdir(APP_PATH);
+  }
   const pluginPath = getPluginPath();
   if (!pluginPath) {
     dialog.showErrorBox(
