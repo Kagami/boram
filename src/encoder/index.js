@@ -15,7 +15,7 @@ import VideoFX from "./video-fx";
 import AudioFX from "./audio-fx";
 import Codecs from "./codecs";
 import Encode from "./encode";
-import {parseTime, showTime, parseSAR} from "../util";
+import {parseTime, showTime, parseAR, round2} from "../util";
 
 const DEFAULT_LIMIT = 19;
 const DEFAULT_BITRATE = 5000;
@@ -123,30 +123,47 @@ export default class extends React.PureComponent {
   getSubTracks() {
     return this.props.info.streams.filter(t => t.codec_type === "subtitle");
   }
-  getFinalWidth({vtrackn, scalew, scaleh, cropw}) {
+
+  getSAR(vtrackn) {
+    const {sample_aspect_ratio} = this.getVideoTracks()[vtrackn];
+    return parseAR(sample_aspect_ratio);
+  }
+  getDAR(vtrackn) {
+    const {display_aspect_ratio} = this.getVideoTracks()[vtrackn];
+    return parseAR(display_aspect_ratio);
+  }
+  isAnamorph(vtrackn) {
+    return this.getSAR(vtrackn) !== 1;
+  }
+  getFinalWidth({vtrackn, scalew, scaleh, cropw, fixSAR}) {
     const {width, height} = this.getVideoTracks()[vtrackn];
+    const sar = this.getSAR(vtrackn);
+    const dar = this.getDAR(vtrackn);
     if (scalew) {
       return scalew;
     } else if (scaleh) {
-      return Math.floor(width * scaleh / height);
+      return round2(scaleh * ((fixSAR || sar === 1) ? dar : sar));
     } else if (cropw) {
-      return cropw;
+      return (fixSAR && sar > 1) ? round2(cropw * sar) : cropw;
     } else {
-      return width;
+      return (fixSAR && dar < 1) ? round2(height * dar) : width;
     }
   }
-  getFinalHeight({vtrackn, scalew, scaleh, croph}) {
+  getFinalHeight({vtrackn, scalew, scaleh, croph, fixSAR}) {
     const {width, height} = this.getVideoTracks()[vtrackn];
+    const sar = this.getSAR(vtrackn);
+    const dar = this.getDAR(vtrackn);
     if (scaleh) {
       return scaleh;
     } else if (scalew) {
-      return Math.floor(height * scalew / width);
+      return round2(scalew / ((fixSAR || sar === 1) ? dar : sar));
     } else if (croph) {
-      return croph;
+      return (fixSAR && sar < 1) ? round2(croph / sar) : croph;
     } else {
-      return height;
+      return (fixSAR && dar > 1) ? round2(width / dar) : height;
     }
   }
+
   getMaxSide(opts) {
     return Math.max(this.getFinalWidth(opts), this.getFinalHeight(opts));
   }
@@ -172,13 +189,6 @@ export default class extends React.PureComponent {
       (size <= 1920 && vb > BIG_FHD_BITRATE) ||
       vb > BIG_OTHER_BITRATE
     );
-  }
-  getSAR(vtrackn) {
-    const {sample_aspect_ratio} = this.getVideoTracks()[vtrackn];
-    return parseSAR(sample_aspect_ratio);
-  }
-  isAnamorph(vtrackn) {
-    return this.getSAR(vtrackn) !== 1;
   }
   canCopyAudio(atrackn) {
     if (atrackn == null) return false;
@@ -233,7 +243,9 @@ export default class extends React.PureComponent {
     this.handleAll(upd, {marked: "both"});
   };
   handleMPVDeinterlace = (deinterlace) => {
-    // Not a user interaction.
+    // Not a user interaction. Passing it via `upd` will result in
+    // infinitife loop. Instead, we should re-run main handler hiding
+    // the fact of update.
     this.setState({deinterlace}, this.handleAll);
   };
   handleCrop = (crop) => {
@@ -312,7 +324,7 @@ export default class extends React.PureComponent {
     };
 
     if (what.crop) {
-      // Always receive all 4 values.
+      // We always get all 4 area params.
       setText("videoFX", "cropw", what.crop.cropw);
       setText("videoFX", "croph", what.crop.croph);
       setText("videoFX", "cropx", what.crop.cropx);
@@ -333,7 +345,7 @@ export default class extends React.PureComponent {
     let cropy = getText("videoFX", "cropy");
     let scalew = getText("videoFX", "scalew");
     let scaleh = getText("videoFX", "scaleh");
-    const fixSAR = get("fixSAR");
+    let fixSAR = get("fixSAR");
     let speed = ""; //getText("videoFX", "speed");
     let fps = ""; //getText("videoFX", "fps");
     const burnSubs = get("burnSubs");
@@ -364,7 +376,6 @@ export default class extends React.PureComponent {
     const mend = get("mend");
     const induration = this.getFullDuration();
     const useExtSub = strackn === this.getSubTracks().length;
-    const _sar = this.getSAR(vtrackn);
     const focused = null;
     // Will contain exact values.
     let _start = null;
@@ -505,6 +516,10 @@ export default class extends React.PureComponent {
     if (what.checked === "deinterlace") {
       this.refs.player.setDeinterlace(deinterlace);
     }
+    if (what.selected === "vtrackn") {
+      fixSAR = this.isAnamorph(vtrackn);
+      this.setState({fixSAR});
+    }
     if (what.selected === "strackn" ||
         (what.checked === "burnSubs" && burnSubs)) {
       this.refs.player.setSub({strackn});
@@ -516,7 +531,7 @@ export default class extends React.PureComponent {
       vtrackn,
       deinterlace,
       cropw, croph, cropx, cropy,
-      scalew, scaleh, fixSAR, _sar,
+      scalew, scaleh, fixSAR,
       speed, fps,
       burnSubs, strackn, extSubPath,
       // afx.
@@ -533,6 +548,8 @@ export default class extends React.PureComponent {
       _start, _duration,
     };
     const _vb = opts.vb = FFmpeg.getVideoBitrate(opts);
+    const _finalw = opts._finalw = this.getFinalWidth(opts);
+    const _finalh = opts._finalh = this.getFinalHeight(opts);
     if (!modeCRF) {
       if (this.isShortClip(opts)) {
         warn("codecs", `Consider CRF mode for such short fragment`);
@@ -553,8 +570,7 @@ export default class extends React.PureComponent {
                         ${SMALL_OTHER_BITRATE}÷${BIG_OTHER_BITRATE} (other)`);
       }
     }
-    if (this.isAnamorph(vtrackn) && !fixSAR &&
-        (scalew == null || scaleh == null)) {
+    if (this.isAnamorph(vtrackn) && !fixSAR) {
       warn("videoFX", `Output anamorphic video,
                        some players will handle it poorly`);
     }
@@ -568,6 +584,8 @@ export default class extends React.PureComponent {
       _duration,
       // For Codecs.
       _vb,
+      // For getPreviewArgs.
+      _finalw, _finalh,
 
       allValid,
       warnings,
@@ -734,6 +752,9 @@ export default class extends React.PureComponent {
               encoding={this.state.encoding}
               allValid={this.state.allValid}
               _duration={this.state._duration}
+              _finalw={this.state._finalw}
+              _finalh={this.state._finalh}
+              _sar={this.state.fixSAR ? 1 : this.getSAR(this.state.vtrackn)}
               format={this.props.info.format}
               vtrack={this.getVideoTracks()[this.state.vtrackn]}
               vcodec={this.state.vcodec}

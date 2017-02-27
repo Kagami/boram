@@ -9,7 +9,7 @@ import {useSheet} from "../jss";
 import {CompactProp as Prop} from "../theme";
 import {
   showTime, showBitrate, showSize, showLang,
-  parseFrameRate, showFrameRate, parseSAR,
+  parseFrameRate, showFrameRate, parseAR,
 } from "../util";
 
 @useSheet({
@@ -41,7 +41,7 @@ export default class extends React.PureComponent {
   }
   getResolution(track) {
     const {width, height, sample_aspect_ratio} = track;
-    const sar = parseSAR(sample_aspect_ratio);
+    const sar = parseAR(sample_aspect_ratio);
     let dwidth = width;
     let dheight = height;
     if (sar > 1) {

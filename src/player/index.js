@@ -8,7 +8,7 @@ import cx from "classnames";
 import {jss, useSheet} from "../jss";
 import {Icon} from "../theme";
 import MPV from "../mpv";
-import {parseTime, showTime, parseSAR, tryRun} from "../util";
+import {parseTime, showTime, parseAR, tryRun} from "../util";
 
 @useSheet({
   player: {
@@ -365,7 +365,7 @@ class CropArea extends React.PureComponent {
   }
   getTrackDims() {
     const {width, height} = this.props.vtrack;
-    const sar = parseSAR(this.props.vtrack.sample_aspect_ratio);
+    const sar = parseAR(this.props.vtrack.sample_aspect_ratio);
     // Displayable video dimensions without taking window size into
     // account. Should be equal to mpv's dwidth/dheight properties.
     let dwidth = width;

@@ -267,18 +267,28 @@ export default class extends React.PureComponent {
         frameParser.reset();
         passn = 2;
         handleLog(this.sep());
-        return run(
-          FFmpeg.getEncodeArgs({baseArgs, passlog, passn, title, outpath})
-        );
+        return run(FFmpeg.getEncodeArgs({
+          baseArgs,
+          passlog, passn,
+          title,
+          outpath,
+        }));
       });
     }
     if (!test && preview != null) {
       videop = videop.then(() => {
+        const {_finalw: width, _finalh: height, _sar: sar} = this.props;
         const inpath = Number.isFinite(preview) ? source.path : preview;
         const time = Number.isFinite(preview) ? preview : null;
         outpath = this.tmpPreviewName;
         handleLog(this.sep());
-        return run(FFmpeg.getPreviewArgs({inpath, time, vcodec, outpath}));
+        return run(FFmpeg.getPreviewArgs({
+          inpath,
+          time,
+          vcodec,
+          width, height, sar,
+          outpath,
+        }));
       }).then(() => {
         const inpath = this.tmpTestName;
         const prevpath = outpath;

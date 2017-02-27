@@ -128,12 +128,11 @@ export default makeRunner("ffmpeg", {
   },
   getRawArgs(opts) {
     const args = [];
-    const scale = [];
     const crop = [];
+    const scale = [];
     const subtitles = [];
     const vfilters = [];
     const afilters = [];
-    const round2 = (s) => `floor((${s}+1)/2)*2`;
 
     // Input.
     if (opts.start != null) {
@@ -212,35 +211,14 @@ export default makeRunner("ffmpeg", {
     if (crop.length) {
       vfilters.push(`crop=${crop.join(":")}`);
     }
-    if (opts.fixSAR && opts._sar !== 1) {
-      if (opts.scalew == null && opts.scaleh == null) {
-        if (opts._sar > 1) {
-          scale.push("iw");
-          scale.push(round2("iw/dar"));
-        } else {
-          scale.push(round2("ih*dar"));
-          scale.push("ih");
-        }
-      } else if (opts.scalew == null) {
-        scale.push(round2(`${opts.scaleh}*dar`));
-        scale.push(opts.scaleh);
-      } else if (opts.scaleh == null) {
-        scale.push(opts.scalew);
-        scale.push(round2(`${opts.scalew}/dar`));
-      } else {
-        // Use unchanged user's values, just reset SAR.
-        scale.push(opts.scalew);
-        scale.push(opts.scaleh);
+    // Scaling must be done once, after crop.
+    if (opts.fixSAR || opts.scalew != null || opts.scaleh != null) {
+      scale.push(opts._finalw);
+      scale.push(opts._finalh);
+      vfilters.push(`scale=${scale.join(":")}`);
+      if (opts.fixSAR) {
+        vfilters.push("setsar=1");
       }
-      vfilters.push(`scale=${scale.join(":")}`);
-      // Clear minor SAR changes.
-      vfilters.push("setsar=1");
-    } else if (opts.scalew != null || opts.scaleh != null) {
-      // Rounding to even is not neccessary with libvpx but e.g. 854x480
-      // is much nicer than 853x480 when scaling to 480p.
-      scale.push(opts.scalew == null ? -2 : opts.scalew);
-      scale.push(opts.scaleh == null ? -2 : opts.scaleh);
-      vfilters.push(`scale=${scale.join(":")}`);
     }
     if (opts.burnSubs) {
       // Workaround for <https://trac.ffmpeg.org/ticket/2067>.

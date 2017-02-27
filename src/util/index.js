@@ -88,13 +88,17 @@ export function showFrameRate(rate) {
   return (rate % 1 ? rate.toFixed(3) : rate) + " fps";
 }
 
-export function parseSAR(ratio) {
+export function parseAR(ratio) {
   ratio = ratio || "";
   let [num, den] = ratio.split(":", 2);
   // Invalid/unknown value is marked as "0:1".
   num = parseInt(num, 10) || 0;
   den = parseInt(den, 10) || 1;
-  return num ? num / den : 1;
+  return (num && den) ? (num / den) : 1;
+}
+
+export function round2(n) {
+  return Math.floor((n + 1) / 2) * 2;
 }
 
 export function showErr(err) {
