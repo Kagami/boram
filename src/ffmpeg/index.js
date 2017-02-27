@@ -386,7 +386,7 @@ export default makeRunner("ffmpeg", {
     args.push(
       "-f", "concat", "-safe", "0", "-i", this._escapeFilename(listpath),
       "-itsoffset", "0.04", "-i", this._escapeFilename(inpath),
-      "-map", "0:v", "-map", "1:a?",
+      "-map", "0:v:0", "-map", "1:a:0?",
       "-c", "copy",
       "-f", "webm", this._escapeFilename(outpath)
     );

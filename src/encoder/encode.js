@@ -281,7 +281,7 @@ export default class extends React.PureComponent {
         return run(FFmpeg.getPreviewArgs({inpath, time, vcodec, outpath}));
       }).then(() => {
         const inpath = this.tmpTestName;
-        const prevpath = this.tmpPreviewName;
+        const prevpath = outpath;
         const listpath = this.tmpConcatName;
         outpath = listpath;
         FFmpeg.writeConcat({inpath, prevpath, outpath});
