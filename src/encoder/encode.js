@@ -317,8 +317,8 @@ export default class extends React.PureComponent {
   cancel() {
     // `start` will fail into error state automatically.
     try {
-      // No need to wait for graceful exit on TERM.
-      // We just want it to stop.
+      // No need to wait for graceful exit, we just want it to stop.
+      // Exit after SIGTERM might take tens of seconds.
       this.ff.kill("SIGKILL");
     } catch (e) {
       /* skip */

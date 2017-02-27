@@ -47,7 +47,6 @@ export default class extends React.PureComponent {
   componentWillUnmount() {
     this.props.events.removeListener("abort", this.abort);
   }
-  canceling = false;
   handleDownload = () => {
     this.setState({progress: 0, status: "spawning youtube-dl", error: null});
     this.props.onProgress(0);
@@ -67,10 +66,7 @@ export default class extends React.PureComponent {
     }, (error) => {
       const progress = 0;
       this.props.onProgress(progress);
-      // Prevent `setState` on unmounted component.
-      if (!this.canceling) {
-        this.setState({progress, error});
-      }
+      this.setState({progress, error});
     });
   };
   // ytdl doesn't clean after itself, so here we go...
@@ -102,8 +98,6 @@ export default class extends React.PureComponent {
     this.cleanYT();
   };
   handleCancel = () => {
-    // Next time component will be recreated.
-    this.canceling = true;
     this.abort();
     try { fs.unlinkSync(this.sourceName); } catch (e) { /* skip */ }
     this.props.onCancel();
