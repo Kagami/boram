@@ -346,9 +346,17 @@ export default makeRunner("ffmpeg", {
       "color=#DDDDDD",
       `size=${width}x${height}`,
     ].join(":");
-    const scale = [
-      width,
-      height,
+    // Clear SAR because "force_original_aspect_ratio" doesn't take it
+    // into account. It shouldn't affect quality much.
+    // Note that it will downscale for DAR > 1 and upscale otherwise.
+    const scale1 = [
+      "iw",
+      "iw/dar",
+    ].join(":");
+    const scale2 = [
+      // Avoid gray border.
+      width + 1,
+      height + 1,
       "force_original_aspect_ratio=decrease",
     ].join(":");
     const overlay = [
@@ -356,7 +364,7 @@ export default makeRunner("ffmpeg", {
       "(H-h)/2",
     ].join(":");
     const vf = [
-      `setpts=PTS-STARTPTS,scale=${scale}[main]`,
+      `setpts=PTS-STARTPTS,scale=${scale1},scale=${scale2}[main]`,
       `color=${color}[bg]`,
       `[bg][main]overlay=${overlay}`,
     ].join(";");

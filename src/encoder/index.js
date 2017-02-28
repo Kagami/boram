@@ -128,17 +128,13 @@ export default class extends React.PureComponent {
     const {sample_aspect_ratio} = this.getVideoTracks()[vtrackn];
     return parseAR(sample_aspect_ratio);
   }
-  getDAR(vtrackn) {
-    const {display_aspect_ratio} = this.getVideoTracks()[vtrackn];
-    return parseAR(display_aspect_ratio);
-  }
   isAnamorph(vtrackn) {
     return this.getSAR(vtrackn) !== 1;
   }
   getFinalWidth({vtrackn, scalew, scaleh, cropw, fixSAR}) {
     const {width, height} = this.getVideoTracks()[vtrackn];
     const sar = this.getSAR(vtrackn);
-    const dar = this.getDAR(vtrackn);
+    const dar = width / height * sar;
     if (scalew) {
       return scalew;
     } else if (scaleh) {
@@ -152,7 +148,7 @@ export default class extends React.PureComponent {
   getFinalHeight({vtrackn, scalew, scaleh, croph, fixSAR}) {
     const {width, height} = this.getVideoTracks()[vtrackn];
     const sar = this.getSAR(vtrackn);
-    const dar = this.getDAR(vtrackn);
+    const dar = width / height * sar;
     if (scaleh) {
       return scaleh;
     } else if (scalew) {
