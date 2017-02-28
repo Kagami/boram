@@ -240,7 +240,8 @@ export default class extends React.PureComponent {
 
     // TODO(Kagami): This won't work with VFR or wrong FPS value. Use
     // the exact number of frames in video after first pass?
-    const fps = parseFrameRate(this.props.vtrack.avg_frame_rate);
+    const {avg_frame_rate: strfps} = this.props.vtrack;
+    const fps = parseFrameRate(strfps);
     const totalFrames = Math.ceil(this.props._duration * fps);
     const passlog = this.tmpLogName;
     const {source, vcodec} = this.props;
@@ -285,8 +286,7 @@ export default class extends React.PureComponent {
         return run(FFmpeg.getPreviewArgs({
           inpath,
           time,
-          vcodec,
-          width, height, sar,
+          vcodec, width, height, sar, strfps,
           outpath,
         }));
       }).then(() => {
@@ -297,7 +297,7 @@ export default class extends React.PureComponent {
         FFmpeg.writeConcat({inpath, prevpath, outpath});
         outpath = target;
         handleLog(this.sep());
-        return run(FFmpeg.getConcatArgs({inpath, listpath, outpath}));
+        return run(FFmpeg.getConcatArgs({inpath, listpath, fps, outpath}));
       });
     }
     videop.then(() => {

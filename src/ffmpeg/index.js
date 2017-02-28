@@ -339,7 +339,7 @@ export default makeRunner("ffmpeg", {
     }
     return args;
   },
-  getPreviewArgs({inpath, time, vcodec, width, height, sar, outpath}) {
+  getPreviewArgs({inpath, time, vcodec, width, height, sar, strfps, outpath}) {
     width = sar > 1 ? Math.round(width * sar) : width;
     height = sar < 1 ? Math.round(height / sar) : height;
     const color = [
@@ -369,7 +369,7 @@ export default makeRunner("ffmpeg", {
       "-i", this._escapeFilename(inpath),
       "-c:v", vcodec, "-b:v", "0", "-crf", "30",
       "-vf", vf,
-      "-r", "25",
+      "-r", strfps,
       // Let FFmpeg auto-select video track.
       "-an", "-sn", "-dn",
       "-frames:v", "1",
@@ -384,11 +384,11 @@ export default makeRunner("ffmpeg", {
       this._escapeConcatArg(inpath),
     ].join("\n"));
   },
-  getConcatArgs({inpath, listpath, outpath}) {
+  getConcatArgs({inpath, listpath, fps, outpath}) {
     const args = this._getCommonArgs();
     args.push(
       "-f", "concat", "-safe", "0", "-i", this._escapeFilename(listpath),
-      "-itsoffset", "0.04", "-i", this._escapeFilename(inpath),
+      "-itsoffset", ceilFixed(1 / fps, 3), "-i", this._escapeFilename(inpath),
       "-map", "0:v:0", "-map", "1:a:0?",
       "-c", "copy",
       "-f", "webm", this._escapeFilename(outpath)
