@@ -3,7 +3,7 @@
  * @module boram/index/renderer
  */
 
-import inputMenu from "electron-input-menu";
+import {mkInputMenu} from "electron-input-menu";
 import context from "electron-contextmenu-middleware";
 import React from "react";
 import ReactDOM from "react-dom";
@@ -80,7 +80,10 @@ class Index extends React.PureComponent {
   }
 }
 
-// See <https://github.com/electron/electron/issues/4068>.
+const inputMenu = mkInputMenu(function(node) {
+  if (node.hasAttribute("data-boram-input-menu-disabled")) return false;
+  return node.matches("input, textarea, [contenteditable]");
+});
 context.use(inputMenu);
 context.activate();
 

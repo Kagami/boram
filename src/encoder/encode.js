@@ -466,7 +466,9 @@ export default class extends React.PureComponent {
   }
   handlePreviewReset = (e) => {
     e.preventDefault();
-    this.setState({preview: null});
+    if (e.buttons === 1) {
+      this.setState({preview: null});
+    }
   };
   handlePreviewTime = () => {
     this.setState({preview: this.props.onGetTime()});
@@ -532,6 +534,7 @@ export default class extends React.PureComponent {
                   height={30}
                   style={{cursor: "pointer"}}
                   readOnly
+                  data-boram-input-menu-disabled
                   value={this.getPrettyPreview()}
                   disabled={this.props.encoding}
                   onMouseDown={this.handlePreviewReset}
