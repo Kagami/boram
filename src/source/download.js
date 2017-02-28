@@ -59,6 +59,8 @@ export default class extends React.PureComponent {
       this.props.onProgress(progress);
     });
     this.ytdl.then(() => {
+      const progress = 100;
+      this.props.onProgress(progress);
       // We hope ytdl already made all correct escapings.
       const saveAs = info._filename;
       const title = `${info.title} <${url}>`;
