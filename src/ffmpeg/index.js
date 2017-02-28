@@ -6,7 +6,11 @@
 import assert from "assert";
 import fs from "fs";
 import os from "os";
-import {ceilFixed, makeRunner, escapeArg, fixOpt, clearOpt} from "../util";
+import {
+  ceilFixed, showTime,
+  escapeArg, fixOpt, clearOpt,
+  makeRunner,
+} from "../util";
 if (BORAM_WIN_BUILD) {
   if (BORAM_X64_BUILD) {
     require.context("../../bin/win64/bin-video", false,
@@ -190,7 +194,7 @@ export default makeRunner("ffmpeg", {
     // across various decoders is still poor.
     args.push("-pix_fmt", "yuv420p");
 
-    // Video filters.
+    // Video effects.
     // Deinterlacing must be always first.
     if (opts.deinterlace) {
       vfilters.push("yadif");
@@ -335,15 +339,36 @@ export default makeRunner("ffmpeg", {
     }
     return args;
   },
-  getPreviewArgs({inpath, time, vcodec, outpath}) {
+  getPreviewArgs({inpath, time, vcodec, width, height, sar, outpath}) {
+    width = sar > 1 ? Math.round(width * sar) : width;
+    height = sar < 1 ? Math.round(height / sar) : height;
+    const color = [
+      "color=#DDDDDD",
+      `size=${width}x${height}`,
+    ].join(":");
+    const scale = [
+      width,
+      height,
+      "force_original_aspect_ratio=decrease",
+    ].join(":");
+    const overlay = [
+      "(W-w)/2",
+      "(H-h)/2",
+    ].join(":");
+    const vf = [
+      `setpts=PTS-STARTPTS,scale=${scale}[main]`,
+      `color=${color}[bg]`,
+      `[bg][main]overlay=${overlay}`,
+    ].join(";");
+
     const args = this._getCommonArgs();
     if (time != null) {
-      args.push("-ss", time.toString());
+      args.push("-ss", showTime(time));
     }
-    // FIXME(Kagami): Scale to target resolution.
     args.push(
       "-i", this._escapeFilename(inpath),
       "-c:v", vcodec, "-b:v", "0", "-crf", "30",
+      "-vf", vf,
       "-r", "25",
       // Let FFmpeg auto-select video track.
       "-an", "-sn", "-dn",
