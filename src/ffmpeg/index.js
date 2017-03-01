@@ -220,7 +220,8 @@ export default makeRunner("ffmpeg", {
       scale.push(opts._finalw);
       scale.push(opts._finalh);
       vfilters.push(`scale=${scale.join(":")}`);
-      if (opts.fixSAR) {
+      if (opts.fixSAR || !opts._anamorph) {
+        // Clear minor AR difference after round to 2.
         vfilters.push("setsar=1");
       }
     }

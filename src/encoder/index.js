@@ -373,6 +373,7 @@ export default class extends React.PureComponent {
     const induration = this.getFullDuration();
     const useExtSub = strackn === this.getSubTracks().length;
     const focused = null;
+    const _anamorph = this.isAnamorph(vtrackn);
     // Will contain exact values.
     let _start = null;
     let _duration = null;
@@ -513,7 +514,7 @@ export default class extends React.PureComponent {
       this.refs.player.setDeinterlace(deinterlace);
     }
     if (what.selected === "vtrackn") {
-      fixSAR = this.isAnamorph(vtrackn);
+      fixSAR = _anamorph;
       this.setState({fixSAR});
     }
     if (what.selected === "strackn" ||
@@ -542,6 +543,7 @@ export default class extends React.PureComponent {
       // helpers.
       inpath, atrack,
       _start, _duration,
+      _anamorph,
     };
     const _vb = opts.vb = FFmpeg.getVideoBitrate(opts);
     const _finalw = opts._finalw = this.getFinalWidth(opts);
@@ -566,7 +568,7 @@ export default class extends React.PureComponent {
                         ${SMALL_OTHER_BITRATE}÷${BIG_OTHER_BITRATE} (other)`);
       }
     }
-    if (this.isAnamorph(vtrackn) && !fixSAR) {
+    if (_anamorph && !fixSAR) {
       warn("videoFX", `Output anamorphic video,
                        some players will handle it poorly`);
     }
