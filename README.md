@@ -10,7 +10,7 @@
 * Industry-grade codec settings, considered defaults
 * Can download source from almost any streaming site, thanks to [youtube-dl](https://rg3.github.io/youtube-dl/)
 * Displays almost any video with embedded player, thanks to [mpv](https://mpv.io/)
-* Supports hardsubbing out of the box, automatically setups Fontconfig on Windows
+* Hardsubbing out of the box with proper shift/track select
 * Simple yet powerful interface, source video centric design
 * Multiple encodes at once in single window
 * Fast filters result preview, no need to go through trial and error
@@ -21,9 +21,9 @@
 
 Download [latest release](https://github.com/Kagami/boram/releases), unpack and run `boram.exe`. 64-bit (x64) releases are preferred.
 
-### Mac OS
+### macOS
 
-Download [latest release](https://github.com/Kagami/boram/releases), unpack and run `boram`.
+Download [latest release](https://github.com/Kagami/boram/releases), unpack, righ-click `boram` app in Finder, select Open and Open. Zip releases can be extracted with standard tools but weight more.
 
 ### Linux
 
