@@ -21,7 +21,9 @@ export function getPluginPath() {
     : (BORAM_MAC_BUILD ? "libboram.dylib" : "libboram.so");
   const fullPluginPath = path.join(APP_PATH, pluginName);
   let pluginPath = path.relative(process.cwd(), fullPluginPath);
-  // "plugin.so" doesn't work, "./plugin.so" is required.
-  pluginPath = `.${path.sep}${pluginPath}`;
+  if (path.dirname(pluginPath) === ".") {
+    // "plugin.so" doesn't work, "./plugin.so" is required.
+    pluginPath = `.${path.sep}${pluginPath}`;
+  }
   return containsNonASCII(pluginPath) ? null : pluginPath;
 }
