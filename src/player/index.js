@@ -217,6 +217,7 @@ export default class extends React.PureComponent {
         <div className={classes.playerInner}>
           <MPV
             ref="mpv"
+            events={this.props.events}
             src={this.props.source.path}
             onPlayPause={this.handlePlayPause}
             onTime={this.handleTime}

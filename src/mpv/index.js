@@ -24,12 +24,21 @@ if (BORAM_WIN_BUILD) {
 })
 export default class extends React.PureComponent {
   componentDidMount() {
-    // TODO(Kagami): Handle plugin init errors.
+    this.props.events.addListener("abort", this.abort);
     this.refs.plugin.addEventListener("message", this.handleMessage, false);
   }
   componentWillUnmount() {
     this.refs.plugin.removeEventListener("message", this.handleMessage, false);
+    this.props.events.removeListener("abort", this.abort);
   }
+  abort = (quit) => {
+    if (quit) {
+      // Terminate mpv synchronously before the "quit" event.
+      // Important on Windows because we can't cleanup temporal sources
+      // opened in mpv before it's closed.
+      this.getNode().remove();
+    }
+  };
   getNode() {
     return this.refs.plugin;
   }

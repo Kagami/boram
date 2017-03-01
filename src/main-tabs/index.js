@@ -127,7 +127,7 @@ export default class extends React.Component {
   };
   abort() {
     for (let i = 0; i < this.state.tabs.length; i++) {
-      this.getInstance(i).abort();
+      this.getInstance(i).abort(true);
     }
   }
   handleTitleChange = (i, label = DEFAULT_LABEL) => {

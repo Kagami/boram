@@ -640,6 +640,7 @@ export default class extends React.PureComponent {
       <Pane vertical style1={styles.item1} size2={340}>
         <Player
           ref="player"
+          events={this.props.events}
           active={this.props.active}
           source={this.props.source}
           format={this.props.info.format}
