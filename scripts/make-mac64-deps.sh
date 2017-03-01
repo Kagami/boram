@@ -7,7 +7,7 @@ mkdir dist
 
 # TODO: fribidi[-glib,-pcre], freetype[-png]
 brew install libass --build-from-source --without-harfbuzz
-brew install ffmpeg --without-lame --without-xvid --with-libvpx --with-libvorbis --with-opus --with-libass
+brew install ffmpeg --HEAD --without-lame --without-xvid --with-libvpx --with-libvorbis --with-opus --with-libass
 brew install mpv --without-jpeg --without-little-cms2 --without-lua --without-youtube-dl
 
 DEPS="
@@ -35,3 +35,6 @@ set +x
 for dep in $DEPS; do
   copy_deps $dep
 done
+
+set -x
+install_name_tool -change /System/Library/Frameworks/CoreImage.framework/Versions/A/CoreImage /System/Library/Frameworks/QuartzCore.framework/Versions/A/Frameworks/CoreImage.framework/Versions/A/CoreImage dist/libavfilter.6.dylib
