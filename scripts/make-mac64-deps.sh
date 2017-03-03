@@ -5,7 +5,10 @@ cd "$( dirname "${BASH_SOURCE[0]}" )"
 rm -rf dist
 mkdir dist
 
-# TODO: fribidi[-glib,-pcre], freetype[-png]
+# TODO(Kagami): Edit formulae for fribidi[-glib,-pcre], freetype[-png].
+# Needs ffmpeg-HEAD for:
+# - <https://github.com/FFmpeg/FFmpeg/commit/70ebc05>
+# - <https://github.com/FFmpeg/FFmpeg/commit/20e8be0>
 brew install libass --build-from-source --without-harfbuzz
 brew install ffmpeg --HEAD --without-lame --without-xvid --with-libvpx --with-libvorbis --with-opus --with-libass
 brew install mpv --without-jpeg --without-little-cms2 --without-lua --without-youtube-dl
@@ -37,4 +40,5 @@ for dep in $DEPS; do
 done
 
 set -x
+# See <https://github.com/Kagami/boram/issues/11>.
 install_name_tool -change /System/Library/Frameworks/CoreImage.framework/Versions/A/CoreImage /System/Library/Frameworks/QuartzCore.framework/Versions/A/Frameworks/CoreImage.framework/Versions/A/CoreImage dist/libavfilter.6.dylib
