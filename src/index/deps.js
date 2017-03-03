@@ -29,7 +29,6 @@ function hasLibrary(lib) {
 }
 
 export function checkLinuxDeps() {
-  // TODO(Kagami): Check for version and required codecs?
   if (!hasBinary("ffmpeg")) {
     throw new Error("ffmpeg not found");
   }

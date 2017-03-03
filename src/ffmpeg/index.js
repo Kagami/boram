@@ -52,7 +52,8 @@ export default makeRunner("ffmpeg", {
     return `file '${arg}'`;
   },
   hasInterlace({inpath, vtrackn, start}) {
-    // TODO(Kagami): BFF?
+    // TODO(Kagami): BFF, telecine? Note that telecine might be
+    // incorrectly detected as TFF but needs "pullup" filter to fix.
     start = (start + 5).toString();
     return this._run([
       "-v", "error", "-nostdin", "-y",
