@@ -10,7 +10,7 @@
 * Industry-grade codec settings, considered defaults
 * Can download source from almost any streaming site, thanks to [youtube-dl](https://rg3.github.io/youtube-dl/)
 * Displays almost any video with embedded player, thanks to [mpv](https://mpv.io/)
-* Hardsubbing out of the box with proper shift/track select
+* Hardsubbing out of the box with proper shift/track selection
 * Simple yet powerful interface, source video centric design
 * Multiple encodes at once in single window
 * Fast filters result preview, no need to go through trial and error
