@@ -3,7 +3,7 @@
  * @module boram/index/renderer
  */
 
-import {mkInputMenu} from "electron-input-menu";
+import {mkInputMenu, defaultIsEditable} from "electron-input-menu";
 import context from "electron-contextmenu-middleware";
 import React from "react";
 import ReactDOM from "react-dom";
@@ -81,8 +81,7 @@ class Index extends React.PureComponent {
 }
 
 const inputMenu = mkInputMenu(function(node) {
-  if (node.hasAttribute("data-boram-input-menu-disabled")) return false;
-  return node.matches("input, textarea, [contenteditable]");
+  return defaultIsEditable(node) && !node.dataset.boramInputMenuDisabled;
 });
 context.use(inputMenu);
 context.activate();
