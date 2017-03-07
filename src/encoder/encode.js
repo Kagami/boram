@@ -541,7 +541,7 @@ export default class extends React.PureComponent {
                 />
                 <div>
                   <SmallButton
-                    icon={<Icon name="tv" />}
+                    icon={<Icon name="clock-o" />}
                     title="Use current video frame as a preview"
                     disabled={this.props.encoding}
                     onClick={this.handlePreviewTime}
