@@ -23,7 +23,7 @@ Download [latest release](https://github.com/Kagami/boram/releases), unpack and 
 
 ### macOS
 
-Download [latest release](https://github.com/Kagami/boram/releases), unpack, righ-click `boram` app in Finder, select Open and Open. Zip releases can be extracted with standard tools but weight more.
+Download [latest release](https://github.com/Kagami/boram/releases), unpack, righ-click `boram` app in Finder, select Open and Open.
 
 ### Linux
 
