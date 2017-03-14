@@ -30,7 +30,11 @@ if (process.env.BORAM_NO_HWACCEL) {
 }
 // Plugin checks and setup. Can't be run on ready.
 (function() {
-  app.commandLine.appendSwitch("ignore-gpu-blacklist");
+  // Broken since 1.6.2. See:
+  // <https://github.com/electron/electron/issues/8807>.
+  if (!BORAM_MAC_BUILD) {
+    app.commandLine.appendSwitch("ignore-gpu-blacklist");
+  }
   if (!BORAM_LIN_BUILD) {
     // Workaround issue with non-ASCII paths. Can't use on Linux because
     // renderer process is spawned by zygote which don't inherit our
