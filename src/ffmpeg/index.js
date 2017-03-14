@@ -162,10 +162,14 @@ export default makeRunner("ffmpeg", {
     // Video.
     args.push("-threads", os.cpus().length);
     if (opts.vcodec === "vp9") {
-      args.push("-c:v", "libvpx-vp9", "-speed", "1");
-      // In case default will change.
-      args.push("-tile-columns", "6");
-      // frame-parallel should be disabled.
+      args.push("-c:v", "libvpx-vp9");
+      args.push("-speed", opts.modeMT === "no-mt" ? "0" : "1");
+      if (opts.modeMT !== "no-mt") {
+        args.push("-tile-columns", "6");
+      }
+      if (opts.modeMT === "row-mt") {
+        args.push("-row-mt", "1");
+      }
       args.push("-frame-parallel", "0");
     } else if (opts.vcodec === "vp8") {
       // TODO(Kagami): Tune slices setting?
@@ -304,6 +308,7 @@ export default makeRunner("ffmpeg", {
     clearOpt(args, [
       "-b:v",
       "-speed",
+      "-row-mt",
       "-tile-columns",
       "-frame-parallel",
       "-auto-alt-ref",

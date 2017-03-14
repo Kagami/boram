@@ -105,6 +105,10 @@ export default class extends React.PureComponent {
     mode2Pass: true,
     modeLimit: true,
     modeCRF: this.isShortClip(),
+    // We use distro-provided packages of FFmpeg on Linux so no
+    // guarantees it's fresh enough. Might check caps with
+    // `-h encoder=libvpx-vp9` though.
+    modeMT: (BORAM_LIN_BUILD && !BORAM_DEBUG) ? "tile-col" : "row-mt",
     rawArgs: "",
   };
   componentDidMount() {
@@ -364,6 +368,7 @@ export default class extends React.PureComponent {
     const mode2Pass = get("mode2Pass");
     const modeLimit = get("modeLimit");
     const modeCRF = get("modeCRF");
+    const modeMT = get("modeMT");
     let rawArgs = "";
     // Helpers.
     const inpath = this.props.source.path;
@@ -539,7 +544,7 @@ export default class extends React.PureComponent {
       start, end,
       vcodec, limit, quality,
       acodec, ab,
-      mode2Pass, modeLimit, modeCRF,
+      mode2Pass, modeLimit, modeCRF, modeMT,
       // helpers.
       inpath, atrack,
       _start, _duration,
@@ -738,6 +743,7 @@ export default class extends React.PureComponent {
               mode2Pass={this.state.mode2Pass}
               modeLimit={this.state.modeLimit}
               modeCRF={this.state.modeCRF}
+              modeMT={this.state.modeMT}
               onUpdate={this.handleAll}
               onRawArgs={this.handleRawArgs}
               onFragmentReset={this.handleFragmentReset}

@@ -177,6 +177,20 @@ export default class extends React.PureComponent {
               checked={this.props.modeCRF}
               onCheck={this.props.makeChecker("modeCRF")}
             />
+            <Sep margin={7} />
+            <ShowHide show={this.props.vcodec === "vp9"}>
+              <SmallSelect
+                width={85}
+                title="Multi-threading mode"
+                value={this.props.modeMT}
+                disabled={this.props.encoding}
+                onChange={this.props.makeSelecter("modeMT")}
+              >
+                <MenuItem value="row-mt" primaryText="row-mt" />
+                <MenuItem value="tile-col" primaryText="tile-col" />
+                <MenuItem value="no-mt" primaryText="no-mt" />
+              </SmallSelect>
+            </ShowHide>
           </Prop>
         </HelpPane>
         <Prop name="raw args" nameClassName={classes.nameArgs}>
