@@ -8,7 +8,7 @@
     "dev": "electron dist/app",
     "test": "eslint .",
     "app": "rm -rf dist/app && NODE_ENV=production webpack",
-    "fix-lin64-ffmpeg": "[ \"${NODE_ENV}\" = production ] && cd dist/*linux-x64 || cd node_modules/electron/dist; rm libffmpeg.so && nm -D electron | awk '/ \\w (av|ff)/{print $3}' | xargs rebind -w electron",
+    "fix-lin64-ffmpeg": "[ \"${NODE_ENV}\" = production ] && cd dist/*linux-x64 || cd node_modules/electron/dist; rm libffmpeg.so; nm -D electron | awk '/ \\w (av|ff)/{print $3}' | xargs rebind -w electron || nm -D boram | awk '/ \\w (av|ff)/{print $3}' | xargs rebind -w boram",
     "mpv-lin64-dev": "rm -f \"${BORAM_WIN_PREBUILT_ROOT}\"/boram*.node && rm -f \"${BORAM_MAC_PREBUILT_ROOT}/boram.node\" && node-gyp rebuild && cp build/Release/boram.node dist/app/libboram.so && cp build/Release/checklib dist/app",
     "mpv-win32-prebuild": "del E:\\boram32.node && node-gyp rebuild --arch=ia32 && copy build\\Release\\boram.node E:\\boram32.node",
     "mpv-win64-prebuild": "del E:\\boram64.node && node-gyp rebuild --arch=x64 && copy build\\Release\\boram.node E:\\boram64.node",
