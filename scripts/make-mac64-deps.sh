@@ -6,10 +6,14 @@ rm -rf dist
 mkdir dist
 
 # TODO(Kagami): Edit formulae for fribidi[-glib,-pcre], freetype[-png].
-# Needs ffmpeg-HEAD for:
+# Need libvpx-HEAD for:
+# - <https://groups.google.com/a/webmproject.org/forum/#!topic/codec-devel/oiHjgEdii2U>
+# Need ffmpeg-HEAD for:
 # - <https://github.com/FFmpeg/FFmpeg/commit/70ebc05>
 # - <https://github.com/FFmpeg/FFmpeg/commit/20e8be0>
+# - <https://github.com/FFmpeg/FFmpeg/commit/734d760>
 brew install libass --build-from-source --without-harfbuzz
+brew install libvpx --HEAD
 brew install ffmpeg --HEAD --without-lame --without-xvid --with-libvpx --with-libvorbis --with-opus --with-libass
 brew install mpv --without-jpeg --without-little-cms2 --without-lua --without-youtube-dl
 
