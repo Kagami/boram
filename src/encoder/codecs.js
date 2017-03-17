@@ -96,7 +96,7 @@ export default class extends React.PureComponent {
                 title="Resulting duration, click to reset"
                 onClick={this.props.onFragmentReset}
               >
-                ({showTime(this.props._duration)})
+                ({showTime(this.props._duration, {ceil: true})})
               </span>
             </ShowHide>
           </Prop>
