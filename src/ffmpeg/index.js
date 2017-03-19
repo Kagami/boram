@@ -164,9 +164,7 @@ export default makeRunner("ffmpeg", {
     if (opts.vcodec === "vp9") {
       args.push("-c:v", "libvpx-vp9");
       args.push("-speed", opts.modeMT === "no-mt" ? "0" : "1");
-      if (opts.modeMT !== "no-mt") {
-        args.push("-tile-columns", "6");
-      }
+      args.push("-tile-columns", opts.modeMT === "no-mt" ? "0" : "6");
       if (opts.modeMT === "row-mt") {
         args.push("-row-mt", "1");
       }
