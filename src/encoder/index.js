@@ -135,12 +135,15 @@ export default class extends React.PureComponent {
   isAnamorph(vtrackn) {
     return this.getSAR(vtrackn) !== 1;
   }
-  getFinalWidth({vtrackn, scalew, scaleh, cropw, fixSAR}) {
+  getFinalWidth({vtrackn, scalew, scaleh, cropw, croph, fixSAR}) {
     const {width, height} = this.getVideoTracks()[vtrackn];
     const sar = this.getSAR(vtrackn);
     const dar = width / height * sar;
     if (scalew) {
       return scalew;
+    } else if (scaleh && (cropw || croph)) {
+      const ar = (cropw || width) / (croph || height);
+      return round2(scaleh * ((fixSAR && sar > 1) ? ar * sar : ar));
     } else if (scaleh) {
       return round2(scaleh * ((fixSAR || sar === 1) ? dar : sar));
     } else if (cropw) {
@@ -149,12 +152,15 @@ export default class extends React.PureComponent {
       return (fixSAR && dar < 1) ? round2(height * dar) : width;
     }
   }
-  getFinalHeight({vtrackn, scalew, scaleh, croph, fixSAR}) {
+  getFinalHeight({vtrackn, scalew, scaleh, cropw, croph, fixSAR}) {
     const {width, height} = this.getVideoTracks()[vtrackn];
     const sar = this.getSAR(vtrackn);
     const dar = width / height * sar;
     if (scaleh) {
       return scaleh;
+    } else if (scalew && (cropw || croph)) {
+      const ar = (cropw || width) / (croph || height);
+      return round2(scalew / ((fixSAR && sar < 1) ? ar / sar : ar));
     } else if (scalew) {
       return round2(scalew / ((fixSAR || sar === 1) ? dar : sar));
     } else if (croph) {

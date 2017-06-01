@@ -482,6 +482,8 @@ class CropArea extends React.PureComponent {
     if (cropw == null && croph == null) return this.clearCrop();
     // We allow to skip some values in UI, so need to emulate lavfi's
     // crop behavior.
+    if (cropw == null) cropx = 0;
+    if (croph == null) cropy = 0;
     cropw = cropw == null ? width : cropw;
     croph = croph == null ? height : croph;
     cropx = cropx == null ? (width - cropw) / 2 : cropx;
