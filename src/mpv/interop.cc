@@ -38,6 +38,7 @@ static const std::unordered_map<std::string, void*> GL_CALLBACKS = {
   GLCB(BindTexture),
   GLCB(BlendFuncSeparate),
   GLCB(BufferData),
+  GLCB(BufferSubData),
   GLCB(Clear),
   GLCB(ClearColor),
   GLCB(CompileShader),
