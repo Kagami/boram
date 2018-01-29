@@ -108,6 +108,7 @@ export default class extends React.PureComponent {
             >
               <MenuItem value="vp9" primaryText="vp9" />
               <MenuItem value="vp8" primaryText="vp8" />
+              <MenuItem value="x264" primaryText="x264" />
             </SmallSelect>
             <Sep/>
             <SmallInput
@@ -192,6 +193,28 @@ export default class extends React.PureComponent {
               </SmallSelect>
             </ShowHide>
           </Prop>
+          <ShowHide show={this.props.vcodec === "x264"}>
+            <Prop name="preset" valueClassName={classes.valueCheck}>
+              <SmallSelect
+                width={100}
+                title="Preset mode"
+                value={this.props.preset}
+                disabled={this.props.encoding}
+                onChange={this.props.makeSelecter("preset")}
+              >
+                <MenuItem value="ultrafast" primaryText="ultrafast" />
+                <MenuItem value="superfast" primaryText="superfast" />
+                <MenuItem value="veryfast" primaryText="veryfast" />
+                <MenuItem value="faster" primaryText="faster" />
+                <MenuItem value="fast" primaryText="fast" />
+                <MenuItem value="medium" primaryText="medium" />
+                <MenuItem value="slow" primaryText="slow" />
+                <MenuItem value="slower" primaryText="slower" />
+                <MenuItem value="veryslow" primaryText="veryslow" />
+                <MenuItem value="placebo" primaryText="placebo" />
+              </SmallSelect>
+            </Prop>
+          </ShowHide>
         </HelpPane>
         <Prop name="raw args" nameClassName={classes.nameArgs}>
           <ArgsInput
