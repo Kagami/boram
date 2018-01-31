@@ -4,7 +4,10 @@ import webpack from "webpack";
 import ExtractTextPlugin from "extract-text-webpack-plugin";
 
 function intree(...parts) {
-  return new RegExp("^" + path.join(__dirname, ...parts) + "$");
+  const escapedDir = __dirname.replace(/\\/g, "\\\\");
+  const escapedSep = path.sep.replace(/\\/g, "\\\\");
+  const escapedPath = [escapedDir].concat(parts).join(escapedSep);
+  return new RegExp("^" + escapedPath + "$", "i");
 }
 
 function infa(...parts) {
