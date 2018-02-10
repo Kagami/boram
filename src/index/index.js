@@ -5,7 +5,7 @@
 
 import fs from "fs";
 import url from "url";
-import {BrowserWindow, app, dialog} from "electron";
+import {BrowserWindow, app, dialog, ipcMain} from "electron";
 import {name, version} from "json!../../package.json";
 import {APP_PATH, ICON_BIG_PATH, WIN_ICON_PATH, PAGE_PATH} from "../shared";
 import {getPluginPath} from "./plugin";
@@ -96,6 +96,7 @@ app.on("ready", () => {
       plugins: true,
     },
   });
+  ipcMain.on("progress", (event, progress) => win.setProgressBar(progress));
   win.setMenu(null);
   win.loadURL(url.format({
     pathname: PAGE_PATH,

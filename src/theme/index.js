@@ -5,6 +5,7 @@
 
 import assert from "assert";
 import React from "react";
+import { ipcRenderer } from "electron";
 import cx from "classnames";
 import Icon from "react-fa";
 import Paper from "material-ui/Paper";
@@ -340,6 +341,7 @@ export const BigButton = (function() {
 
 export function BigProgress(props) {
   const {height, ...other} = props;
+  ipcRenderer.send("progress", props.value / 100);
   const style = {
     height: height || 30,
     borderRadius: 0,
