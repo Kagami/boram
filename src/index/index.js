@@ -97,6 +97,7 @@ app.on("ready", () => {
     },
   });
   ipcMain.on("progress", (event, progress) => win.setProgressBar(progress));
+  ipcMain.on("complete", () => win.setProgressBar(-1));
   win.setMenu(null);
   win.loadURL(url.format({
     pathname: PAGE_PATH,
