@@ -4,6 +4,7 @@
   "private": true,
   "description": "Cross-platform WebM converter",
   "scripts": {
+    "postinstall": "patch -p1 < mui-tabs.patch",
     "start": "rm -rf dist && webpack --watch",
     "dev": "electron dist/app",
     "test": "eslint .",
