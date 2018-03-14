@@ -4,7 +4,7 @@
  */
 
 import {basename} from "path";
-import {remote, ipcRenderer} from "electron";
+import {remote} from "electron";
 import React from "react";
 import cx from "classnames";
 import {ICON_BIG_PATH} from "../shared";
@@ -145,9 +145,9 @@ export default class extends React.Component {
       return acc + curr.progress;
     }, 0);
     const meanProgress = progressSum / totalActiveTabs || 0;
-    ipcRenderer.send("progress", meanProgress / 100);
+    remote.getCurrentWindow().setProgressBar(meanProgress / 100);
     if (meanProgress === 100) {
-      ipcRenderer.send("complete");
+      remote.getCurrentWindow().setProgressBar(-1);
     }
     this.setState({tabs});
   };
