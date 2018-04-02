@@ -172,10 +172,13 @@ export default makeRunner("ffmpeg", {
     } else if (opts.vcodec === "vp8") {
       // TODO(Kagami): Tune slices setting?
       args.push("-c:v", "libvpx", "-speed", "0");
+    } else if (opts.vcodec === "x264") {
+      args.push("-c:v", "libx264");
     } else {
       assert(false);
     }
     args.push("-b:v", opts.vb ? `${opts.vb}k` : "0");
+
     if (opts.quality != null) {
       if (opts.quality === 0) {
         // Slightly different than "-crf 0".
@@ -184,15 +187,21 @@ export default makeRunner("ffmpeg", {
         args.push("-crf", opts.quality.toString());
       }
     }
-    // In case default will change.
-    args.push("-auto-alt-ref", "1", "-lag-in-frames", "25");
-    // Bigger keyframe interval saves bitrate but a lot of users will
-    // complain if they can't seek video and savings are not that high
-    // compared to disadvantages. It's still possible to enter any
-    // advanced options in raw args field.
-    // It should be default for both VP8 and VP9 in latest libvpx,
-    // passing it anyway for compatibility with old versions.
-    args.push("-g", "128");
+
+    args.push("-preset", opts.preset);
+
+    if (opts.vcodec !== "x264") {
+      // In case default will change.
+      args.push("-auto-alt-ref", "1", "-lag-in-frames", "25");
+      // Bigger keyframe interval saves bitrate but a lot of users will
+      // complain if they can't seek video and savings are not that high
+      // compared to disadvantages. It's still possible to enter any
+      // advanced options in raw args field.
+      // It should be default for both VP8 and VP9 in latest libvpx,
+      // passing it anyway for compatibility with old versions.
+      args.push("-g", "128");
+    }
+
     // Using other subsamplings require profile>0 which support
     // across various decoders is still poor.
     args.push("-pix_fmt", "yuv420p");
@@ -335,10 +344,10 @@ export default makeRunner("ffmpeg", {
       passlog = passlog.slice(0, -6);
       args.push("-pass", "2", "-passlogfile", passlog);
       args.push("-metadata", `title=${title}`);
-      args.push("-f", "webm", this._escapeFilename(outpath));
+      args.push(this._escapeFilename(outpath));
     } else if (passn === 0) {
       args.push("-metadata", `title=${title}`);
-      args.push("-f", "webm", this._escapeFilename(outpath));
+      args.push(this._escapeFilename(outpath));
     } else {
       assert(false);
     }
@@ -387,7 +396,7 @@ export default makeRunner("ffmpeg", {
       "-an", "-sn", "-dn",
       "-frames:v", "1",
       "-pix_fmt", "yuv420p",
-      "-f", "webm", this._escapeFilename(outpath)
+      this._escapeFilename(outpath)
     );
     return args;
   },
@@ -404,7 +413,7 @@ export default makeRunner("ffmpeg", {
       "-itsoffset", ceilFixed(1 / fps, 3), "-i", this._escapeFilename(inpath),
       "-map", "0:v:0", "-map", "1:a:0?",
       "-c", "copy",
-      "-f", "webm", this._escapeFilename(outpath)
+      this._escapeFilename(outpath)
     );
     return args;
   },

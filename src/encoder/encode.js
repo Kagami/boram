@@ -143,6 +143,9 @@ export default class extends React.PureComponent {
     this.tmpPreviewName = tmp.tmpNameSync({prefix: "boram-", postfix: ".webm"});
     this.tmpConcatName = tmp.tmpNameSync({prefix: "boram-", postfix: ".txt"});
   }
+  componentDidUpdate(prevProps) {
+    if (this.props.vcodec !== prevProps.vcodec) this.updateTarget();
+  }
   componentWillUnmount() {
     this.props.events.removeListener("abort", this.abort);
     this.cleanup();
@@ -388,9 +391,10 @@ export default class extends React.PureComponent {
     bareName = bareName.replace(/-\d+$/, "");
     let index = 0;
     let target = "";
+    const fileFormat = (this.props.vcodec === "x264") ? "mp4" : "webm";
     do {
       const suffix = `-${index + 1}`;
-      const name = `${bareName}${index ? suffix : ""}.webm`;
+      const name = `${bareName}${index ? suffix : ""}.${fileFormat}`;
       target = path.join(dir, name);
       index += 1;
     } while (fs.existsSync(target));
@@ -492,6 +496,7 @@ export default class extends React.PureComponent {
       defaultPath: this.state.target,
       filters: [
         {name: "WebM", extensions: ["webm"]},
+        {name: "x264", extensions: ["mp4"]},
       ],
     });
     if (!target) return;

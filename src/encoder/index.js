@@ -20,10 +20,13 @@ import {parseTime, showTime, parseAR, round2} from "../util";
 const DEFAULT_LIMIT = 19;
 const DEFAULT_BITRATE = 5000;
 const DEFAULT_Q = 25;
+const DEFAULT_X264_Q = 23;
 const MIN_VP8_Q = 4;
 const MAX_VP8_Q = 63;
 const MIN_VP9_Q = 0;
 const MAX_VP9_Q = 63;
+const MIN_X264_Q = 0;
+const MAX_X264_Q = 51;
 const DEFAULT_AUDIO_CODEC = "opus";
 const DEFAULT_OPUS_BITRATE = 128;
 const DEFAULT_VORBIS_Q = 4;
@@ -102,13 +105,15 @@ export default class extends React.PureComponent {
     atrackn: this.getAudioTracks().length ? 0 : null,
     vcodec: "vp9",
     acodec: DEFAULT_AUDIO_CODEC,
-    mode2Pass: true,
-    modeLimit: true,
-    modeCRF: this.isShortClip(),
+    mode2Pass: false,
+    modeLimit: false,
+    // modeCRF: this.isShortClip(),
+    modeCRF: true,
     // We use distro-provided packages of FFmpeg on Linux so no
     // guarantees it's fresh enough. Might check caps with
     // `-h encoder=libvpx-vp9` though.
     modeMT: (BORAM_LIN_BUILD && !BORAM_DEBUG) ? "tile-col" : "row-mt",
+    preset: "veryslow",
     rawArgs: "",
   };
   componentDidMount() {
@@ -375,6 +380,7 @@ export default class extends React.PureComponent {
     const modeLimit = get("modeLimit");
     const modeCRF = get("modeCRF");
     const modeMT = get("modeMT");
+    const preset = get("preset");
     let rawArgs = "";
     // Helpers.
     const inpath = this.props.source.path;
@@ -489,7 +495,11 @@ export default class extends React.PureComponent {
     });
     quality = validate("codecs", "quality", quality, v => {
       if (modeCRF) {
-        v = v || DEFAULT_Q;
+        if (vcodec === "x264") {
+          v = v || DEFAULT_X264_Q;
+        } else {
+          v = v || DEFAULT_Q;
+        }
       } else if (!v) {
         return null;
       }
@@ -498,6 +508,8 @@ export default class extends React.PureComponent {
         return requireRange(v, MIN_VP9_Q, MAX_VP9_Q);
       } else if (vcodec === "vp8") {
         return requireRange(v, MIN_VP8_Q, MAX_VP8_Q);
+      } else if (vcodec === "x264") {
+        return requireRange(v, MIN_X264_Q, MAX_X264_Q);
       } else {
         assert(false);
       }
@@ -550,7 +562,7 @@ export default class extends React.PureComponent {
       start, end,
       vcodec, limit, quality,
       acodec, ab,
-      mode2Pass, modeLimit, modeCRF, modeMT,
+      mode2Pass, modeLimit, modeCRF, modeMT, preset,
       // helpers.
       inpath, atrack,
       _start, _duration,
@@ -650,7 +662,7 @@ export default class extends React.PureComponent {
     const {classes} = this.sheet;
     const {styles} = this.constructor;
     return (
-      <Pane vertical style1={styles.item1} size2={340}>
+      <Pane vertical style1={styles.item1} size2={450}>
         <Player
           ref="player"
           events={this.props.events}
@@ -750,6 +762,7 @@ export default class extends React.PureComponent {
               modeLimit={this.state.modeLimit}
               modeCRF={this.state.modeCRF}
               modeMT={this.state.modeMT}
+              preset={this.state.preset}
               onUpdate={this.handleAll}
               onRawArgs={this.handleRawArgs}
               onFragmentReset={this.handleFragmentReset}
