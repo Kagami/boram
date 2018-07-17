@@ -2,12 +2,12 @@ diff --git a/node_modules/material-ui/Tabs/Tab.js b/node_modules/material-ui/Tab
 index e0fd233..5f965c0 100644
 --- a/node_modules/material-ui/Tabs/Tab.js
 +++ b/node_modules/material-ui/Tabs/Tab.js
-@@ -104,7 +104,7 @@ var Tab = function (_Component) {
+@@ -108,7 +108,7 @@ var Tab = function (_Component) {
            style = _props.style,
            value = _props.value,
            width = _props.width,
--          other = (0, _objectWithoutProperties3.default)(_props, ['icon', 'index', 'onActive', 'onTouchTap', 'selected', 'label', 'buttonStyle', 'style', 'value', 'width']);
-+          other = (0, _objectWithoutProperties3.default)(_props, ['icon', 'index', 'onActive', 'onTouchTap', 'selected', 'label', 'buttonStyle', 'style', 'value', 'width', 'tabKey']);
+-          other = (0, _objectWithoutProperties3.default)(_props, ['icon', 'index', 'onActive', 'onClick', 'selected', 'label', 'buttonStyle', 'style', 'value', 'width']);
++          other = (0, _objectWithoutProperties3.default)(_props, ['icon', 'index', 'onActive', 'onClick', 'selected', 'label', 'buttonStyle', 'style', 'value', 'width', 'tabKey']);
  
  
        var styles = getStyles(this.props, this.context);
@@ -15,7 +15,7 @@ diff --git a/node_modules/material-ui/Tabs/Tabs.js b/node_modules/material-ui/Ta
 index 98e821a..d13e7be 100644
 --- a/node_modules/material-ui/Tabs/Tabs.js
 +++ b/node_modules/material-ui/Tabs/Tabs.js
-@@ -202,14 +202,16 @@ var Tabs = function (_Component) {
+@@ -207,14 +207,16 @@ var Tabs = function (_Component) {
  
          process.env.NODE_ENV !== "production" ? (0, _warning2.default)(!tabValue || tab.props.value !== undefined, 'Material-UI: Tabs value prop has been passed, but Tab ' + index + '\n        does not have a value prop. Needs value if Tabs is going\n        to be a controlled component.') : void 0;
  

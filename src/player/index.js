@@ -793,13 +793,13 @@ class Volume extends React.PureComponent {
     super(props);
     // We need to create new sheet per component because we edit them at
     // runtime and multiple components will intersect with each other.
-    const sliderSheet = jss.createStyleSheet(
+    const sheet2 = jss.createStyleSheet(
       {slider: {"&::-webkit-slider-runnable-track": {}}},
-      {link: true, meta: Math.random().toString()}
+      {link: true}
     ).attach();
-    this.sliderClass2 = sliderSheet.classes.slider;
-    const className = `${this.sliderClass2}::-webkit-slider-runnable-track`;
-    this.progressRule = sliderSheet.addRule("", {background: ""}, {className});
+    this.sliderClass2 = sheet2.classes.slider;
+    const trackSel = `.${this.sliderClass2}::-webkit-slider-runnable-track`;
+    this.progressRule = sheet2.getRule(trackSel);
   }
   state = {shown: false};
   isDragging() {
@@ -963,13 +963,13 @@ class Time extends React.PureComponent {
 class Seek extends React.PureComponent {
   constructor(props) {
     super(props);
-    const sliderSheet = jss.createStyleSheet(
+    const sheet2 = jss.createStyleSheet(
       {slider: {"&::-webkit-slider-runnable-track": {}}},
-      {link: true, meta: Math.random().toString()}
+      {link: true}
     ).attach();
-    this.sliderClass2 = sliderSheet.classes.slider;
-    const className = `${this.sliderClass2}::-webkit-slider-runnable-track`;
-    this.progressRule = sliderSheet.addRule("", {background: ""}, {className});
+    this.sliderClass2 = sheet2.classes.slider;
+    const trackSel = `.${this.sliderClass2}::-webkit-slider-runnable-track`;
+    this.progressRule = sheet2.getRule(trackSel);
   }
   handleKey = (e) => {
     e.preventDefault();

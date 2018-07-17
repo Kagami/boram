@@ -209,14 +209,14 @@ export default class extends React.Component {
             name="copy"
             title="Clone tab"
             className={classes.icon}
-            onTouchTap={this.handleClone.bind(null, i)}
+            onClick={this.handleClone.bind(null, i)}
           />
         </ShowHide>
         <Icon
           name="close"
           title="Close tab"
           className={classes.icon}
-          onTouchTap={this.handleClose.bind(null, i)}
+          onClick={this.handleClose.bind(null, i)}
         />
       </div>
     );
@@ -228,7 +228,7 @@ export default class extends React.Component {
         name="plus"
         title="New tab"
         className={classes.iconNew}
-        onTouchTap={this.handleNew}
+        onClick={this.handleNew}
       />
     );
   }
