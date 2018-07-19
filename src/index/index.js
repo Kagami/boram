@@ -6,14 +6,14 @@
 import fs from "fs";
 import url from "url";
 import {BrowserWindow, app, dialog} from "electron";
-import {name, version} from "json!../../package.json";
+import {name, version} from "../../package.json";
 import {APP_PATH, ICON_BIG_PATH, WIN_ICON_PATH, PAGE_PATH} from "../shared";
 import {getPluginPath} from "./plugin";
-import "file!./package.json";
-import "file!./index.html";
-import "file!./icon-big.png";
+import "file-loader?name=package.json!./package.json.electron";
+import "./index.html";
+import "./icon-big.png";
 if (BORAM_WIN_BUILD) {
-  require("file!./icon.ico");
+  require("./icon.ico");
 }
 
 const toRemoveNames = [];

@@ -10,9 +10,9 @@ import ReactDOM from "react-dom";
 import {useSheet} from "../jss";
 import {MuiThemeProvider, BACKGROUND_COLOR} from "../theme";
 import MainTabs from "../main-tabs";
-import "file!./roboto-light.ttf";
-import "file!./roboto-regular.ttf";
-import "file!./roboto-medium.ttf";
+import "./roboto-light.ttf";
+import "./roboto-regular.ttf";
+import "./roboto-medium.ttf";
 
 @useSheet({"@global": {
   body: {
