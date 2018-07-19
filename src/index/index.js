@@ -22,7 +22,17 @@ global.removeOnQuit = function(name) {
 };
 
 if (BORAM_DEBUG) {
-  require("electron-debug")({enabled: true});
+  // Don't use electron-debug because of
+  // https://github.com/sindresorhus/electron-debug/issues/61
+  const localShortcut = require("electron-localshortcut");
+  localShortcut.register("F12", () => {
+    const win = BrowserWindow.getFocusedWindow();
+    win.webContents.toggleDevTools();
+  });
+  localShortcut.register("CmdOrCtrl+R", () => {
+    const win = BrowserWindow.getFocusedWindow();
+    win.webContents.reloadIgnoringCache();
+  });
 }
 // Plugin init would fail if activated, sort of debug option.
 if (process.env.BORAM_NO_HWACCEL) {

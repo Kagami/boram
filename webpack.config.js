@@ -29,8 +29,6 @@ module.exports = {
     __dirname: false,
   },
   externals: [
-    // Mute warning.
-    "devtron",
     // Brings tons of useless code.
     {"pretty-error": "Error"},
   ],
