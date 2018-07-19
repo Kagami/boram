@@ -58,7 +58,7 @@ if (process.env.BORAM_NO_HWACCEL) {
 function runtimeChecks() {
   if (BORAM_WIN_BUILD) {
     const arch = require("arch")();
-    if (!BORAM_X64_BUILD && arch !== "x86") {
+    if (!BORAM_X64_BUILD && arch === "x64") {
       // Strictly not an error but x64 build will be faster.
       dialog.showErrorBox(
         "Wrong build",
