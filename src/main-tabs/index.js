@@ -74,7 +74,7 @@ const DEFAULT_LABEL = "untitled";
 export default class extends React.Component {
   // NOTE(Kagami): This component is _not_ pure.
   state = {tabs: [], tabIndex: 0};
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.addTab();
   }
   componentDidMount() {

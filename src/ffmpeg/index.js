@@ -14,13 +14,13 @@ import {
 if (BORAM_WIN_BUILD) {
   if (BORAM_X64_BUILD) {
     require.context("../../bin/win64/bin-video", false,
-                    /\.dll$|[\/\\]ffmpeg\.exe$/);
+                    /\.dll$|[/\\]ffmpeg\.exe$/);
   } else {
     require.context("../../bin/win32/bin-video", false,
-                    /\.dll$|[\/\\]ffmpeg\.exe$/);
+                    /\.dll$|[/\\]ffmpeg\.exe$/);
   }
 } else if (BORAM_MAC_BUILD) {
-  require.context("../../bin/mac64", false, /\.dylib$|[\/\\]ffmpeg$/);
+  require.context("../../bin/mac64", false, /\.dylib$|[/\\]ffmpeg$/);
 }
 
 export default makeRunner("ffmpeg", {

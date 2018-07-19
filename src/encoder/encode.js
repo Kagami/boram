@@ -41,7 +41,7 @@ class Output extends React.PureComponent {
   componentDidMount() {
     this.scrollToEnd();
   }
-  componentWillUpdate(nextProps) {
+  UNSAFE_componentWillUpdate(nextProps) {
     const {scrollHeight, scrollTop, clientHeight} = this.refs.out;
     this.atEnd = scrollHeight - scrollTop <= clientHeight;
     this.menu.items[0].enabled = !nextProps.encoding;

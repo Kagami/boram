@@ -146,7 +146,7 @@ export function parseArgs(rawArgs) {
 export function quoteArgs(args) {
   return args.map(arg => {
     // Reserved shell symbols.
-    if (/[\s'"<>|&;()*\\\[\]]/.test(arg)) {
+    if (/[\s'"<>|&;()*\\[\]]/.test(arg)) {
       return escapeArg(arg);
     } else {
       return arg;

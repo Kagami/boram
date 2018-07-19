@@ -24,7 +24,7 @@ import {parseTime, showTime, parseAR, tryRun} from "../util";
 })
 export default class extends React.PureComponent {
   state = {pause: true, time: 0, volume: 100, mute: false, fullscreen: false};
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.setTime(this.state.time);
   }
   componentDidMount() {
@@ -328,7 +328,7 @@ class CropArea extends React.PureComponent {
     window.addEventListener("mouseup", this.handleGlobalMouseUp, false);
     this.setRects();
   }
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const acrop = this.props.crop;
     const bcrop = nextProps.crop;
     if (!acrop) return;

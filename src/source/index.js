@@ -22,7 +22,7 @@ import ShowHide from "../show-hide";
 })
 export default class extends React.PureComponent {
   state = {};
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     if (BORAM_DEBUG) {
       let info = process.env.BORAM_DEBUG_INFO;
       const source = process.env.BORAM_DEBUG_SOURCE;
