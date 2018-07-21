@@ -14,7 +14,7 @@ assert(BORAM_WIN_BUILD || BORAM_MAC_BUILD || BORAM_LIN_BUILD,
        "Unknown platform");
 
 module.exports = {
-  mode: BORAM_DEBUG ? "none" : "production",
+  mode: BORAM_DEBUG ? "development" : "production",
   stats: {
     children: false,
     entrypoints: false,
