@@ -27,7 +27,7 @@ Download [latest release](https://github.com/Kagami/boram/releases), unpack, rig
 
 ### Linux
 
-Download [latest release](https://github.com/Kagami/boram/releases), unpack and run `./boram`. You need to have python, ffmpeg and libmpv1 installed.
+Download [latest release](https://github.com/Kagami/boram/releases), unpack and run `./boram`. You need to have python, ffmpeg and libmpv1 installed. ffmpeg 4.x is required by default, run `mv libffmpeg.so.57 libffmpeg.so` if you have ffmpeg 3.x.
 
 ## License
 
