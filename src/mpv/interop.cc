@@ -287,9 +287,12 @@ class BoramInstance : public pp::Instance {
     if (!mpv_)
       DIE("context init failed");
 
+    char* terminal = getenv("BORAM_TERMINAL");
+    if (terminal && strlen(terminal))
+      mpv_set_option_string(mpv_, "terminal", "yes");
     char* verbose = getenv("BORAM_VERBOSE");
     if (verbose && strlen(verbose))
-      mpv_set_option_string(mpv_, "terminal", "yes");
+      mpv_set_option_string(mpv_, "msg-level", "all=v");
 
     // Can't be set after initialize in mpv 0.18.
     mpv_set_option_string(mpv_, "input-default-bindings", "yes");
