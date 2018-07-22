@@ -5,13 +5,10 @@ cd "$( dirname "${BASH_SOURCE[0]}" )"
 rm -rf dist
 mkdir dist
 
-# TODO(Kagami): Edit formulae for fribidi[-glib,-pcre], freetype[-png].
-# Need libvpx-HEAD for:
-# - <https://groups.google.com/a/webmproject.org/forum/#!topic/codec-devel/oiHjgEdii2U>
-brew install libass --build-from-source --without-harfbuzz
-brew install libvpx --HEAD --with-highbitdepth
+brew install libass --without-harfbuzz
+brew install libvpx --with-highbitdepth
 brew install ffmpeg --without-lame --without-xvid --with-libvpx --with-libvorbis --with-opus --with-libass
-brew install mpv --without-jpeg --without-little-cms2 --without-lua --without-youtube-dl
+brew install mpv --without-jpeg --without-little-cms2 --without-mujs --without-youtube-dl
 
 DEPS="
 /usr/local/bin/ffmpeg
@@ -41,4 +38,4 @@ done
 
 set -x
 # See <https://github.com/Kagami/boram/issues/11>.
-install_name_tool -change /System/Library/Frameworks/CoreImage.framework/Versions/A/CoreImage /System/Library/Frameworks/QuartzCore.framework/Versions/A/Frameworks/CoreImage.framework/Versions/A/CoreImage dist/libavfilter.6.dylib
+install_name_tool -change /System/Library/Frameworks/CoreImage.framework/Versions/A/CoreImage /System/Library/Frameworks/QuartzCore.framework/Versions/A/Frameworks/CoreImage.framework/Versions/A/CoreImage dist/libavfilter.7.dylib
