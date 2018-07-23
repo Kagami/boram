@@ -66,15 +66,15 @@ if (process.env.BORAM_NO_HWACCEL) {
 })();
 
 function runtimeChecks() {
-  if (BORAM_WIN_BUILD) {
+  if (BORAM_WIN_BUILD && !BORAM_X64_BUILD) {
     const arch = require("arch")();
-    if (!BORAM_X64_BUILD && arch === "x64") {
-      // Strictly not an error but x64 build will be faster.
-      dialog.showErrorBox(
-        "Wrong build",
-        "You're trying to run x86 build on x64 system."
-      );
-      return app.exit(1);
+    if (arch === "x64") {
+      dialog.showMessageBox({
+        type: "warning",
+        title: "Wrong build",
+        message: "You're running x86 build on x64 system. " +
+                 "Consider using x64 build for better performance.",
+      });
     }
   }
   if (BORAM_LIN_BUILD) {
