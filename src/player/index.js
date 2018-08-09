@@ -565,8 +565,8 @@ class CropArea extends React.PureComponent {
       let {startW: width, startH: height, startX: left, startY: top} = this;
       switch (this.startPos) {
       case "nw":
-        left += dx;
-        width -= dx;
+        if (left !== 0) left += dx;
+        if (left !== 0) width -= dx;
         top += dy;
         height -= dy;
         break;
@@ -580,8 +580,8 @@ class CropArea extends React.PureComponent {
         height -= dy;
         break;
       case "sw":
-        left += dx;
-        width -= dx;
+        if (left !== 0) left += dx;
+        if (left !== 0) width -= dx;
         height += dy;
         break;
       case "n":
@@ -595,8 +595,8 @@ class CropArea extends React.PureComponent {
         width += dx;
         break;
       case "w":
-        left += dx;
-        width -= dx;
+        if (left !== 0) left += dx;
+        if (left !== 0) width -= dx;
         break;
       case "i":
         left += dx;
