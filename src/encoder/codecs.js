@@ -106,6 +106,7 @@ export default class extends React.PureComponent {
               value={this.props.vcodec}
               onChange={this.props.makeSelecter("vcodec")}
             >
+              <MenuItem value="av1" primaryText="av1" />
               <MenuItem value="vp9" primaryText="vp9" />
               <MenuItem value="vp8" primaryText="vp8" />
             </SmallSelect>

@@ -160,8 +160,18 @@ export default makeRunner("ffmpeg", {
     }
 
     // Video.
-    args.push("-threads", os.cpus().length);
-    if (opts.vcodec === "vp9") {
+    const threads = os.cpus().length;
+    args.push("-threads", threads);
+    if (opts.vcodec === "av1") {
+      args.push("-c:v", "libaom-av1");
+      args.push("-cpu-used", "4");
+      args.push("-strict", "experimental");
+      // In AV1 tile-columns seems to be not constrained by video width.
+      // Or at least not that much compared to VP9. So make sure we
+      // saturated all available threads.
+      const tileCols = Math.ceil(Math.log2(threads));
+      args.push("-tile-columns", tileCols);
+    } else if (opts.vcodec === "vp9") {
       args.push("-c:v", "libvpx-vp9");
       args.push("-speed", opts.modeMT === "no-mt" ? "0" : "1");
       args.push("-tile-columns", opts.modeMT === "no-mt" ? "0" : "6");
@@ -308,11 +318,13 @@ export default makeRunner("ffmpeg", {
     clearOpt(args, [
       "-b:v",
       "-speed",
+      "-cpu-used",
       "-row-mt",
       "-tile-columns",
       "-frame-parallel",
       "-auto-alt-ref",
       "-lag-in-frames",
+      "-strict",
       "-g",
     ]);
     args.push("-preset", "ultrafast");
@@ -328,9 +340,6 @@ export default makeRunner("ffmpeg", {
       // We always have single output stream so caller should reserve
       // only path with suffix "-0.log".
       passlog = passlog.slice(0, -6);
-      // Passlog shouldn't be escaped as filename:
-      // "-passlogfile file:test" will create "file:test-0.log".
-      // Seems to be ffmpeg's inconsistency.
       args.push("-an", "-pass", "1", "-passlogfile", passlog);
       args.push("-f", "null", "-");
     } else if (passn === 2) {
