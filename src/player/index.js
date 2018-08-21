@@ -401,20 +401,6 @@ class CropArea extends React.PureComponent {
       top: Math.round((domHeight - outHeight) / 2),
     };
   }
-  getCrop() {
-    let {width, height, left, top} = this.state;
-    // We allow width to be negative (grow in opposite dimension), so
-    // need to fix before displaying.
-    if (width < 0) {
-      width = Math.abs(width);
-      left -= width;
-    }
-    if (height < 0) {
-      height = Math.abs(height);
-      top -= height;
-    }
-    return {width, height, left, top};
-  }
   isEmpty() {
     return !this.state.width || !this.state.height;
   }
@@ -444,7 +430,7 @@ class CropArea extends React.PureComponent {
   getCSSCrop() {
     // Not available until DOM is rendered.
     if (!this.vidRect) return null;
-    let {width, height, left, top} = this.getCrop();
+    let {width, height, left, top} = this.state;
     left += this.vidRect.left;
     top += this.vidRect.top;
     const display = this.isEmpty() ? "none" : "block";
@@ -452,7 +438,7 @@ class CropArea extends React.PureComponent {
     return {width, height, left, top, display, cursor};
   }
   getFFCrop() {
-    let {width: cropw, height: croph, left: cropx, top: cropy} = this.getCrop();
+    let {width: cropw, height: croph, left: cropx, top: cropy} = this.state;
     if (this.isEmpty()) {
       // Will clear UI inputs.
       cropw = croph = cropx = cropy = null;
@@ -501,25 +487,44 @@ class CropArea extends React.PureComponent {
     cropx = Math.round(cropx / scalef);
     cropy = Math.round(cropy / scalef);
 
-    this.setCrop({width: cropw, height: croph, left: cropx, top: cropy},
-                 null, {movOuter: true});
+    this.setCrop({width: cropw, height: croph, left: cropx, top: cropy});
   }
-  setCrop(upd, cb = null, opts = {}) {
+  setCrop(upd, cb = null) {
     let {width, height, left, top} = {...this.state, ...upd};
 
-    left = Math.min(Math.max(0, left), this.vidRect.width);
-    top = Math.min(Math.max(0, top), this.vidRect.height);
+    // Need "moving" behavior by default.
+    const resizing = this.movOuter || this.movInner && this.startPos !== "i";
 
-    if (this.movOuter || (this.movInner && this.startPos !== "i") ||
-        opts.movOuter) {
-      width = width > 0 ? Math.min(width, this.vidRect.width - left)
-                        : Math.max(-left, width);
-      height = height > 0 ? Math.min(height, this.vidRect.height - top)
-                          : Math.max(-top, height);
-    } else if (this.movInner) {
-      left = Math.min(left, this.vidRect.width - width);
-      top = Math.min(top, this.vidRect.height - height);
+    if (resizing) {
+      // Swap coordinates when resizing to opposite direction.
+      if (width < 0) {
+        width = Math.abs(width);
+        left -= width;
+      }
+      if (height < 0) {
+        height = Math.abs(height);
+        top -= height;
+      }
+      // Avoid increasing w/h when moving mouse to l/t.
+      if (left < 0) {
+        width += left;
+      }
+      if (top < 0) {
+        height += top;
+      }
     }
+
+    // Constraint l/t.
+    left = Math.max(0, left);
+    top = Math.max(0, top);
+    left = Math.min(left, resizing ? this.vidRect.width
+                                   : this.vidRect.width - width);
+    top = Math.min(top, resizing ? this.vidRect.height
+                                 : this.vidRect.height - height);
+
+    // Constraint w/h.
+    width = Math.min(width, this.vidRect.width - left);
+    height = Math.min(height, this.vidRect.height - top);
 
     this.setState({width, height, left, top}, cb);
   }
@@ -551,7 +556,12 @@ class CropArea extends React.PureComponent {
     const dy = e.clientY - this.baseY;
     if (this.movOuter) {
       if (this.moved) {
-        this.setCrop({width: dx, height: dy});
+        this.setCrop({
+          width: dx,
+          height: dy,
+          left: this.startX,
+          top: this.startY,
+        });
       } else {
         this.moved = true;
         this.setCrop({
