@@ -35,7 +35,7 @@ export default makeRunner("youtube-dl", {
     ]).then(JSON.parse);
   },
   download({url, format, outpath}, onUpdate) {
-    const {vfid, afid, sfid, vcodec} = format;
+    const {vfid, afid, sfid} = format;
     const ppArgs = [];
     const args = [
       "--no-part",
@@ -45,12 +45,6 @@ export default makeRunner("youtube-dl", {
     ];
     if (BORAM_MAC_BUILD) {
       args.push("--ffmpeg-location", getRunPath("ffmpeg"));
-    }
-    if (vcodec === "vp9.2") {
-      // See <https://trac.ffmpeg.org/ticket/6042>.
-      // Fixed in master but keep for compatibility with older versions:
-      // <https://github.com/FFmpeg/FFmpeg/commit/e7dec52>.
-      ppArgs.push("-strict", "unofficial");
     }
     if (sfid) {
       args.push("--sub-lang", sfid, "--write-sub", "--embed-subs");
