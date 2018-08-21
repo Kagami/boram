@@ -30,7 +30,7 @@ const HELP = {
   ], quality: [
     "Video quality",
     `Generally useful for CRF mode and short clips.
-     0÷63 for VP9 ("0" is lossless), 4÷63 for VP8.
+     0÷63 ("0" is lossless, VP9 only).
      "25" is good value and thus default in CRF mode.`,
   ], ab: [
     "Audio bitrate/quality",

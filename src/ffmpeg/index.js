@@ -177,11 +177,13 @@ export default makeRunner("ffmpeg", {
     }
     args.push("-b:v", opts.vb ? `${opts.vb}k` : "0");
     if (opts.quality != null) {
-      if (opts.quality === 0) {
-        // Slightly different than "-crf 0".
+      args.push("-crf", opts.quality.toString());
+      if (opts.vcodec === "vp8" && opts.quality < 4) {
+        // Set to 4 by default.
+        args.push("-qmin", "0");
+      }
+      if (opts.vcodec === "vp9" && opts.quality === 0) {
         args.push("-lossless", "1");
-      } else {
-        args.push("-crf", opts.quality.toString());
       }
     }
     // In case default will change.
