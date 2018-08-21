@@ -209,6 +209,7 @@ export const SmallSelect = (function() {
     return (
       <SelectField
         {...other}
+        autoWidth
         style={mainStyle}
         menuStyle={styles.menu}
         labelStyle={styles.label}
