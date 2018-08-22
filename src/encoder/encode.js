@@ -17,7 +17,7 @@ import {
   BigProgress,
 } from "../theme";
 import {
-  parseFrameRate, parseArgs,
+  getOpt, parseFrameRate, parseArgs,
   showSize, showBitrate, showTime, quoteArgs,
 } from "../util";
 
@@ -248,6 +248,7 @@ export default class extends React.PureComponent {
     const {preview, target} = this.state;
     const title = this.refs.title.getValue().trim();
     const baseArgs = parseArgs(this.props.rawArgs);
+    const outfmt = getOpt(baseArgs, "-f", "webm", {last: true});
     const frameParser = this.createFrameParser();
     const startTime = this.now();
 
@@ -287,7 +288,7 @@ export default class extends React.PureComponent {
           inpath,
           time,
           vcodec, width, height, sar, strfps,
-          outpath,
+          outfmt, outpath,
         }));
       }).then(() => {
         const inpath = this.tmpTestName;
@@ -297,7 +298,11 @@ export default class extends React.PureComponent {
         FFmpeg.writeConcat({inpath, prevpath, outpath});
         outpath = target;
         handleLog(this.sep());
-        return run(FFmpeg.getConcatArgs({inpath, listpath, fps, outpath}));
+        return run(FFmpeg.getConcatArgs({
+          inpath, listpath,
+          fps,
+          outfmt, outpath,
+        }));
       });
     }
     videop.then(() => {

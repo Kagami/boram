@@ -360,7 +360,8 @@ export default makeRunner("ffmpeg", {
     }
     return args;
   },
-  getPreviewArgs({inpath, time, vcodec, width, height, sar, strfps, outpath}) {
+  getPreviewArgs({inpath, time, vcodec, width, height, sar, strfps,
+                  outfmt, outpath}) {
     width = sar > 1 ? Math.round(width * sar) : width;
     height = sar < 1 ? Math.round(height / sar) : height;
     const color = [
@@ -403,7 +404,8 @@ export default makeRunner("ffmpeg", {
       "-an", "-sn", "-dn",
       "-frames:v", "1",
       "-pix_fmt", "yuv420p",
-      "-f", "webm", this._escapeFilename(outpath)
+      "-strict", "experimental",
+      "-f", outfmt, this._escapeFilename(outpath)
     );
     return args;
   },
@@ -413,14 +415,15 @@ export default makeRunner("ffmpeg", {
       this._escapeConcatArg(inpath),
     ].join("\n"));
   },
-  getConcatArgs({inpath, listpath, fps, outpath}) {
+  getConcatArgs({inpath, listpath, fps, outfmt, outpath}) {
     const args = this._getCommonArgs();
     args.push(
       "-f", "concat", "-safe", "0", "-i", this._escapeFilename(listpath),
       "-itsoffset", ceilFixed(1 / fps, 3), "-i", this._escapeFilename(inpath),
       "-map", "0:v:0", "-map", "1:a:0?",
       "-c", "copy",
-      "-f", "webm", this._escapeFilename(outpath)
+      "-strict", "experimental",
+      "-f", outfmt, this._escapeFilename(outpath)
     );
     return args;
   },

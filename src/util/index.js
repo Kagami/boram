@@ -154,15 +154,27 @@ export function quoteArgs(args) {
   }).join(" ");
 }
 
-export function getOpt(arr, key, def) {
+export function getOpt(arr, key, def, opts = {}) {
+  let res = null;
   let prev = false;
-  const res = arr.find(v => {
-    if (prev) {
-      return true;
-    } else if (v === key) {
-      prev = true;
+  if (opts.last) {
+    for (let i = arr.length; i >= 0; i--) {
+      if (arr[i] === key) {
+        if (i < arr.length - 1) {
+          res = arr[i + 1];
+        }
+        break;
+      }
     }
-  });
+  } else {
+    res = arr.find(v => {
+      if (prev) {
+        return true;
+      } else if (v === key) {
+        prev = true;
+      }
+    });
+  }
   return res == null ? def : res;
 }
 
