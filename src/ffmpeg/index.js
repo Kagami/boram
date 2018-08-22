@@ -300,6 +300,9 @@ export default makeRunner("ffmpeg", {
       }
     }
 
+    // Output format. Can be fixed by user.
+    args.push("-f", "webm");
+
     return args.join(" ");
   },
   _getCommonArgs(baseArgs = []) {
@@ -328,7 +331,8 @@ export default makeRunner("ffmpeg", {
       "-g",
     ]);
     args.push("-preset", "ultrafast");
-    args.push("-f", "matroska", this._escapeFilename(outpath));
+    fixOpt(args, "-f", "matroska", {add: true, last: true});
+    args.push(this._escapeFilename(outpath));
     return args;
   },
   getEncodeArgs({baseArgs, passlog, passn, title, outpath}) {
@@ -341,15 +345,16 @@ export default makeRunner("ffmpeg", {
       // only path with suffix "-0.log".
       passlog = passlog.slice(0, -6);
       args.push("-an", "-pass", "1", "-passlogfile", passlog);
-      args.push("-f", "null", "-");
+      fixOpt(args, "-f", "null", {add: true, last: true});
+      args.push("-");
     } else if (passn === 2) {
       passlog = passlog.slice(0, -6);
       args.push("-pass", "2", "-passlogfile", passlog);
       args.push("-metadata", `title=${title}`);
-      args.push("-f", "webm", this._escapeFilename(outpath));
+      args.push(this._escapeFilename(outpath));
     } else if (passn === 0) {
       args.push("-metadata", `title=${title}`);
-      args.push("-f", "webm", this._escapeFilename(outpath));
+      args.push(this._escapeFilename(outpath));
     } else {
       assert(false);
     }

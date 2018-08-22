@@ -167,21 +167,33 @@ export function getOpt(arr, key, def) {
 }
 
 export function fixOpt(arr, key, newval, opts = {}) {
+  const getval = (v) => typeof newval === "function" ? newval(v) : newval;
   let found = false;
   let prev = false;
-  arr.forEach((v, i) => {
-    if (prev) {
-      arr[i] = typeof newval === "function" ? newval(v) : newval;
-      prev = false;
-      found = true;
-    } else if (v === key) {
-      prev = true;
+  if (opts.last) {
+    for (let i = arr.length; i >= 0; i--) {
+      if (arr[i] === key) {
+        if (i < arr.length - 1) {
+          arr[i + 1] = getval(arr[i + 1]);
+          found = true;
+        }
+        break;
+      }
     }
-  });
+  } else {
+    arr.forEach((v, i) => {
+      if (prev) {
+        arr[i] = getval(v);
+        prev = false;
+        found = true;
+      } else if (v === key) {
+        prev = true;
+      }
+    });
+  }
   if (!found) {
     if (opts.add) {
-      const v = typeof newval === "function" ? newval(null) : newval;
-      arr.push(key, v);
+      arr.push(key, getval(null));
     }
   }
 }
