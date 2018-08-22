@@ -155,33 +155,30 @@ export function quoteArgs(args) {
 }
 
 export function getOpt(arr, key, def, opts = {}) {
-  let res = null;
-  let prev = false;
   if (opts.last) {
     for (let i = arr.length; i >= 0; i--) {
       if (arr[i] === key) {
         if (i < arr.length - 1) {
-          res = arr[i + 1];
+          return arr[i + 1];
         }
         break;
       }
     }
   } else {
-    res = arr.find(v => {
-      if (prev) {
-        return true;
-      } else if (v === key) {
+    let prev = false;
+    for (const v of arr) {
+      if (prev) return v;
+      if (v === key) {
         prev = true;
       }
-    });
+    }
   }
-  return res == null ? def : res;
+  return def;
 }
 
 export function fixOpt(arr, key, newval, opts = {}) {
   const getval = (v) => typeof newval === "function" ? newval(v) : newval;
   let found = false;
-  let prev = false;
   if (opts.last) {
     for (let i = arr.length; i >= 0; i--) {
       if (arr[i] === key) {
@@ -193,6 +190,7 @@ export function fixOpt(arr, key, newval, opts = {}) {
       }
     }
   } else {
+    let prev = false;
     arr.forEach((v, i) => {
       if (prev) {
         arr[i] = getval(v);
@@ -203,10 +201,8 @@ export function fixOpt(arr, key, newval, opts = {}) {
       }
     });
   }
-  if (!found) {
-    if (opts.add) {
-      arr.push(key, getval(null));
-    }
+  if (!found && opts.add) {
+    arr.push(key, getval(null));
   }
 }
 
