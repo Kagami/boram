@@ -83,7 +83,7 @@
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-react": "^6.24.1",
     "css-loader": "^1.0.0",
-    "electron": "^1.8.7",
+    "electron": "^1.8.8",
     "electron-localshortcut": "^3.1.0",
     "electron-packager": "^12.1.0",
     "eslint": "^5.2.0",
