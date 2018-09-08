@@ -1,4 +1,7 @@
 {
+  "variables": {
+    "prev_ffmpeg%": "0",
+  },
   "targets": [
     {
       "target_name": "boram",
@@ -50,17 +53,23 @@
           "ldflags": ["-static-libstdc++"],
         },
         {
-          "target_name": "ffmpeg57",
-          "libraries": ["-l:libavformat.so.57"],
-          "ldflags": ["-static-libstdc++"],
-        },
-        {
           "target_name": "checklib",
           "type": "executable",
           "sources": ["src/index/checklib.c"],
           "libraries": ["-ldl"],
           "ldflags": ["-static-libstdc++"],
         },
+      ],
+      "conditions": [
+        ["prev_ffmpeg==1", {
+          "targets": [
+            {
+              "target_name": "ffmpeg57",
+              "libraries": ["-l:libavformat.so.57"],
+              "ldflags": ["-static-libstdc++"],
+            },
+          ],
+        }],
       ],
     }],
   ],
