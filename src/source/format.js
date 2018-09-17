@@ -37,7 +37,7 @@ export default class extends React.PureComponent {
     // Higher resolution/FPS is always better.
     if (a.height !== b.height) return b.height - a.height;
     if (a.width !== b.width) return b.width - a.width;
-    if (a.fps !== b.fps) return b.fps - a.fps;
+    if (a.fps !== b.fps) return (b.fps || 0) - (a.fps || 0);
     // Prefer HDR.
     if (a.vcodec === "vp9.2") return -1;
     if (b.vcodec === "vp9.2") return 1;
@@ -52,8 +52,8 @@ export default class extends React.PureComponent {
         }
       }
     }
-    // Else prefer by bitrate.
-    if (a.tbr !== b.tbr) return b.tbr - a.tbr;
+    // Else prefer by size.
+    if (a.filesize !== b.filesize) return b.filesize - a.filesize;
     return 0;
   }
   getVCodecName({vcodec}) {
