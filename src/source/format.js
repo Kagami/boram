@@ -56,10 +56,8 @@ export default class extends React.PureComponent {
     if (a.tbr !== b.tbr) return b.tbr - a.tbr;
     return 0;
   }
-  getVCodecName({vcodec, ext}) {
-    return vcodec === "vp9.2"
-      ? "vp9 hdr"
-      : (vcodec || ext).replace(/\..+$/, "");
+  getVCodecName({vcodec}) {
+    return vcodec === "vp9.2" ? "vp9 hdr" : vcodec.replace(/\..+$/, "");
   }
   getACodecName({acodec}) {
     return (acodec && acodec !== "none")
@@ -76,7 +74,7 @@ export default class extends React.PureComponent {
   }
   getVideoFormats() {
     const formats = this.props.info.formats
-      .filter(f => !f.acodec || f.vcodec !== "none")
+      .filter(f => f.vcodec && f.vcodec !== "none")
       .sort(this.compareVideoFormats)
       .map(f => ({
         key: f.format_id,
@@ -100,7 +98,7 @@ export default class extends React.PureComponent {
   }
   getAudioFormats() {
     return this.props.info.formats
-      .filter(f => f.vcodec === "none")
+      .filter(f => f.acodec && f.vcodec === "none")
       .sort(this.compareAudioFormats)
       .map(f => ({
         key: f.format_id,
