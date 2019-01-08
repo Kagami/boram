@@ -166,9 +166,11 @@ export default makeRunner("ffmpeg", {
       args.push("-c:v", "libaom-av1");
       args.push("-cpu-used", opts.modeMT === "no-mt" ? "0" : "4");
       if (opts.modeMT !== "no-mt") {
-        const log2tiles = Math.ceil(Math.log2(threads) / 2);
-        args.push("-tile-columns", log2tiles);
-        args.push("-tile-rows", log2tiles);
+        const maxCols = Math.floor(Math.log2((opts._finalw + 63) / 64));
+        const maxRows = Math.floor(Math.log2((opts._finalh + 63) / 64));
+        const tiles = Math.ceil(Math.log2(threads) / 2);
+        args.push("-tile-columns", Math.min(tiles, maxCols));
+        args.push("-tile-rows", Math.min(tiles, maxRows));
       }
       if (opts.modeMT === "row-mt") {
         args.push("-row-mt", "1");
