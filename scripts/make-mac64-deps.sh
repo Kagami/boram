@@ -5,10 +5,12 @@ cd "$( dirname "${BASH_SOURCE[0]}" )"
 rm -rf dist
 mkdir dist
 
-brew install libass --without-harfbuzz
-brew install libvpx --with-highbitdepth
-brew install ffmpeg --without-lame --without-xvid --with-libvpx --with-libvorbis --with-opus --with-libass
-brew install mpv --without-jpeg --without-little-cms2 --without-mujs --without-youtube-dl
+brew install libass -s  # Without harfbuzz
+brew install libvpx --HEAD  # highbitdepth
+brew install aom --HEAD  # lowbitdepth
+brew install dav1d --HEAD
+brew install ffmpeg --HEAD --with-libass --with-aom --with-dav1d  # Without lame, sdl2, snappy, theora, x265, xvid, xz
+brew install mpv -s  # Without jpeg, little-cms2, lua, mujs, youtube-dl
 
 DEPS="
 /usr/local/bin/ffmpeg
