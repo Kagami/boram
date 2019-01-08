@@ -4,7 +4,7 @@
   "private": true,
   "description": "Cross-platform WebM converter",
   "scripts": {
-    "postinstall": "patch -N -r- -p1 <mui-tabs.patch; patch -N -r- -p1 <epackager-path.patch; cp build/Release/ffmpeg58.node node_modules/electron/dist/libffmpeg.so; true",
+    "postinstall": "patch -N -r- -p1 <epackager-path.patch; cp build/Release/ffmpeg58.node node_modules/electron/dist/libffmpeg.so; true",
     "start": "webpack --watch",
     "dev": "electron dist/app",
     "test": "eslint .",
@@ -64,7 +64,7 @@
     "jss-extend": "^6.2.0",
     "jss-global": "^3.0.0",
     "jss-nested": "^6.0.1",
-    "material-ui": "^0.20.1",
+    "material-ui-boram": "^0.20.3-boram.0",
     "react": "^16.4.2",
     "react-dom": "^16.4.2",
     "react-fa": "^5.0.0",
