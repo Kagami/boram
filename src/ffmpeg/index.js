@@ -164,13 +164,16 @@ export default makeRunner("ffmpeg", {
     args.push("-threads", threads);
     if (opts.vcodec === "av1") {
       args.push("-c:v", "libaom-av1");
-      args.push("-cpu-used", "4");
+      args.push("-cpu-used", opts.modeMT === "no-mt" ? "0" : "4");
+      if (opts.modeMT !== "no-mt") {
+        const log2tiles = Math.ceil(Math.log2(threads) / 2);
+        args.push("-tile-columns", log2tiles);
+        args.push("-tile-rows", log2tiles);
+      }
+      if (opts.modeMT === "row-mt") {
+        args.push("-row-mt", "1");
+      }
       args.push("-strict", "experimental");
-      // In AV1 tile-columns seems to be not constrained by video width.
-      // Or at least not that much compared to VP9. So make sure we
-      // saturated all available threads.
-      const tileCols = Math.ceil(Math.log2(threads));
-      args.push("-tile-columns", tileCols);
     } else if (opts.vcodec === "vp9") {
       args.push("-c:v", "libvpx-vp9");
       args.push("-speed", opts.modeMT === "no-mt" ? "0" : "1");

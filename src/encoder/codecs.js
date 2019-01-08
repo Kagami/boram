@@ -179,7 +179,8 @@ export default class extends React.PureComponent {
               onCheck={this.props.makeChecker("modeCRF")}
             />
             <Sep margin={7} />
-            <ShowHide show={this.props.vcodec === "vp9"}>
+            <ShowHide show={this.props.vcodec === "vp9" ||
+                            this.props.vcodec === "av1"}>
               <SmallSelect
                 width={85}
                 title="Multi-threading mode"
