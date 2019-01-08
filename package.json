@@ -1,6 +1,6 @@
 {
   "name": "boram",
-  "version": "0.5.4-dev",
+  "version": "0.5.4",
   "private": true,
   "description": "Cross-platform WebM converter",
   "scripts": {
