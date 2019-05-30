@@ -86,7 +86,7 @@
     "electron": "^1.8.8",
     "electron-localshortcut": "^3.1.0",
     "electron-packager-boram": "^12.1.1-boram.0",
-    "eslint": "^5.2.0",
+    "eslint": "^5.16.0",
     "eslint-plugin-react": "^7.10.0",
     "file-loader": "^1.1.11",
     "mini-css-extract-plugin": "^0.4.1",
