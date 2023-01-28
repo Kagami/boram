@@ -117,7 +117,7 @@ export default class extends React.PureComponent {
   }
   getSubFormats() {
     // ytdl automatically selects format across available subtitles
-    // (e.g. it selects vtt across ttml and vtt on youtube). We hope
+    // (e.g. it selects vtt across ttml and vtt on yt-dlp). We hope
     // selected format is always appropriate because we can't
     // distinguish multiple formats with same ID.
     const requestedFormats = this.props.info.requested_subtitles || {};

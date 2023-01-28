@@ -1,25 +1,25 @@
 /**
- * youtube-dl wrapper. Provides platform-independent Promise API.
- * @module boram/youtube-dl
+ * yt-dlp wrapper. Provides platform-independent Promise API.
+ * @module boram/yt-dlp
  */
 
 import assert from "assert";
 import path from "path";
 import {APP_PATH} from "../shared";
 import {makeRunner, getRunPath} from "../util";
-require("../../bin/youtube-dl." + (BORAM_WIN_BUILD ? "exe" : "zip"));
+require("../../bin/yt-dlp." + (BORAM_WIN_BUILD ? "exe" : "zip"));
 
-export default makeRunner("youtube-dl", {
+export default makeRunner("yt-dlp", {
   _fixPathArgs(runpath, args) {
     // Special case for ytdl on Mac: we run it with python.
     if (BORAM_MAC_BUILD || !runpath) {
-      // We always pack youtube-dl binary on Windows.
+      // We always pack yt-dlp binary on Windows.
       assert(!BORAM_WIN_BUILD);
       // Can be run as executable but this way we get better error
       // message if Python is not installed.
       const altexe = "python";
       runpath = getRunPath(altexe, {system: true});
-      const zippath = path.join(APP_PATH, "youtube-dl.zip");
+      const zippath = path.join(APP_PATH, "yt-dlp.zip");
       return [runpath, [zippath].concat(args), altexe];
     } else {
       return [runpath, args];

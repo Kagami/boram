@@ -1,5 +1,5 @@
 /**
- * Download source video with youtube-dl.
+ * Download source video with yt-dlp.
  * @module boram/source/download
  */
 
@@ -8,7 +8,7 @@ import {remote} from "electron";
 import tmp from "tmp";
 import React from "react";
 import cx from "classnames";
-import YouTubeDL from "../youtube-dl";
+import YouTubeDL from "../yt-dlp";
 import {useSheet} from "../jss";
 import {BigProgress, BigButton, Sep} from "../theme";
 import {showErr} from "../util";
@@ -48,7 +48,7 @@ export default class extends React.PureComponent {
     this.props.events.removeListener("abort", this.abort);
   }
   handleDownload = () => {
-    this.setState({progress: 0, status: "spawning youtube-dl", error: null});
+    this.setState({progress: 0, status: "spawning yt-dlp", error: null});
     this.props.onProgress(0);
     const {info, format} = this.props;
     const url = info.webpage_url;
