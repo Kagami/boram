@@ -7,12 +7,12 @@ import {shell, remote} from "electron";
 import React from "react";
 import cx from "classnames";
 import {useSheet} from "../jss";
-import YouTubeDL from "../youtube-dl";
+import YouTubeDL from "../yt-dlp";
 import {Icon, Tip} from "../theme";
 import {showErr} from "../util";
 
 const YTDL_SUPPORTED_URL =
-  "https://rg3.github.io/youtube-dl/supportedsites.html";
+  "https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md";
 const COMMON_VIDEO_EXTENSIONS = [
   "mkv", "webm",
   "ogg", "ogv", "ogm",
@@ -195,7 +195,7 @@ export default class extends React.PureComponent {
           <span>Any site </span>
           <a href="" onClick={this.handleSupportedClick}
              title="Open list in browser">
-            supported by youtube-dl
+            supported by yt-dlp
           </a>
           <span> is accepted</span>
         </Tip>

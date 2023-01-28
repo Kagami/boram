@@ -8,7 +8,7 @@
 * Open-source, cross-platform, works on Windows, Mac and Linux
 * AV1/VP9/VP8/Opus/Vorbis/2pass/limit/CRF/CQ/raw-args modes support
 * Industry-grade codec settings, considered defaults
-* Can download source from almost any streaming site, thanks to [youtube-dl](https://rg3.github.io/youtube-dl/)
+* Can download source from almost any streaming site, thanks to [yt-dlp](https://github.com/yt-dlp/yt-dlp)
 * Displays almost any video with embedded player, thanks to [mpv](https://mpv.io/)
 * Hardsubbing out of the box with proper shift/track selection
 * Simple yet powerful interface, source video centric design
@@ -35,7 +35,7 @@ boram's own code is licensed under [CC0](licenses/LICENSE.BORAM) but releases al
 
 * Libraries from dependencies section of [package.json](package.json)
 * [Chromium](licenses/LICENSE.CHROMIUM) and [Electron](licenses/LICENSE.ELECTRON) components
-* [youtube-dl binaries](licenses/LICENSE.PYTHON)
+* [yt-dlp binaries](licenses/LICENSE.PYTHON)
 * [FFmpeg binaries](licenses/LICENSE.FFMPEG)
 * [mpv binaries](licenses/LICENSE.MPV)
 * [Font Awesome font](licenses/LICENSE.FONTAWESOME)

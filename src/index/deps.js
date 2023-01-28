@@ -35,8 +35,8 @@ export function checkLinuxDeps() {
   if (!hasBinary("ffprobe")) {
     throw new Error("ffprobe not found");
   }
-  if (!hasBinary("youtube-dl") && !hasBinary("python")) {
-    throw new Error("youtube-dl/python not found");
+  if (!hasBinary("yt-dlp") && !hasBinary("python")) {
+    throw new Error("yt-dlp/python not found");
   }
   if (!hasLibrary("libmpv.so.1") && !hasLibrary("libmpv.so")) {
     throw new Error("libmpv not found");
